@@ -16,7 +16,9 @@ namespace FoundationFortune.Events
 {
     public enum HintAlign
     {
-        Center, Right, Left
+        Center, 
+        Right, 
+        Left
     }
 
     public partial class ServerEvents
