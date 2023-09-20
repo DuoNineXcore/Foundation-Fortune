@@ -1,9 +1,6 @@
 ﻿using CommandSystem;
 using System;
 using System.Text;
-using FoundationFortune.Events;
-using PluginAPI.Core;
-using RemoteAdmin;
 
 namespace FoundationFortune.Commands.Buy
 {
@@ -24,7 +21,7 @@ namespace FoundationFortune.Commands.Buy
           protected override bool ExecuteParent(ArraySegment<string> arguments, ICommandSender sender, out string response)
           {
                StringBuilder builder = new();
-               builder.AppendLine("<Input a valid subcommand:");
+               builder.AppendLine("Input a valid subcommand:");
                builder.AppendLine("Item");
                builder.AppendLine("Perk");
                builder.AppendLine("List");
