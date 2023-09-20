@@ -8,11 +8,11 @@ using System.Security;
 using System.Security.Permissions;
 
 [assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyTitle("SizeCommand")]
+[assembly: AssemblyTitle("FoundationFortune")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("SizeCommand")]
+[assembly: AssemblyProduct("FoundationFortune")]
 [assembly: AssemblyCopyright("Copyright ©  2023")]
 [assembly: AssemblyTrademark("")]
 [assembly: ComVisible(false)]
