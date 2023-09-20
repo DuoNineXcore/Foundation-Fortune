@@ -7,12 +7,7 @@ using InventorySystem.Items.Firearms.Attachments;
 using FoundationFortune.API.Database;
 using Exiled.API.Features.Items;
 using FoundationFortune.API.NPCs;
-using PlayerRoles;
 using Exiled.API.Enums;
-using Exiled.API.Extensions;
-using Exiled.API.Features.Spawn;
-using Exiled.API.Interfaces;
-using System;
 using Random = UnityEngine.Random;
 using Exiled.API.Features.Doors;
 
@@ -91,8 +86,9 @@ namespace FoundationFortune.Events
         {
             HintAlign? hintAlignment = PlayerDataRepository.GetUserHintAlign(ply.UserId);
 
-            if (IsPlayerOnBuyingBotRadius(ply))
+            if (IsPlayerOnBuyingBotRadius(ply, out Npc npc))
             {
+                BuyingBot.LookAt(npc, ply.Position);
                 if (!confirmSell.ContainsKey(ply.UserId))
                 {
                     hintMessage += $"<align={hintAlignment}>{FoundationFortune.Singleton.Config.BuyingBotHint}</align>";
@@ -288,13 +284,33 @@ namespace FoundationFortune.Events
 
                 if (distance <= buyingBotRadius)
                 {
+                    BuyingBot.LookAt(kvp.Key, player.Position);
                     return true;
                 }
             }
-
             return false;
         }
 
+        public bool IsPlayerOnBuyingBotRadius(Player player, out Npc? npc)
+        {
+            float buyingBotRadius = FoundationFortune.Singleton.Config.BuyingBotRadius;
+
+            foreach (var kvp in buyingBotPositions)
+            {
+                var botPosition = kvp.Value;
+
+                float distance = Vector3.Distance(player.Position, botPosition);
+
+                if (distance <= buyingBotRadius)
+                {
+                    BuyingBot.LookAt(kvp.Key, player.Position);
+                    npc = kvp.Key;
+                    return true;
+                }
+            }
+            npc = null;
+            return false;
+        }
 
         private class HintEntry
         {
