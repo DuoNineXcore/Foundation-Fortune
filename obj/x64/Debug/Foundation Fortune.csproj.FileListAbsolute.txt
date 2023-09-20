@@ -1,0 +1,26 @@
+C:\Users\duoni\Desktop\Foundation Fortune NW\obj\x64\Debug\Foundation Fortune.csproj.AssemblyReference.cache
+C:\Users\duoni\Desktop\Foundation Fortune NW\obj\x64\Debug\Foundation Fortune.csproj.CoreCompileInputs.cache
+C:\Users\duoni\Desktop\Foundation Fortune NW\bin\Debug\Foundation Fortune.dll
+C:\Users\duoni\Desktop\Foundation Fortune NW\bin\Debug\Foundation Fortune.pdb
+C:\Users\duoni\Desktop\Foundation Fortune NW\bin\Debug\LiteDB.dll
+C:\Users\duoni\Desktop\Foundation Fortune NW\bin\Debug\NorthwoodLib.dll
+C:\Users\duoni\Desktop\Foundation Fortune NW\bin\Debug\Pooling.dll
+C:\Users\duoni\Desktop\Foundation Fortune NW\bin\Debug\UnityEngine.CoreModule.dll
+C:\Users\duoni\Desktop\Foundation Fortune NW\bin\Debug\YamlDotNet.dll
+C:\Users\duoni\Desktop\Foundation Fortune NW\obj\x64\Debug\Foundation Fortune.csproj.CopyComplete
+C:\Users\duoni\Desktop\Foundation Fortune NW\obj\x64\Debug\Foundation Fortune.dll
+C:\Users\duoni\Desktop\Foundation Fortune NW\obj\x64\Debug\Foundation Fortune.pdb
+C:\Users\duoni\Desktop\Foundation Fortune NW\bin\Debug\PluginAPI.dll
+C:\Users\duoni\Desktop\Foundation Fortune NW\bin\Debug\Mirror.dll
+C:\Users\duoni\Desktop\Foundation Fortune NW\bin\Debug\SCPSLAudioApi.dll
+C:\Users\duoni\Desktop\Foundation Fortune NW\bin\Debug\Assembly-CSharp-Publicized.dll
+C:\Users\duoni\Desktop\Foundation Fortune NW\bin\Debug\CommandSystem.Core.dll
+C:\Users\duoni\Desktop\Foundation Fortune NW\bin\Debug\Exiled.API.dll
+C:\Users\duoni\Desktop\Foundation Fortune NW\bin\Debug\Exiled.CreditTags.dll
+C:\Users\duoni\Desktop\Foundation Fortune NW\bin\Debug\Exiled.CustomItems.dll
+C:\Users\duoni\Desktop\Foundation Fortune NW\bin\Debug\Exiled.CustomRoles.dll
+C:\Users\duoni\Desktop\Foundation Fortune NW\bin\Debug\Exiled.Events.dll
+C:\Users\duoni\Desktop\Foundation Fortune NW\bin\Debug\Exiled.Loader.dll
+C:\Users\duoni\Desktop\Foundation Fortune NW\bin\Debug\Exiled.Permissions.dll
+C:\Users\duoni\Desktop\Foundation Fortune NW\bin\Debug\Exiled.Updater.dll
+C:\Users\duoni\Desktop\Foundation Fortune NW\bin\Debug\0Harmony.dll
