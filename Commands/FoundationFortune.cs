@@ -1,4 +1,4 @@
-﻿using CommandSystem;
+﻿/*using CommandSystem;
 using Exiled.Permissions.Extensions;
 using System;
 using Exiled.API.Features;
@@ -186,7 +186,6 @@ namespace FoundationFortune.Commands
             response = $"Failed to add the BuyingBot.";
             return false;
         }
-
 
         private bool RemoveBuyingBot(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
@@ -547,4 +546,4 @@ namespace FoundationFortune.Commands
         }
         #endregion
     }
-}
+}*/

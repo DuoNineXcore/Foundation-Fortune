@@ -18,7 +18,9 @@ namespace FoundationFortune.Events
     {
         Center, 
         Right, 
-        Left
+        Left,
+        TopLeft,
+        TopRight
     }
 
     public partial class ServerEvents
@@ -70,7 +72,7 @@ namespace FoundationFortune.Events
 
         public void KillingReward(DiedEventArgs ev)
         {
-            if (ev.Attacker != null && ev.Attacker != ev.Player)
+            if (ev.Attacker != null && ev.Attacker != ev.Player && ev.Attacker.IsScp)
             {
                 var config = FoundationFortune.Singleton.Config;
                 var killHint = config.KillHint.Replace("[victim]", ev.Player.Nickname);

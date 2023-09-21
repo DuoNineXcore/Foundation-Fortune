@@ -45,13 +45,13 @@ namespace FoundationFortune
         public string BuyingBotHint { get; set; } = "<b><size=27>>>You're around a buying bot!<<</size></b>";
         public float BuyingBotRadius { get; set; } = 3f;
         public bool BuyingBotFixedLocation { get; set; } = true;
-        public List<NPCSpawn> BuyingBotSpawnSettings { get; set; } = new List<NPCSpawn>
+        public List<NPCSpawn>BuyingBotSpawnSettings { get; set; } = new List<NPCSpawn>
         {
-            new NPCSpawn { Name = "Buying Bot 1", Badge = "Foundation Fortune", BadgeColor = "green", Role = RoleTypeId.ClassD, HeldItem = ItemType.KeycardChaosInsurgency, Scale = new Vector3(1, 1, 1), Room = RoomType.HczNuke },
-            new NPCSpawn { Name = "Buying Bot 2", Badge = "Foundation Fortune", BadgeColor = "green", Role = RoleTypeId.ClassD, HeldItem = ItemType.KeycardChaosInsurgency, Scale = new Vector3(1, 1, 1), Room = RoomType.Hcz079 },
-            new NPCSpawn { Name = "Buying Bot 3", Badge = "Foundation Fortune", BadgeColor = "green", Role = RoleTypeId.ClassD, HeldItem = ItemType.KeycardChaosInsurgency, Scale = new Vector3(1, 1, 1), Room = RoomType.Hcz096 },
-            new NPCSpawn { Name = "Buying Bot 4", Badge = "Foundation Fortune", BadgeColor = "green", Role = RoleTypeId.ClassD, HeldItem = ItemType.KeycardChaosInsurgency, Scale = new Vector3(1, 1, 1), Room = RoomType.Hcz939 },
-            new NPCSpawn { Name = "Buying Bot 5", Badge = "Foundation Fortune", BadgeColor = "green", Role = RoleTypeId.ClassD, HeldItem = ItemType.KeycardChaosInsurgency, Scale = new Vector3(1, 1, 1), Room = RoomType.HczArmory }
+            new NPCSpawn { Name = "Buying Bot 1", Badge = "Foundation Fortune", BadgeColor = "pumpkin", IsBuyingBot = true, Role = RoleTypeId.ClassD, HeldItem = ItemType.KeycardChaosInsurgency, Scale = new Vector3(1, 1, 1), Room = RoomType.HczNuke },
+            new NPCSpawn { Name = "Buying Bot 2", Badge = "Foundation Fortune", BadgeColor = "pumpkin", IsBuyingBot = true, Role = RoleTypeId.ClassD, HeldItem = ItemType.KeycardChaosInsurgency, Scale = new Vector3(1, 1, 1), Room = RoomType.Hcz079 },
+            new NPCSpawn { Name = "Selling Bot 3", Badge = "Foundation Fortune", BadgeColor = "yellow", IsBuyingBot = false, Role = RoleTypeId.Scientist, HeldItem = ItemType.KeycardChaosInsurgency, Scale = new Vector3(1, 1, 1), Room = RoomType.Hcz096 },
+            new NPCSpawn { Name = "Selling Bot 4", Badge = "Foundation Fortune", BadgeColor = "yellow", IsBuyingBot = false, Role = RoleTypeId.Scientist, HeldItem = ItemType.KeycardChaosInsurgency, Scale = new Vector3(1, 1, 1), Room = RoomType.Hcz939 },
+            new NPCSpawn { Name = "Buying Bot 5", Badge = "Foundation Fortune", BadgeColor = "pumpkin", IsBuyingBot = true, Role = RoleTypeId.ClassD, HeldItem = ItemType.KeycardChaosInsurgency, Scale = new Vector3(1, 1, 1), Room = RoomType.HczArmory }
         };
 
         [Description("The time you have to sell an item after asking for confirmation.")]
@@ -61,6 +61,7 @@ namespace FoundationFortune
         public List<SellableItem> SellableItems { get; set; } = new List<SellableItem>
         {
             new SellableItem { ItemType = ItemType.MicroHID, Price = 1200, DisplayName = "Micro HID" },
+            new SellableItem { ItemType = ItemType.SCP207, Price = 5, DisplayName = "fuck you maro" },
             new SellableItem { ItemType = ItemType.SCP500, Price = 1000, DisplayName = "SCP-500" },
         };
 
@@ -68,13 +69,14 @@ namespace FoundationFortune
         public List<BuyableItem> BuyableItems { get; set; } = new List<BuyableItem>
         {
             new BuyableItem { ItemType = ItemType.MicroHID, Price = 500, DisplayName = "Micro HID" },
+            new BuyableItem { ItemType = ItemType.SCP207, Price = 5, DisplayName = "fuck you maro" },
             new BuyableItem { ItemType = ItemType.SCP500, Price = 1000, DisplayName = "SCP-500" },
         };
 
         [Description("List of perks that can be bought.")]
         public List<PerkItem> PerkItems { get; set; } = new List<PerkItem>
         {
-            new PerkItem { PerkType = PerkType.Revival, Price = 3000, DisplayName = "Revival", Description = "This is just warzone."},
+            new PerkItem { PerkType = PerkType.Revival, Price = 3000, DisplayName = "Revival", Description = "This is just warzone 2."},
             new PerkItem { PerkType = PerkType.ExtraHP, Price = 2200, DisplayName = "Extra HP", Description = "This is just, idk."},
             new PerkItem { PerkType = PerkType.AHPBoost, Price = 1100, DisplayName = "AHP Boost", Description = "This is just SCP Health scaling on lower values."},
             new PerkItem { PerkType = PerkType.Invisibility, Price = 1000, DisplayName = "Invisibility", Description = "This is just 268."},
@@ -113,6 +115,7 @@ namespace FoundationFortune
         public string Name { get; set; }
         public string Badge { get; set; }
         public string BadgeColor { get; set; }
+        public bool IsBuyingBot { get; set; }
         public RoleTypeId Role { get; set; }
         public ItemType HeldItem { get; set; }
         public Vector3 Scale { get; set; }

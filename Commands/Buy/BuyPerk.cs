@@ -2,19 +2,23 @@
 using CustomPlayerEffects;
 using Exiled.API.Features;
 using FoundationFortune.API.Database;
+using FoundationFortune.API.Perks;
 using InventorySystem;
 using System;
 using System.Linq;
 
 namespace FoundationFortune.Commands.Buy
 {
-     internal class BuyPerk : ICommand
+    [CommandHandler(typeof(ClientCommandHandler))]
+    [CommandHandler(typeof(RemoteAdminCommandHandler))]
+    internal class BuyPerk : ICommand
      {
-          public string Command { get; } = "Perk";
-          public string Description { get; } = "Buy a perk!";
-          public string[] Aliases { get; } = new string[] { "p" };
+        public string Command { get; } = "Perk";
+        public string Description { get; } = "Buy a perk!";
+        public string[] Aliases { get; } = new string[] { "p" };
+        private Perks perks = new();
 
-          public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
+        public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
           {
                Player player = Player.Get(sender);
 
@@ -43,49 +47,14 @@ namespace FoundationFortune.Commands.Buy
                          return false;
                     }
                     PlayerDataRepository.SubtractMoneySaved(player.UserId, perk.Price);
-                    GrantPerk(player, perkType);
-                    response = $"You have successfully bought a {perk.DisplayName} for ${perk.Price}";
+                    perks.GrantPerk(player, perkType);
+                    response = $"You have successfully bought {perk.DisplayName} for ${perk.Price}";
                     return true;
                }
                else
                {
                     response = "You must be at a buying station to buy a perk!";
                     return false;
-               }
-          }
-
-
-          private void GrantPerk(Player player, PerkType perk)
-          {
-               switch(perk)
-               {
-                    case PerkType.Revival:
-                         break;
-
-                    case PerkType.ExtraHP:
-                         player.MaxHealth += 50;
-                         break;
-
-                    case PerkType.AHPBoost:
-                         player.AddAhp(50, decay: 0);
-                         break;
-
-                    case PerkType.Invisibility:
-                         player.EnableEffect<Invisible>(0);
-                         break;
-
-                    case PerkType.Regeneration:
-                         player.EnableEffect<Vitality>(30);
-                         break;
-
-                    case PerkType.MovementBoost:
-                         player.EnableEffect<MovementBoost>(150);
-                         player.ChangeEffectIntensity<MovementBoost>(30);
-                         break;
-
-                    default: 
-                         Log.Warn($"{perk} has not been implemented!");
-                         break;
                }
           }
      }
