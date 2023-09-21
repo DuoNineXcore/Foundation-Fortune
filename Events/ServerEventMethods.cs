@@ -314,16 +314,22 @@ namespace FoundationFortune.Events
 
         public bool IsPlayerNearSellingBot(Player player)
         {
-            foreach (var spawnSettings in FoundationFortune.Singleton.Config.BuyingBotSpawnSettings)
-            {
-                bool isNearBot = IsPlayerOnBuyingBotRadius(player);
+            bool isNearBot = IsPlayerOnBuyingBotRadius(player, out Npc npc);
+            if(!isNearBot || npc == null) return false;
 
-                if (isNearBot && spawnSettings.IsSellingBot)
-                {
-                    return true;
-                }
-            }
+            bool isSellingBot = FoundationFortune.Singleton.Config.BuyingBotSpawnSettings.Any(c => c.Name == npc.Nickname && c.IsSellingBot);
+            if(isSellingBot) return true;
+
             return false;
+
+            //foreach (var spawnSettings in FoundationFortune.Singleton.Config.BuyingBotSpawnSettings)
+            //{
+            //    if (isNearBot && spawnSettings.IsSellingBot)
+            //    {
+            //        return true;
+            //    }
+            //}
+            //return false;
         }
 
 
