@@ -12,8 +12,6 @@ using UnityEngine;
 
 namespace FoundationFortune.Commands.FortuneCommands
 {
-    [CommandHandler(typeof(ClientCommandHandler))]
-    [CommandHandler(typeof(RemoteAdminCommandHandler))]
     internal class NpcCommand : ICommand
     {
         public string Command { get; } = "npc";

@@ -1,6 +1,5 @@
 ﻿using CommandSystem;
 using System;
-using System.Text;
 
 namespace FoundationFortune.Commands.FortuneCommands
 {
@@ -17,6 +16,7 @@ namespace FoundationFortune.Commands.FortuneCommands
                RegisterCommand(new HintCommand());
                RegisterCommand(new NpcCommand());
           }
+          public ParentFortuneCommand() => LoadGeneratedCommands();
 
           protected override bool ExecuteParent(ArraySegment<string> arguments, ICommandSender sender, out string response)
           {

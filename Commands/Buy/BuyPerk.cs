@@ -1,16 +1,12 @@
 ﻿using CommandSystem;
-using CustomPlayerEffects;
 using Exiled.API.Features;
 using FoundationFortune.API.Database;
 using FoundationFortune.API.Perks;
-using InventorySystem;
 using System;
 using System.Linq;
 
 namespace FoundationFortune.Commands.Buy
 {
-    [CommandHandler(typeof(ClientCommandHandler))]
-    [CommandHandler(typeof(RemoteAdminCommandHandler))]
     internal class BuyPerk : ICommand
      {
         public string Command { get; } = "Perk";

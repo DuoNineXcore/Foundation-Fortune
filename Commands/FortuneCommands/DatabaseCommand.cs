@@ -8,8 +8,6 @@ using System.Linq;
 
 namespace FoundationFortune.Commands.FortuneCommands
 {
-    [CommandHandler(typeof(ClientCommandHandler))]
-    [CommandHandler(typeof(RemoteAdminCommandHandler))]
     internal class DatabaseCommand : ICommand
     {
         public string Command { get; } = "database";

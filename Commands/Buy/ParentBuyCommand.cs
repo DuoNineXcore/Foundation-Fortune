@@ -6,10 +6,10 @@ namespace FoundationFortune.Commands.Buy
 {
      [CommandHandler(typeof(ClientCommandHandler))]
      [CommandHandler(typeof(RemoteAdminCommandHandler))]
-     public class ParentBuyCommand : ParentCommand
+     public sealed class ParentBuyCommand : ParentCommand
      {
-          public override string Command { get; } = "Buy";
-          public override string[] Aliases { get; } = new string[] { "B" };
+          public override string Command { get; } = "buy";
+          public override string[] Aliases { get; } =  new string[] { "b" };
           public override string Description { get; } = "You buy stuff.. What else did you expect?";
           public override void LoadGeneratedCommands()
           {
@@ -17,6 +17,7 @@ namespace FoundationFortune.Commands.Buy
                RegisterCommand(new BuyListCommand());
                RegisterCommand(new BuyPerk());
           }
+          public ParentBuyCommand() => LoadGeneratedCommands();
 
           protected override bool ExecuteParent(ArraySegment<string> arguments, ICommandSender sender, out string response)
           {

@@ -7,8 +7,6 @@ using Exiled.API.Features;
 
 namespace FoundationFortune.Commands.FortuneCommands
 {
-    [CommandHandler(typeof(ClientCommandHandler))]
-    [CommandHandler(typeof(RemoteAdminCommandHandler))]
     internal class HintCommand : ICommand
     {
         public string Command { get; } = "hint";
