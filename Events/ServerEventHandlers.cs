@@ -95,47 +95,51 @@ namespace FoundationFortune.Events
                 return;
             }
 
-            if (!confirmSell.ContainsKey(ev.Player.UserId))
+            if (IsPlayerNearSellingBot(ev.Player))
             {
-                foreach (var sellableItem in FoundationFortune.Singleton.Config.SellableItems)
+                if (!confirmSell.ContainsKey(ev.Player.UserId))
                 {
-                    if (ev.Item.Type == sellableItem.ItemType)
+                    foreach (var sellableItem in FoundationFortune.Singleton.Config.SellableItems)
                     {
-                        itemsBeingSold[ev.Player.UserId] = (ev.Item, sellableItem.Price);
+                        if (ev.Item.Type == sellableItem.ItemType)
+                        {
+                            itemsBeingSold[ev.Player.UserId] = (ev.Item, sellableItem.Price);
 
-                        confirmSell[ev.Player.UserId] = true;
-                        dropTimestamp[ev.Player.UserId] = Time.time;
-                        ev.IsAllowed = false;
-                        return;
+                            confirmSell[ev.Player.UserId] = true;
+                            dropTimestamp[ev.Player.UserId] = Time.time;
+                            ev.IsAllowed = false;
+                            return;
+                        }
+                    }
+                }
+
+                if (confirmSell.TryGetValue(ev.Player.UserId, out bool isConfirming) && dropTimestamp.TryGetValue(ev.Player.UserId, out float dropTime))
+                {
+                    if (isConfirming && Time.time - dropTime <= FoundationFortune.Singleton.Config.SellingConfirmationTime)
+                    {
+                        if (itemsBeingSold.TryGetValue(ev.Player.UserId, out var soldItemData))
+                        {
+                            Item soldItem = soldItemData.item;
+                            int price = soldItemData.price;
+
+                            if (soldItem == ev.Item)
+                            {
+                                EnqueueHint(ev.Player, $"<b><size=24><color=green>+{price}$</color> Sold {FoundationFortune.Singleton.Config.SellableItems.Find(x => x.ItemType == ev.Item.Type).DisplayName}.</color></b></size>", price, 3, false, false);
+                                ev.Player.RemoveItem(ev.Item);
+                            }
+                            else
+                            {
+                                EnqueueHint(ev.Player, "<b><size=24><color=red>Item changed. Sale canceled.</color></b></size>", 0, 3, false, false);
+                            }
+
+                            itemsBeingSold.Remove(ev.Player.UserId);
+                            ev.IsAllowed = true;
+                            return;
+                        }
                     }
                 }
             }
 
-            if (confirmSell.TryGetValue(ev.Player.UserId, out bool isConfirming) && dropTimestamp.TryGetValue(ev.Player.UserId, out float dropTime))
-            {
-                if (isConfirming && Time.time - dropTime <= FoundationFortune.Singleton.Config.SellingConfirmationTime)
-                {
-                    if (itemsBeingSold.TryGetValue(ev.Player.UserId, out var soldItemData))
-                    {
-                        Item soldItem = soldItemData.item;
-                        int price = soldItemData.price;
-
-                        if (soldItem == ev.Item)
-                        {
-                            EnqueueHint(ev.Player, $"<b><size=24><color=green>+{price}$</color> Sold {FoundationFortune.Singleton.Config.SellableItems.Find(x => x.ItemType == ev.Item.Type).DisplayName}.</color></b></size>", price, 3, false, false);
-                            ev.Player.RemoveItem(ev.Item);
-                        }
-                        else
-                        {
-                            EnqueueHint(ev.Player, "<b><size=24><color=red>Item changed. Sale canceled.</color></b></size>", 0, 3, false, false);
-                        }
-
-                        itemsBeingSold.Remove(ev.Player.UserId);
-                        ev.IsAllowed = true;
-                        return;
-                    }
-                }
-            }
             ev.IsAllowed = true;
         }
 

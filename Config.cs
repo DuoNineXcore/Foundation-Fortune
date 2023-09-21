@@ -47,11 +47,11 @@ namespace FoundationFortune
         public bool BuyingBotFixedLocation { get; set; } = true;
         public List<NPCSpawn>BuyingBotSpawnSettings { get; set; } = new List<NPCSpawn>
         {
-            new NPCSpawn { Name = "Buying Bot 1", Badge = "Foundation Fortune", BadgeColor = "pumpkin", IsBuyingBot = true, Role = RoleTypeId.ClassD, HeldItem = ItemType.KeycardChaosInsurgency, Scale = new Vector3(1, 1, 1), Room = RoomType.HczNuke },
-            new NPCSpawn { Name = "Buying Bot 2", Badge = "Foundation Fortune", BadgeColor = "pumpkin", IsBuyingBot = true, Role = RoleTypeId.ClassD, HeldItem = ItemType.KeycardChaosInsurgency, Scale = new Vector3(1, 1, 1), Room = RoomType.Hcz079 },
-            new NPCSpawn { Name = "Selling Bot 3", Badge = "Foundation Fortune", BadgeColor = "yellow", IsBuyingBot = false, Role = RoleTypeId.Scientist, HeldItem = ItemType.KeycardChaosInsurgency, Scale = new Vector3(1, 1, 1), Room = RoomType.Hcz096 },
-            new NPCSpawn { Name = "Selling Bot 4", Badge = "Foundation Fortune", BadgeColor = "yellow", IsBuyingBot = false, Role = RoleTypeId.Scientist, HeldItem = ItemType.KeycardChaosInsurgency, Scale = new Vector3(1, 1, 1), Room = RoomType.Hcz939 },
-            new NPCSpawn { Name = "Buying Bot 5", Badge = "Foundation Fortune", BadgeColor = "pumpkin", IsBuyingBot = true, Role = RoleTypeId.ClassD, HeldItem = ItemType.KeycardChaosInsurgency, Scale = new Vector3(1, 1, 1), Room = RoomType.HczArmory }
+            new NPCSpawn { Name = "Buying Bot 1", Badge = "Foundation Fortune", BadgeColor = "pumpkin", IsSellingBot = false, Role = RoleTypeId.ClassD, HeldItem = ItemType.KeycardChaosInsurgency, Scale = new Vector3(1, 1, 1), Room = RoomType.HczNuke },
+            new NPCSpawn { Name = "Buying Bot 2", Badge = "Foundation Fortune", BadgeColor = "pumpkin", IsSellingBot = false, Role = RoleTypeId.ClassD, HeldItem = ItemType.KeycardChaosInsurgency, Scale = new Vector3(1, 1, 1), Room = RoomType.Hcz079 },
+            new NPCSpawn { Name = "Selling Bot 3", Badge = "Foundation Fortune", BadgeColor = "yellow", IsSellingBot = true, Role = RoleTypeId.Scientist, HeldItem = ItemType.KeycardChaosInsurgency, Scale = new Vector3(1, 1, 1), Room = RoomType.Hcz096 },
+            new NPCSpawn { Name = "Selling Bot 4", Badge = "Foundation Fortune", BadgeColor = "yellow", IsSellingBot = true, Role = RoleTypeId.Scientist, HeldItem = ItemType.KeycardChaosInsurgency, Scale = new Vector3(1, 1, 1), Room = RoomType.Hcz939 },
+            new NPCSpawn { Name = "Buying Bot 5", Badge = "Foundation Fortune", BadgeColor = "pumpkin", IsSellingBot = false, Role = RoleTypeId.ClassD, HeldItem = ItemType.KeycardChaosInsurgency, Scale = new Vector3(1, 1, 1), Room = RoomType.HczArmory }
         };
 
         [Description("The time you have to sell an item after asking for confirmation.")]
@@ -115,7 +115,7 @@ namespace FoundationFortune
         public string Name { get; set; }
         public string Badge { get; set; }
         public string BadgeColor { get; set; }
-        public bool IsBuyingBot { get; set; }
+        public bool IsSellingBot { get; set; }
         public RoleTypeId Role { get; set; }
         public ItemType HeldItem { get; set; }
         public Vector3 Scale { get; set; }

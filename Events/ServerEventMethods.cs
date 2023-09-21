@@ -312,6 +312,21 @@ namespace FoundationFortune.Events
             return false;
         }
 
+        public bool IsPlayerNearSellingBot(Player player)
+        {
+            foreach (var spawnSettings in FoundationFortune.Singleton.Config.BuyingBotSpawnSettings)
+            {
+                bool isNearBot = IsPlayerOnBuyingBotRadius(player);
+
+                if (isNearBot && spawnSettings.IsSellingBot)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+
         private class HintEntry
         {
             public string Text { get; }

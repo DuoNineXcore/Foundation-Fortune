@@ -92,12 +92,12 @@
             return nextAvailableIndex;
         }
 
-        public static bool IsBuyingBot(ReferenceHub refHub)
+        public static bool IsSellingBot(ReferenceHub refHub)
         {
             return FoundationFortune.Singleton.BuyingBotIndexation.Values.Any(botAndIndexation => botAndIndexation.bot == Player.Get(refHub));
         }
 
-        public static bool IsBuyingBot(ScpSubroutineBase targetTrack)
+        public static bool IsSellingBot(ScpSubroutineBase targetTrack)
         {
             return targetTrack.Role.TryGetOwner(out ReferenceHub refHub)
                     && FoundationFortune.Singleton.BuyingBotIndexation.Values.Any(botAndIndexation => botAndIndexation.bot == Player.Get(refHub));

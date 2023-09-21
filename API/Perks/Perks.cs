@@ -10,8 +10,6 @@ namespace FoundationFortune.API.Perks
 {
     public class Perks
     {
-        public Dictionary<Player, bool> BountiedPlayer = new();
-
         public void GrantPerk(Player ply, PerkType perk)
         {
             switch (perk)

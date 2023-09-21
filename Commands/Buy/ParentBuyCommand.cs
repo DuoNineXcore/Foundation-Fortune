@@ -17,16 +17,12 @@ namespace FoundationFortune.Commands.Buy
                RegisterCommand(new BuyListCommand());
                RegisterCommand(new BuyPerk());
           }
+
           public ParentBuyCommand() => LoadGeneratedCommands();
 
           protected override bool ExecuteParent(ArraySegment<string> arguments, ICommandSender sender, out string response)
           {
-               StringBuilder builder = new();
-               builder.AppendLine("Input a valid subcommand:");
-               builder.AppendLine("Item");
-               builder.AppendLine("Perk");
-               builder.AppendLine("List");
-               response = builder.ToString();
+               response = "Input a valid subcommand: Item, Perk, List";
                return false;
           }
      }

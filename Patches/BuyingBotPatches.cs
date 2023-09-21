@@ -44,10 +44,10 @@
             newInstructions.InsertRange(0, new List<CodeInstruction>()
             {
                 new CodeInstruction(OpCodes.Ldarg_1),
-                new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(BuyingBot), nameof(BuyingBot.IsBuyingBot), new[] { typeof(ReferenceHub) })),
+                new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(BuyingBot), nameof(BuyingBot.IsSellingBot), new[] { typeof(ReferenceHub) })),
                 new CodeInstruction(OpCodes.Brtrue_S, skip),
                 new CodeInstruction(OpCodes.Ldarg_0),
-                new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(BuyingBot), nameof(BuyingBot.IsBuyingBot), new[] { typeof(Scp096TargetsTracker) })),
+                new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(BuyingBot), nameof(BuyingBot.IsSellingBot), new[] { typeof(Scp096TargetsTracker) })),
                 new CodeInstruction(OpCodes.Brtrue_S, skip),
             });
 
@@ -75,10 +75,10 @@
             newInstructions.InsertRange(index, new List<CodeInstruction>()
             {
                 new CodeInstruction(OpCodes.Ldloc_3),
-                new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(BuyingBot), nameof(BuyingBot.IsBuyingBot), new[] { typeof(ReferenceHub) })),
+                new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(BuyingBot), nameof(BuyingBot.IsSellingBot), new[] { typeof(ReferenceHub) })),
                 new CodeInstruction(OpCodes.Brtrue_S, skip),
                 new CodeInstruction(OpCodes.Ldarg_0),
-                new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(BuyingBot), nameof(BuyingBot.IsBuyingBot), new[] { typeof(Scp173ObserversTracker) })),
+                new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(BuyingBot), nameof(BuyingBot.IsSellingBot), new[] { typeof(Scp173ObserversTracker) })),
                 new CodeInstruction(OpCodes.Brtrue_S, skip),
             });
 
@@ -105,7 +105,7 @@
             {
                 new CodeInstruction(OpCodes.Ldarg_1),
                 new CodeInstruction(OpCodes.Callvirt, AccessTools.PropertyGetter(typeof(CharacterModel), nameof(CharacterModel.OwnerHub))),
-                new CodeInstruction(OpCodes.Callvirt, AccessTools.Method(typeof(BuyingBot), nameof(BuyingBot.IsBuyingBot), new[] { typeof(ReferenceHub) })),
+                new CodeInstruction(OpCodes.Callvirt, AccessTools.Method(typeof(BuyingBot), nameof(BuyingBot.IsSellingBot), new[] { typeof(ReferenceHub) })),
                 new CodeInstruction(OpCodes.Brfalse_S, skip),
                 new CodeInstruction(OpCodes.Ret)
             });
@@ -132,7 +132,7 @@
             newInstructions.InsertRange(0, new List<CodeInstruction>()
             {
                 new CodeInstruction(OpCodes.Ldarg_1),
-                new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(BuyingBot), nameof(BuyingBot.IsBuyingBot), new[] { typeof(ReferenceHub) })),
+                new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(BuyingBot), nameof(BuyingBot.IsSellingBot), new[] { typeof(ReferenceHub) })),
                 new CodeInstruction(OpCodes.Brfalse_S, skip),
                 new CodeInstruction(OpCodes.Ldarg_1),
                 new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(Player), nameof(Player.Get), new[] { typeof(ReferenceHub) })),
