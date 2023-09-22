@@ -26,8 +26,8 @@ namespace FoundationFortune
         [Description("Escaping player event.")]
         public int EscapeReward { get; set; } = 300;
         public string EscapeHint { get; set; } = "<b><size=24><color=green>+$300</color> Escaped.</b></size>";
-        public bool EscapeRewardTransfer { get; set; } = false;
-        public bool EscapeRewardTransferAll { get; set; } = true;
+        public bool EscapeRewardTransfer { get; set; } = true;
+        public bool EscapeRewardTransferAll { get; set; } = false;
 
         [Description("Amount of Coins to drop. NOTE: the value of the coins will be divided by the amount of coins. so if there's 10 coins a coin will be worth a tenth of the player's on hold money account.")]
         public int CoinsToDrop { get; set; } = 10;

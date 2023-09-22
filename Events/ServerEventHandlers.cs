@@ -12,6 +12,7 @@ using FoundationFortune.API.NPCs;
 using Discord;
 using System.Linq;
 using Mono.Cecil.Cil;
+using Exiled.Events.EventArgs.Server;
 
 namespace FoundationFortune.Events
 {
@@ -26,15 +27,22 @@ namespace FoundationFortune.Events
 
     public partial class ServerEvents
     {
+        private CoroutineHandle moneyHintCoroutine;
+
         public void RoundStart()
         {
+            foreach (Player p in Player.List)
+            {
+                if (!moneyHintCoroutine.IsRunning) moneyHintCoroutine = Timing.RunCoroutine(UpdateMoneyAndHints(p));
+            }
+
             InitializeWorkstationPositions();
             InitializeBuyingBots();
+        }
 
-            foreach (var p in Player.List)
-            {
-                Timing.RunCoroutine(UpdateMoneyAndHints(p));
-            }
+        public void RoundEnd(RoundEndedEventArgs ev)
+        {
+            if (moneyHintCoroutine.IsRunning) Timing.KillCoroutines(moneyHintCoroutine);
         }
 
         public void RegisterInDatabase(VerifiedEventArgs ev)
@@ -53,6 +61,7 @@ namespace FoundationFortune.Events
                 };
                 PlayerDataRepository.InsertPlayer(newPlayer);
             }
+            if (Round.IsStarted) moneyHintCoroutine = Timing.RunCoroutine(UpdateMoneyAndHints(ev.Player));
         }
 
         public void SpawningNpc(SpawningEventArgs ev)

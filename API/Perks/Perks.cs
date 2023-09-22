@@ -37,12 +37,15 @@ namespace FoundationFortune.API.Perks
 
         public bool GrantRevivalPerk(Player reviver, string targetName)
         {
+            foreach (Player ply in Player.List) Log.Debug(ply.Nickname ?? "Null Nickname");
             Player targetToRevive = Player.Get(targetName);
+            Log.Debug(targetToRevive is null);
+            if (targetToRevive != null) Log.Debug(targetToRevive.Role.Type);
             Npc buyingbot = FoundationFortune.Singleton.serverEvents.GetBuyingBotNearPlayer(reviver);
 
             if (targetToRevive != null && targetToRevive.Role == RoleTypeId.Spectator)
             {
-                BuyingBot.PlayAudio(buyingbot, "BuySuccess", 50, false, VoiceChat.VoiceChatChannel.Intercom);
+                BuyingBot.PlayAudio(buyingbot, "BuySuccess.ogg", 50, false, VoiceChat.VoiceChatChannel.Intercom);
                 RevivePlayer(reviver, targetToRevive);
                 return true;
             }
@@ -61,7 +64,7 @@ namespace FoundationFortune.API.Perks
 
             foreach (var ply in Player.List)
             {
-                FoundationFortune.Singleton.serverEvents.EnqueueHint(ply, $"<color={reviver.Role.Color.ToHex()}>{reviver.Nickname}</color> Has Revived {targetToRevive.Nickname}", 0, 3, false, false);
+                FoundationFortune.Singleton.serverEvents.EnqueueHint(ply, $"<b><size=24><color={reviver.Role.Color.ToHex()}>{reviver.Nickname}</color> Has Revived {targetToRevive.Nickname}</b></size>", 0, 3, false, false);
             }
         }
     }
