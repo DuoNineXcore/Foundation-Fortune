@@ -65,6 +65,7 @@ namespace FoundationFortune
             Exiled.Events.Handlers.Scp049.ActivatingSense += serverEvents.FuckYourAbility;
             Exiled.Events.Handlers.Scp0492.TriggeringBloodlust += serverEvents.FuckYourOtherAbility;
             Exiled.Events.Handlers.Player.Spawning += serverEvents.SpawningNpc;
+            //CharacterClassManager.OnInstanceModeChanged += serverEvents.InstanceModeChange;
         }
 
         private void UnregisterEvents()
@@ -77,6 +78,7 @@ namespace FoundationFortune
             Exiled.Events.Handlers.Scp049.ActivatingSense -= serverEvents.FuckYourAbility;
             Exiled.Events.Handlers.Scp0492.TriggeringBloodlust -= serverEvents.FuckYourOtherAbility;
             Exiled.Events.Handlers.Player.Spawning -= serverEvents.SpawningNpc;
+            //CharacterClassManager.OnInstanceModeChanged -= serverEvents.InstanceModeChange;
             serverEvents = null;
         }
 

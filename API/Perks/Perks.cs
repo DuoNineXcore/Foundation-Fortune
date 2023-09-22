@@ -1,11 +1,8 @@
 ﻿using CustomPlayerEffects;
 using Exiled.API.Features;
 using FoundationFortune.API.NPCs;
+using InventorySystem.Items.Usables.Scp330;
 using PlayerRoles;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using static UnityEngine.GraphicsBuffer;
 
 namespace FoundationFortune.API.Perks
 {
@@ -26,21 +23,18 @@ namespace FoundationFortune.API.Perks
                     ply.EnableEffect<Invisible>(30);
                     break;
                 case PerkType.Regeneration:
-                    ply.EnableEffect<Vitality>(30);
+                    Scp330Bag.AddSimpleRegeneration(ply.ReferenceHub, 4f, 75f);
                     break;
                 case PerkType.MovementBoost:
-                    ply.EnableEffect<MovementBoost>(150);
-                    ply.ChangeEffectIntensity<MovementBoost>(30);
+                    ply.EnableEffect<MovementBoost>(0);
+                    ply.ChangeEffectIntensity<MovementBoost>(25);
                     break;
             }
         }
 
         public bool GrantRevivalPerk(Player reviver, string targetName)
         {
-            foreach (Player ply in Player.List) Log.Debug(ply.Nickname ?? "Null Nickname");
             Player targetToRevive = Player.Get(targetName);
-            Log.Debug(targetToRevive is null);
-            if (targetToRevive != null) Log.Debug(targetToRevive.Role.Type);
             Npc buyingbot = FoundationFortune.Singleton.serverEvents.GetBuyingBotNearPlayer(reviver);
 
             if (targetToRevive != null && targetToRevive.Role == RoleTypeId.Spectator)

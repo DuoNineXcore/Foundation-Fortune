@@ -52,11 +52,11 @@ namespace FoundationFortune.Commands.FortuneCommands
                 return false;
             }
 
-            string name = arguments.At(2);
-            string badge = arguments.At(3);
-            string color = arguments.At(4);
-            string roleString = arguments.At(5);
-            string heldItemString = arguments.At(6);
+            string name = arguments.At(1);
+            string badge = arguments.At(2);
+            string color = arguments.At(3);
+            string roleString = arguments.At(4);
+            string heldItemString = arguments.At(5);
 
             if (!Enum.TryParse(roleString, out RoleTypeId role) || !Enum.TryParse(heldItemString, out ItemType heldItem))
             {
@@ -64,7 +64,7 @@ namespace FoundationFortune.Commands.FortuneCommands
                 return false;
             }
 
-            if (!float.TryParse(arguments.At(7), out float scaleX) || !float.TryParse(arguments.At(8), out float scaleY) || !float.TryParse(arguments.At(9), out float scaleZ))
+            if (!float.TryParse(arguments.At(6), out float scaleX) || !float.TryParse(arguments.At(7), out float scaleY) || !float.TryParse(arguments.At(8), out float scaleZ))
             {
                 response = "Invalid Scale specified. Please provide three float values for X, Y, and Z components.";
                 return false;
@@ -104,7 +104,7 @@ namespace FoundationFortune.Commands.FortuneCommands
                 return false;
             }
 
-            if (!int.TryParse(arguments.At(2), out int indexationNumber))
+            if (!int.TryParse(arguments.At(1), out int indexationNumber))
             {
                 response = "Invalid IndexationNumber. Please provide a valid number.";
                 return false;
