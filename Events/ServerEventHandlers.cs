@@ -8,6 +8,7 @@ using Exiled.API.Features;
 using Exiled.API.Features.Items;
 using Exiled.Events.EventArgs.Scp049;
 using Exiled.Events.EventArgs.Scp0492;
+using FoundationFortune.API.NPCs;
 using Discord;
 using System.Linq;
 using Mono.Cecil.Cil;
@@ -123,6 +124,8 @@ namespace FoundationFortune.Events
 
                             if (soldItem == ev.Item)
                             {
+                                Npc buyingbot = GetBuyingBotNearPlayer(ev.Player);
+                                BuyingBot.PlayAudio(buyingbot, "BuySuccess.ogg", 50, false, VoiceChat.VoiceChatChannel.Mimicry);
                                 EnqueueHint(ev.Player, $"<b><size=24><color=green>+{price}$</color> Sold {FoundationFortune.Singleton.Config.SellableItems.Find(x => x.ItemType == ev.Item.Type).DisplayName}.</color></b></size>", price, 3, false, false);
                                 ev.Player.RemoveItem(ev.Item);
                             }

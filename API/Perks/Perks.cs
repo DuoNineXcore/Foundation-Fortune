@@ -1,9 +1,11 @@
 ﻿using CustomPlayerEffects;
 using Exiled.API.Features;
+using FoundationFortune.API.NPCs;
 using PlayerRoles;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using static UnityEngine.GraphicsBuffer;
 
 namespace FoundationFortune.API.Perks
 {
@@ -35,10 +37,12 @@ namespace FoundationFortune.API.Perks
 
         public bool GrantRevivalPerk(Player reviver, string targetName)
         {
-            Player targetToRevive = Player.List.FirstOrDefault(p => p.Role == RoleTypeId.Spectator && p.Nickname == targetName);
+            Player targetToRevive = Player.Get(targetName);
+            Npc buyingbot = FoundationFortune.Singleton.serverEvents.GetBuyingBotNearPlayer(reviver);
 
-            if (targetToRevive != null)
+            if (targetToRevive != null && targetToRevive.Role == RoleTypeId.Spectator)
             {
+                BuyingBot.PlayAudio(buyingbot, "BuySuccess", 50, false, VoiceChat.VoiceChatChannel.Intercom);
                 RevivePlayer(reviver, targetToRevive);
                 return true;
             }

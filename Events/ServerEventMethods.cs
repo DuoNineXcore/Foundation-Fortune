@@ -312,6 +312,24 @@ namespace FoundationFortune.Events
             return false;
         }
 
+        public Npc GetBuyingBotNearPlayer(Player player)
+        {
+            float buyingBotRadius = FoundationFortune.Singleton.Config.BuyingBotRadius;
+
+            foreach (var kvp in buyingBotPositions)
+            {
+                var botPosition = kvp.Value;
+
+                float distance = Vector3.Distance(player.Position, botPosition);
+
+                if (distance <= buyingBotRadius)
+                {
+                    return kvp.Key;
+                }
+            }
+            return null;
+        }
+
         public bool IsPlayerNearSellingBot(Player player)
         {
             bool isNearBot = IsPlayerOnBuyingBotRadius(player, out Npc npc);

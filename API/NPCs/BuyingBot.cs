@@ -10,10 +10,13 @@
     using PlayerRoles;
     using PlayerRoles.FirstPersonControl;
     using PlayerRoles.PlayableScps.Subroutines;
+    using SCPSLAudioApi.AudioCore;
     using System;
     using System.Collections.Generic;
+    using System.IO;
     using System.Linq;
     using UnityEngine;
+    using VoiceChat;
 
     public class BuyingBotComponent : MonoBehaviour
     {
@@ -136,6 +139,30 @@
             return SpawnedBuyingBot;
         }
 
+        public static void PlayAudio(Npc npc, string audioFile, byte volume, bool loop, VoiceChatChannel channel)
+        {
+            var path = Path.Combine(Path.Combine(Paths.Configs, "Foundation Fortune"), audioFile);
+            var audioPlayer = AudioPlayerBase.Get(npc.ReferenceHub);
+            audioPlayer.Enqueue(path, -1);
+            audioPlayer.LogDebug = false;
+            audioPlayer.BroadcastChannel = channel;
+            audioPlayer.Volume = volume;
+            audioPlayer.Loop = loop;
+            audioPlayer.Continue = true;
+            audioPlayer.Play(0);
+        }
+
+        public static void StopAudio(Npc npc)
+        {
+            var audioPlayer = AudioPlayerBase.Get(npc.ReferenceHub);
+
+            if (audioPlayer.CurrentPlay != null)
+            {
+                audioPlayer.Stoptrack(true);
+                audioPlayer.OnDestroy();
+            }
+        }
+
         public static Npc SpawnFix(string name, RoleTypeId role, int id = 0, Vector3? position = null)
         {
             GameObject gameObject = UnityEngine.Object.Instantiate(NetworkManager.singleton.playerPrefab);
@@ -164,7 +191,7 @@
             try
             {
                 npc.ReferenceHub.characterClassManager.SyncedUserId = "FoundationFortune";
-                npc.ReferenceHub.characterClassManager.InstanceMode = ClientInstanceMode.Unverified;
+                npc.ReferenceHub.characterClassManager.InstanceMode = ClientInstanceMode.DedicatedServer;
             }
             catch (Exception e)
             {
@@ -189,7 +216,6 @@
             return npc;
         }
 
-        // source for this method: o5zereth on discord
         public static (ushort horizontal, ushort vertical) ToClientUShorts(Quaternion rotation)
         {
             if (rotation.eulerAngles.z != 0f)

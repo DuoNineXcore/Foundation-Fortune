@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using Exiled.Events.EventArgs.Player;
 using FoundationFortune.API.Items;
 using HarmonyLib;
+using SCPSLAudioApi;
 
 namespace FoundationFortune
 {
@@ -35,6 +36,7 @@ namespace FoundationFortune
             Singleton = this;
             CreateDatabase();
             RegisterEvents();
+            Startup.SetupDependencies();
             CustomItem.RegisterItems();
             if (_harmony is null)
             {
