@@ -13,6 +13,29 @@
      using System.Linq;
      using System.Reflection.Emit;
 
+     //[HarmonyPatch(typeof(CharacterClassManager), nameof(CharacterClassManager.InstanceMode), MethodType.Setter)]
+     //internal static class ClientInstancePatch
+     //{
+     //     private static bool Prefix(CharacterClassManager __instance, ClientInstanceMode value)
+     //     {
+     //          Log.Debug($"ClientInstance attempted change: " + value);
+     //          if(value == __instance._targetInstanceMode) return false;
+     //          Player player = Player.Get(__instance.Hub);
+     //          if(player == null || player != null && !player.IsNPC)
+     //          {
+     //               Log.Debug("Player is null or not an Npc");
+     //               __instance._targetInstanceMode = value;
+     //               return false;
+     //          }
+     //          if(value != ClientInstanceMode.Unverified)
+     //          {
+     //               Log.Debug("Npc is not unverified!");
+     //               __instance._targetInstanceMode = ClientInstanceMode.Unverified;
+     //          }
+     //          return false;
+     //     }
+     //} // nvm not needed.. i think?
+
      [HarmonyPatch(typeof(NineTailedFoxAnnouncer), nameof(NineTailedFoxAnnouncer.AnnounceScpTermination))]
      internal static class TerminationPatch
      {
