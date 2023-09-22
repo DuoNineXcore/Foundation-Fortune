@@ -12,6 +12,7 @@
      using System.Collections.Generic;
      using System.Linq;
      using System.Reflection.Emit;
+     using PlayerRoles.PlayableScps.Scp079;
 
      //[HarmonyPatch(typeof(CharacterClassManager), nameof(CharacterClassManager.InstanceMode), MethodType.Setter)]
      //internal static class ClientInstancePatch
@@ -35,6 +36,47 @@
      //          return false;
      //     }
      //} // nvm not needed.. i think?
+
+     //[HarmonyPatch(typeof(Scp079ScannerSequence), nameof(Scp079ScannerSequence.TrackedPlayers), MethodType.Getter)]
+     //internal static class Scp079ScanPatch
+     //{
+     //     private static bool Prefix(Scp079ScannerSequence __instance, ref Scp079ScannerTrackedPlayer[] __result)
+     //     {
+     //          List<Scp079ScannerTrackedPlayer> trackedPlayers = new();
+
+     //          foreach(var trackedPlayer in __instance._tracker.TrackedPlayers)
+     //          {
+     //               Player player = Player.Get(trackedPlayer.Hub);
+     //               if(!player.IsNPC) trackedPlayers.AddItem(trackedPlayer);
+     //          }
+     //          __result = trackedPlayers.ToArray();
+     //          return false;
+     //     }
+     //}
+
+     [HarmonyPatch(typeof(Scp079ScannerTracker), nameof(Scp079ScannerTracker.AddTarget))]
+     internal static class Scp079TargetAddPatch
+     {
+          private static bool Prefix(Scp079ScannerTracker __instance, ReferenceHub hub)
+          {
+               Player player = Player.Get(hub);
+               if (player is null || player is not null && player.IsNPC) return false;
+               return true;
+          }
+     } // this is better
+
+     [HarmonyPatch(typeof(Scp079Recontainer), nameof(Scp079Recontainer.OnServerRoleChanged))]
+     internal static class Scp079RecontainPatch
+     {
+          private static bool Prefix(Scp079Recontainer __instance, ReferenceHub hub)
+          {
+               Player player = Player.Get(hub);
+               if(player == null) return true;
+               if(player.IsNPC) return false;
+
+               return true;
+          }
+     }
 
      [HarmonyPatch(typeof(NineTailedFoxAnnouncer), nameof(NineTailedFoxAnnouncer.AnnounceScpTermination))]
      internal static class TerminationPatch
