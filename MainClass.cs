@@ -26,6 +26,7 @@ namespace FoundationFortune
 
         public static FoundationFortune Singleton;
         public Dictionary<string, (Npc? bot, int indexation)> BuyingBotIndexation { get; private set; } = new Dictionary<string, (Npc? bot, int indexation)>();
+        public Dictionary<string, List<PerkType>> purchasedPerks = new Dictionary<string, List<PerkType>>();
         public ServerEvents serverEvents = new();
         public LiteDatabase db;
 

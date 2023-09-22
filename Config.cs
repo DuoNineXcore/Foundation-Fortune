@@ -37,12 +37,13 @@ namespace FoundationFortune
 
         [Description("Selling Workstation Settings.")]
         public bool UseSellingWorkstation { get; set; } = false;
-        public string SellingWorkstationHint { get; set; } = "<b><size=27>>>You're on a Selling Workstation!<<</size></b>";
+        public string SellingWorkstationHint { get; set; } = "<b><size=24>>>You're on a Selling Workstation!<<</size></b>";
         public float SellingWorkstationRadius { get; set; } = 3f;
 
-        [Description("Buying Bot Settings.")]
+        [Description("Buying/Selling Bot Settings.")]
         public bool UseBuyingBot { get; set; } = true;
-        public string BuyingBotHint { get; set; } = "<b><size=27>>>You're around a buying bot!<<</size></b>";
+        public string BuyingBotHint { get; set; } = "<b><size=24>You're around a buying bot. Type .buy list in the console.</size></b>";
+        public string SellingBotHint { get; set; } = "<b><size=24>You're around a Selling bot. Drop Items twice to sell them.</size></b>";
         public float BuyingBotRadius { get; set; } = 3f;
         public bool BuyingBotFixedLocation { get; set; } = true;
         public List<NPCSpawn>BuyingBotSpawnSettings { get; set; } = new List<NPCSpawn>
@@ -61,7 +62,6 @@ namespace FoundationFortune
         public List<SellableItem> SellableItems { get; set; } = new List<SellableItem>
         {
             new SellableItem { ItemType = ItemType.MicroHID, Price = 1200, DisplayName = "Micro HID" },
-            new SellableItem { ItemType = ItemType.SCP207, Price = 5, DisplayName = "fuck you maro" },
             new SellableItem { ItemType = ItemType.SCP500, Price = 1000, DisplayName = "SCP-500" },
         };
 
@@ -69,7 +69,6 @@ namespace FoundationFortune
         public List<BuyableItem> BuyableItems { get; set; } = new List<BuyableItem>
         {
             new BuyableItem { ItemType = ItemType.MicroHID, Price = 500, DisplayName = "Micro HID" },
-            new BuyableItem { ItemType = ItemType.SCP207, Price = 5, DisplayName = "fuck you maro" },
             new BuyableItem { ItemType = ItemType.SCP500, Price = 1000, DisplayName = "SCP-500" },
         };
 

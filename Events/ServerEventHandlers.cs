@@ -80,7 +80,6 @@ namespace FoundationFortune.Events
             }
         }
 
-
         public void EscapingReward(EscapingEventArgs ev)
         {
             var config = FoundationFortune.Singleton.Config;
@@ -138,6 +137,11 @@ namespace FoundationFortune.Events
                         }
                     }
                 }
+            }
+            else
+            {
+                ev.IsAllowed = true;
+                EnqueueHint(ev.Player, "<b><size=24><color=red>This is not a selling bot.</color></b></size>", 0, 3, false, false);
             }
 
             ev.IsAllowed = true;

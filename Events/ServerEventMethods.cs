@@ -321,15 +321,6 @@ namespace FoundationFortune.Events
             if(isSellingBot) return true;
 
             return false;
-
-            //foreach (var spawnSettings in FoundationFortune.Singleton.Config.BuyingBotSpawnSettings)
-            //{
-            //    if (isNearBot && spawnSettings.IsSellingBot)
-            //    {
-            //        return true;
-            //    }
-            //}
-            //return false;
         }
 
 

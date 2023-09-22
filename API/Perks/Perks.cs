@@ -1,10 +1,9 @@
 ﻿using CustomPlayerEffects;
 using Exiled.API.Features;
+using PlayerRoles;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FoundationFortune.API.Perks
 {
@@ -14,8 +13,6 @@ namespace FoundationFortune.API.Perks
         {
             switch (perk)
             {
-                case PerkType.Revival:
-                    break;
                 case PerkType.ExtraHP:
                     ply.Heal(50, true);
                     ply.MaxHealth += 50;
@@ -33,7 +30,35 @@ namespace FoundationFortune.API.Perks
                     ply.EnableEffect<MovementBoost>(150);
                     ply.ChangeEffectIntensity<MovementBoost>(30);
                     break;
-            } 
+            }
+        }
+
+        public bool GrantRevivalPerk(Player reviver, string targetName)
+        {
+            Player targetToRevive = Player.List.FirstOrDefault(p => p.Role == RoleTypeId.Spectator && p.Nickname == targetName);
+
+            if (targetToRevive != null)
+            {
+                RevivePlayer(reviver, targetToRevive);
+                return true;
+            }
+            else
+            {
+                FoundationFortune.Singleton.serverEvents.EnqueueHint(reviver, $"<b><size=24>No dead player with Name: '{targetName}' found nearby to revive.</b></size>", 0, 3, false, false);
+                return false;
+            }
+        }
+
+        private void RevivePlayer(Player reviver, Player targetToRevive)
+        {
+            targetToRevive.Role.Set(reviver.Role);
+            targetToRevive.Heal(50);
+            targetToRevive.Teleport(reviver.Position);
+
+            foreach (var ply in Player.List)
+            {
+                FoundationFortune.Singleton.serverEvents.EnqueueHint(ply, $"<color={reviver.Role.Color.ToHex()}>{reviver.Nickname}</color> Has Revived {targetToRevive.Nickname}", 0, 3, false, false);
+            }
         }
     }
 }
