@@ -56,8 +56,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\Documents\C# References\Pooling.dll</HintPath>
     </Reference>
-    <Reference Include="SCPSLAudioApi">
-      <HintPath>..\..\Documents\C# References\SCPSLAudioApi.dll</HintPath>
+    <Reference Include="SCPSLAudioApi, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\Debug\SCPSLAudioApi.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="UnityEngine.CoreModule">

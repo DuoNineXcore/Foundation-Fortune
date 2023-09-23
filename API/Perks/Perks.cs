@@ -39,7 +39,7 @@ namespace FoundationFortune.API.Perks
 
             if (targetToRevive != null && targetToRevive.Role == RoleTypeId.Spectator)
             {
-                BuyingBot.PlayAudio(buyingbot, "BuySuccess.ogg", 50, false, VoiceChat.VoiceChatChannel.Intercom);
+                BuyingBot.PlayAudio(buyingbot, "BuySuccess.ogg", 70, false, VoiceChat.VoiceChatChannel.Intercom);
                 RevivePlayer(reviver, targetToRevive);
                 return true;
             }

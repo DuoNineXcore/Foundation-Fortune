@@ -20,9 +20,7 @@ namespace FoundationFortune.Events
      {
           Center,
           Right,
-          Left,
-          TopLeft,
-          TopRight
+          Left
      }
 
      public partial class ServerEvents

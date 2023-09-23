@@ -201,21 +201,6 @@ namespace FoundationFortune.Events
 
                buyingBotPositions.Clear();
 
-               //for (int i = 0; i < FoundationFortune.Singleton.Config.BuyingBotSpawnSettings.Count; i++)
-               //{
-               //     NPCSpawn spawnSettings = FoundationFortune.Singleton.Config.BuyingBotSpawnSettings[i];
-               //     Log.Debug($"Spawning Bot {i + 1}");
-
-               //     BuyingBot.SpawnBuyingBot(
-               //         spawnSettings.Name,
-               //         spawnSettings.Badge,
-               //         spawnSettings.BadgeColor,
-               //         spawnSettings.Role,
-               //         spawnSettings.HeldItem,
-               //         spawnSettings.Scale
-               //     );
-               //}
-
                foreach(NPCSpawn spawn in FoundationFortune.Singleton.Config.BuyingBotSpawnSettings)
                {
                     Log.Debug($"Spawning Bot: {spawn.Name}");
