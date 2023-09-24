@@ -70,7 +70,7 @@ namespace FoundationFortune.Events
 			if (!Round.IsLocked && !Round.IsEnded)
 			{
 				if (alivePlayers.Count() <= 1) ev.IsRoundEnded = true;
-				if (chaos >= 1 && mtf == 0 || mtf >= 1 && chaos == 0 && scps == 0) ev.IsRoundEnded = true;
+				if (chaos >= 1 && mtf == 0 && scps == 0 || mtf >= 1 && chaos == 0 && scps == 0) ev.IsRoundEnded = true;
 			}
 		}
 
