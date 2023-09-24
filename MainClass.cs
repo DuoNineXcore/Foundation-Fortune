@@ -14,6 +14,8 @@ using Exiled.Events.EventArgs.Player;
 using FoundationFortune.API.Items;
 using HarmonyLib;
 using SCPSLAudioApi;
+using FoundationFortune.API.NPCs;
+using System.Reflection;
 
 namespace FoundationFortune
 {

@@ -1,18 +1,20 @@
 ﻿namespace FoundationFortune.API.NPCs
 {
-     using HarmonyLib;
-     using Exiled.API.Features;
-     using NorthwoodLib.Pools;
-     using PlayerRoles;
-     using PlayerRoles.FirstPersonControl.Thirdperson;
-     using PlayerRoles.PlayableScps.Scp096;
-     using PlayerRoles.PlayableScps.Scp173;
-     using PlayerRoles.PlayableScps.Scp939;
-     using PlayerRoles.PlayableScps.Scp939.Ripples;
-     using System.Collections.Generic;
-     using System.Linq;
-     using System.Reflection.Emit;
-     using PlayerRoles.PlayableScps.Scp079;
+    using HarmonyLib;
+    using Exiled.API.Features;
+    using System.Text;
+    using NorthwoodLib.Pools;
+    using PlayerRoles;
+    using PlayerRoles.FirstPersonControl.Thirdperson;
+    using PlayerRoles.PlayableScps.Scp096;
+    using PlayerRoles.PlayableScps.Scp173;
+    using PlayerRoles.PlayableScps.Scp939;
+    using PlayerRoles.PlayableScps.Scp939.Ripples;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Reflection.Emit;
+    using PlayerRoles.PlayableScps.Scp079;
+    using System.Reflection;
 
     /*
      [HarmonyPatch(typeof(CharacterClassManager), nameof(CharacterClassManager.InstanceMode), MethodType.Setter)]
@@ -56,7 +58,7 @@
      }
     */
 
-     [HarmonyPatch(typeof(Scp079ScannerTracker), nameof(Scp079ScannerTracker.AddTarget))]
+    [HarmonyPatch(typeof(Scp079ScannerTracker), nameof(Scp079ScannerTracker.AddTarget))]
      internal static class Scp079TargetAddPatch
      {
           private static bool Prefix(Scp079ScannerTracker __instance, ReferenceHub hub)
@@ -122,35 +124,32 @@
         }
     }
 
-    [HarmonyPatch(typeof(Scp173ObserversTracker), nameof(Scp173ObserversTracker.UpdateObservers))]
-    internal static class UpdateObservers
+    /*[HarmonyPatch(typeof(RoundSummary), nameof(RoundSummary._ProcessServerSideCode))]
+    internal static class _ProcessServerSideCode
     {
-        static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions, ILGenerator generator)
+        static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
         {
-            List<CodeInstruction> newInstructions = ListPool<CodeInstruction>.Shared.Rent(instructions);
+            List<CodeInstruction> newInstructions = new List<CodeInstruction>(instructions);
+            StringBuilder instructionLog = new StringBuilder();
 
-            Label skip = generator.DefineLabel();
-
-            int index = newInstructions.FindIndex(x => x.opcode == OpCodes.Call && x.operand == (object)AccessTools.Method(typeof(Scp173ObserversTracker), nameof(Scp173ObserversTracker.UpdateObserver))) + 3;
-            newInstructions[index].labels.Add(skip);
-
-            index = newInstructions.FindIndex(x => x.opcode == OpCodes.Call && x.operand == (object)AccessTools.Method(typeof(Scp173ObserversTracker), nameof(Scp173ObserversTracker.UpdateObserver))) - 3;
-            newInstructions.InsertRange(index, new List<CodeInstruction>()
+            for (int i = 0; i < newInstructions.Count; i++)
             {
-                new CodeInstruction(OpCodes.Ldloc_3),
-                new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(BuyingBot), nameof(BuyingBot.IsSellingBot), new[] { typeof(ReferenceHub) })),
-                new CodeInstruction(OpCodes.Brtrue_S, skip),
-                new CodeInstruction(OpCodes.Ldarg_0),
-                new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(BuyingBot), nameof(BuyingBot.IsSellingBot), new[] { typeof(Scp173ObserversTracker) })),
-                new CodeInstruction(OpCodes.Brtrue_S, skip),
-            });
+                if (newInstructions[i].opcode == OpCodes.Ldloc_1 &&
+                    newInstructions[i + 1].opcode == OpCodes.Call &&
+                    newInstructions[i + 2].opcode == OpCodes.Brtrue_S)
+                {
+                    newInstructions[i + 2].opcode = OpCodes.Ble_S;
+                    break;
+                }
 
-            foreach (CodeInstruction instruction in newInstructions)
-                yield return instruction;
+                instructionLog.AppendLine($"{newInstructions[i].ToString()}");
+            }
 
-            ListPool<CodeInstruction>.Shared.Return(newInstructions);
+            Log.Debug($"Instructions:\n{instructionLog.ToString()}");
+
+            return newInstructions.AsEnumerable();
         }
-    }
+    }*/
 
     [HarmonyPatch(typeof(FootstepRippleTrigger), nameof(FootstepRippleTrigger.OnFootstepPlayed))]
      internal static class OnFootstepPlayed

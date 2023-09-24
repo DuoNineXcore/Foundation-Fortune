@@ -38,23 +38,23 @@ namespace FoundationFortune.Events
                InitializeBuyingBots();
           }
 
-          //public void InstanceModeChange(ReferenceHub hub, ClientInstanceMode mode)
-          //{
-          //     Log.Info(mode);
-          //     if(hub is null) return;
-          //     Log.Info("1");
-          //     Player player = Player.Get(hub);
-          //     Log.Info("2");
-          //     if (player is null || player is not null && !player.IsNPC) return;
-          //     Log.Info("3");
-          //     if (mode == ClientInstanceMode.DedicatedServer) return;
-          //     Log.Info("4");
+          /*public void InstanceModeChange(ReferenceHub hub, ClientInstanceMode mode)
+          {
+               Log.Info(mode);
+               if(hub is null) return;
+               Log.Info("1");
+               Player player = Player.Get(hub);
+               Log.Info("2");
+               if (player is null || player is not null && !player.IsNPC) return;
+               Log.Info("3");
+               if (mode == ClientInstanceMode.DedicatedServer) return;
+               Log.Info("4");
 
-          //     hub.characterClassManager.InstanceMode = ClientInstanceMode.DedicatedServer;
+               hub.characterClassManager.InstanceMode = ClientInstanceMode.DedicatedServer;
 
-          //     Log.Info(hub.nicknameSync?.DisplayName.ToString() ?? "Null name");
-          //     Log.Info(hub.characterClassManager.InstanceMode);
-          //}
+               Log.Info(hub.nicknameSync?.DisplayName.ToString() ?? "Null name");
+               Log.Info(hub.characterClassManager.InstanceMode);
+          }*/
 
           public void RoundEnd(RoundEndedEventArgs ev)
           {
