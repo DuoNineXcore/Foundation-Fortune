@@ -14,190 +14,190 @@ using System.Collections.Generic;
 
 namespace FoundationFortune.Events
 {
-     public enum HintAlign
-     {
-          Center,
-          Right,
-          Left,
-          TopLeft,
-          TopRight
-     }
+	public enum HintAlign
+	{
+		Center,
+		Right,
+		Left,
+		TopLeft,
+		TopRight
+	}
 
-     public partial class ServerEvents
-     {
-          private CoroutineHandle moneyHintCoroutine;
+	public partial class ServerEvents
+	{
+		private CoroutineHandle moneyHintCoroutine;
+		private CoroutineHandle roundEndCoroutine;
+		private RoundSummary round;
 
-          private CoroutineHandle roundEndCoroutine;
+		public void RoundStart()
+		{
+			roundEndCoroutine = Timing.RunCoroutine(RoundEndChecker());
+			moneyHintCoroutine = Timing.RunCoroutine(UpdateMoneyAndHints());
 
-          public void RoundStart()
-          {
-               roundEndCoroutine = Timing.RunCoroutine(RoundEndChecker());
+			FoundationFortune.Singleton.BuyingBotIndexation.Clear();
+			buyingBotPositions.Clear();
 
-               moneyHintCoroutine = Timing.RunCoroutine(UpdateMoneyAndHints());
+			InitializeWorkstationPositions();
+			InitializeBuyingBots();
+		}
 
-               FoundationFortune.Singleton.BuyingBotIndexation.Clear();
-               buyingBotPositions.Clear();
+		private IEnumerator<float> RoundEndChecker()
+		{
+			while (true)
+			{
+                IEnumerable<Player> players = Player.List.Where(p => !p.IsNPC);
+				IEnumerable<Player> alivePlayers = players.Where(p => p.IsAlive);
+				int chaos = alivePlayers.Count(p => p.IsCHI);
+				int mtf = alivePlayers.Count(p => p.IsNTF || p.Role.Type == RoleTypeId.Scientist);
+				int scps = alivePlayers.Count(p => p.IsScp);
 
-               InitializeWorkstationPositions();
-               InitializeBuyingBots();
-          }
+				if (!Round.IsLocked && !Round.IsEnded)
+				{
+                    if (alivePlayers.Count() <= 1) round.ForceEnd();
+                    if (chaos >= 1 && mtf == 0 || mtf >= 1 && chaos == 0 && scps == 0) round.ForceEnd();
+                }
 
-          private IEnumerator<float> RoundEndChecker()
-          {
-               Log.Debug("RoundEndChecker::Start");
-               while (true)
-               {
-                    IEnumerable<Player> players = Player.List.Where(p => !p.IsNPC);
-                    IEnumerable<Player> alivePlayers = players.Where(p => p.IsAlive);
-                    int chaos = alivePlayers.Count(p => p.IsCHI);
-                    int mtf = alivePlayers.Count(p => p.IsNTF || p.Role.Type == RoleTypeId.Scientist);
-                    int scps = alivePlayers.Count(p => p.IsScp);
+				yield return Timing.WaitForSeconds(1f);
+            }
+		}
 
-                    if(alivePlayers.Count() <= 1) Round.EndRound(true);
-                    if(chaos >= 1 && mtf == 0 || mtf >= 1 && chaos == 0 && scps == 0) Round.EndRound(true);
+		public void RoundEnd(RoundEndedEventArgs ev)
+		{
+			Log.Debug("Round End");
 
+			if (moneyHintCoroutine.IsRunning) Timing.KillCoroutines(moneyHintCoroutine);
+			if (roundEndCoroutine.IsRunning) Timing.KillCoroutines(roundEndCoroutine);
+		}
 
-                    yield return Timing.WaitForSeconds(2.5f);
-               }
-          }
+		public void RegisterInDatabase(VerifiedEventArgs ev)
+		{
+			var existingPlayer = PlayerDataRepository.GetPlayerById(ev.Player.UserId);
+			if (existingPlayer == null && !ev.Player.IsNPC)
+			{
+				var newPlayer = new PlayerData
+				{
+					Username = ev.Player.DisplayNickname,
+					UserId = ev.Player.UserId,
+					MoneyOnHold = 0,
+					MoneySaved = 0,
+					HintMinmode = false,
+					HintAlign = HintAlign.Center
+				};
+				PlayerDataRepository.InsertPlayer(newPlayer);
+			}
+		}
 
-          public void RoundEnd(RoundEndedEventArgs ev)
-          {
-               Log.Debug("Round End");
+		public void SpawningNpc(SpawningEventArgs ev)
+		{
+			if (ev.Player.IsNPC)
+			{
+				RoundSummary.singleton.Network_chaosTargetCount -= 1;
+			}
+		}
 
-               if (moneyHintCoroutine.IsRunning) Timing.KillCoroutines(moneyHintCoroutine);
-               if (roundEndCoroutine.IsRunning) Timing.KillCoroutines(roundEndCoroutine);
-          }
+		public void KillingReward(DiedEventArgs ev)
+		{
+			if (ev.Attacker != null && ev.Attacker != ev.Player && ev.Attacker.IsScp)
+			{
+				var config = FoundationFortune.Singleton.Config;
+				var killHint = config.KillHint.Replace("[victim]", ev.Player.Nickname);
+				EnqueueHint(ev.Attacker, killHint, config.KillReward, config.MaxHintAge, config.KillRewardTransfer, config.KillRewardTransferAll);
+			}
+			if (ev.Player.IsNPC)
+			{
+				RoundSummary.singleton.Network_chaosTargetCount += 2;
+			}
+		}
 
-          public void RegisterInDatabase(VerifiedEventArgs ev)
-          {
-               var existingPlayer = PlayerDataRepository.GetPlayerById(ev.Player.UserId);
-               if (existingPlayer == null && !ev.Player.IsNPC)
-               {
-                    var newPlayer = new PlayerData
-                    {
-                         Username = ev.Player.DisplayNickname,
-                         UserId = ev.Player.UserId,
-                         MoneyOnHold = 0,
-                         MoneySaved = 0,
-                         HintMinmode = false,
-                         HintAlign = HintAlign.Center
-                    };
-                    PlayerDataRepository.InsertPlayer(newPlayer);
-               }
-          }
+		public void EscapingReward(EscapingEventArgs ev)
+		{
+			var config = FoundationFortune.Singleton.Config;
+			EnqueueHint(ev.Player, $"{config.EscapeHint}", config.EscapeReward, config.MaxHintAge, config.EscapeRewardTransfer, config.EscapeRewardTransferAll);
+		}
 
-          public void SpawningNpc(SpawningEventArgs ev)
-          {
-               if (ev.Player.IsNPC)
-               {
-                    RoundSummary.singleton.Network_chaosTargetCount -= 1;
-               }
-          }
+		public void SellingItem(DroppingItemEventArgs ev)
+		{
+			if (!IsPlayerOnSellingWorkstation(ev.Player) && !IsPlayerOnBuyingBotRadius(ev.Player))
+			{
+				ev.IsAllowed = true;
+				return;
+			}
 
-          public void KillingReward(DiedEventArgs ev)
-          {
-               if (ev.Attacker != null && ev.Attacker != ev.Player && ev.Attacker.IsScp)
-               {
-                    var config = FoundationFortune.Singleton.Config;
-                    var killHint = config.KillHint.Replace("[victim]", ev.Player.Nickname);
-                    EnqueueHint(ev.Attacker, killHint, config.KillReward, config.MaxHintAge, config.KillRewardTransfer, config.KillRewardTransferAll);
-               }
-               if (ev.Player.IsNPC)
-               {
-                    RoundSummary.singleton.Network_chaosTargetCount += 2;
-               }
-          }
+			if (IsPlayerNearSellingBot(ev.Player))
+			{
+				if (!confirmSell.ContainsKey(ev.Player.UserId))
+				{
+					foreach (var sellableItem in FoundationFortune.Singleton.Config.SellableItems)
+					{
+						if (ev.Item.Type == sellableItem.ItemType)
+						{
+							itemsBeingSold[ev.Player.UserId] = (ev.Item, sellableItem.Price);
 
-          public void EscapingReward(EscapingEventArgs ev)
-          {
-               var config = FoundationFortune.Singleton.Config;
-               EnqueueHint(ev.Player, $"{config.EscapeHint}", config.EscapeReward, config.MaxHintAge, config.EscapeRewardTransfer, config.EscapeRewardTransferAll);
-          }
+							confirmSell[ev.Player.UserId] = true;
+							dropTimestamp[ev.Player.UserId] = Time.time;
+							ev.IsAllowed = false;
+							return;
+						}
+					}
+				}
 
-          public void SellingItem(DroppingItemEventArgs ev)
-          {
-               if (!IsPlayerOnSellingWorkstation(ev.Player) && !IsPlayerOnBuyingBotRadius(ev.Player))
-               {
-                    ev.IsAllowed = true;
-                    return;
-               }
+				if (confirmSell.TryGetValue(ev.Player.UserId, out bool isConfirming) && dropTimestamp.TryGetValue(ev.Player.UserId, out float dropTime))
+				{
+					if (isConfirming && Time.time - dropTime <= FoundationFortune.Singleton.Config.SellingConfirmationTime)
+					{
+						if (itemsBeingSold.TryGetValue(ev.Player.UserId, out var soldItemData))
+						{
+							Item soldItem = soldItemData.item;
+							int price = soldItemData.price;
 
-               if (IsPlayerNearSellingBot(ev.Player))
-               {
-                    if (!confirmSell.ContainsKey(ev.Player.UserId))
-                    {
-                         foreach (var sellableItem in FoundationFortune.Singleton.Config.SellableItems)
-                         {
-                              if (ev.Item.Type == sellableItem.ItemType)
-                              {
-                                   itemsBeingSold[ev.Player.UserId] = (ev.Item, sellableItem.Price);
+							if (soldItem == ev.Item)
+							{
+								Npc buyingbot = GetBuyingBotNearPlayer(ev.Player);
+								BuyingBot.PlayAudio(buyingbot, "BuySuccess.ogg", 50, false, VoiceChat.VoiceChatChannel.Mimicry);
+								EnqueueHint(ev.Player, $"<b><size=24><color=green>+{price}$</color> Sold {FoundationFortune.Singleton.Config.SellableItems.Find(x => x.ItemType == ev.Item.Type).DisplayName}.</color></b></size>", price, 3, false, false);
+								ev.Player.RemoveItem(ev.Item);
+							}
+							else
+							{
+								EnqueueHint(ev.Player, "<b><size=24><color=red>Item changed. Sale canceled.</color></b></size>", 0, 3, false, false);
+							}
 
-                                   confirmSell[ev.Player.UserId] = true;
-                                   dropTimestamp[ev.Player.UserId] = Time.time;
-                                   ev.IsAllowed = false;
-                                   return;
-                              }
-                         }
-                    }
+							itemsBeingSold.Remove(ev.Player.UserId);
+							ev.IsAllowed = true;
+							return;
+						}
+					}
+				}
+			}
+			else
+			{
+				ev.IsAllowed = true;
+				EnqueueHint(ev.Player, "<b><size=24><color=red>This is not a selling bot.</color></b></size>", 0, 3, false, false);
+			}
 
-                    if (confirmSell.TryGetValue(ev.Player.UserId, out bool isConfirming) && dropTimestamp.TryGetValue(ev.Player.UserId, out float dropTime))
-                    {
-                         if (isConfirming && Time.time - dropTime <= FoundationFortune.Singleton.Config.SellingConfirmationTime)
-                         {
-                              if (itemsBeingSold.TryGetValue(ev.Player.UserId, out var soldItemData))
-                              {
-                                   Item soldItem = soldItemData.item;
-                                   int price = soldItemData.price;
+			ev.IsAllowed = true;
+		}
 
-                                   if (soldItem == ev.Item)
-                                   {
-                                        Npc buyingbot = GetBuyingBotNearPlayer(ev.Player);
-                                        BuyingBot.PlayAudio(buyingbot, "BuySuccess.ogg", 50, false, VoiceChat.VoiceChatChannel.Mimicry);
-                                        EnqueueHint(ev.Player, $"<b><size=24><color=green>+{price}$</color> Sold {FoundationFortune.Singleton.Config.SellableItems.Find(x => x.ItemType == ev.Item.Type).DisplayName}.</color></b></size>", price, 3, false, false);
-                                        ev.Player.RemoveItem(ev.Item);
-                                   }
-                                   else
-                                   {
-                                        EnqueueHint(ev.Player, "<b><size=24><color=red>Item changed. Sale canceled.</color></b></size>", 0, 3, false, false);
-                                   }
+		public void FuckYourAbility(ActivatingSenseEventArgs ev)
+		{
+			if (ev.Target != null)
+			{
+				if (ev.Target.IsNPC)
+				{
+					ev.IsAllowed = false;
+				}
+			}
+		}
 
-                                   itemsBeingSold.Remove(ev.Player.UserId);
-                                   ev.IsAllowed = true;
-                                   return;
-                              }
-                         }
-                    }
-               }
-               else
-               {
-                    ev.IsAllowed = true;
-                    EnqueueHint(ev.Player, "<b><size=24><color=red>This is not a selling bot.</color></b></size>", 0, 3, false, false);
-               }
-
-               ev.IsAllowed = true;
-          }
-
-          public void FuckYourAbility(ActivatingSenseEventArgs ev)
-          {
-               if (ev.Target != null)
-               {
-                    if (ev.Target.IsNPC)
-                    {
-                         ev.IsAllowed = false;
-                    }
-               }
-          }
-
-          public void FuckYourOtherAbility(TriggeringBloodlustEventArgs ev)
-          {
-               if (ev.Target != null)
-               {
-                    if (ev.Target.IsNPC)
-                    {
-                         ev.IsAllowed = false;
-                    }
-               }
-          }
-     }
+		public void FuckYourOtherAbility(TriggeringBloodlustEventArgs ev)
+		{
+			if (ev.Target != null)
+			{
+				if (ev.Target.IsNPC)
+				{
+					ev.IsAllowed = false;
+				}
+			}
+		}
+	}
 }
