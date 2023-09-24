@@ -1,7 +1,6 @@
 ﻿using FoundationFortune.API.Database;
 using MEC;
 using PlayerRoles;
-using PlayerStatsSystem;
 using UnityEngine;
 using Exiled.Events.EventArgs.Player;
 using Exiled.API.Features;
@@ -9,10 +8,9 @@ using Exiled.API.Features.Items;
 using Exiled.Events.EventArgs.Scp049;
 using Exiled.Events.EventArgs.Scp0492;
 using FoundationFortune.API.NPCs;
-using Discord;
 using System.Linq;
-using Mono.Cecil.Cil;
 using Exiled.Events.EventArgs.Server;
+using System.Collections.Generic;
 
 namespace FoundationFortune.Events
 {
@@ -20,15 +18,21 @@ namespace FoundationFortune.Events
      {
           Center,
           Right,
-          Left
+          Left,
+          TopLeft,
+          TopRight
      }
 
      public partial class ServerEvents
      {
           private CoroutineHandle moneyHintCoroutine;
 
+          private CoroutineHandle roundEndCoroutine;
+
           public void RoundStart()
           {
+               roundEndCoroutine = Timing.RunCoroutine(RoundEndChecker());
+
                moneyHintCoroutine = Timing.RunCoroutine(UpdateMoneyAndHints());
 
                FoundationFortune.Singleton.BuyingBotIndexation.Clear();
@@ -38,29 +42,31 @@ namespace FoundationFortune.Events
                InitializeBuyingBots();
           }
 
-          /*public void InstanceModeChange(ReferenceHub hub, ClientInstanceMode mode)
+          private IEnumerator<float> RoundEndChecker()
           {
-               Log.Info(mode);
-               if(hub is null) return;
-               Log.Info("1");
-               Player player = Player.Get(hub);
-               Log.Info("2");
-               if (player is null || player is not null && !player.IsNPC) return;
-               Log.Info("3");
-               if (mode == ClientInstanceMode.DedicatedServer) return;
-               Log.Info("4");
+               Log.Debug("RoundEndChecker::Start");
+               while (true)
+               {
+                    IEnumerable<Player> players = Player.List.Where(p => !p.IsNPC);
+                    IEnumerable<Player> alivePlayers = players.Where(p => p.IsAlive);
+                    int chaos = alivePlayers.Count(p => p.IsCHI);
+                    int mtf = alivePlayers.Count(p => p.IsNTF || p.Role.Type == RoleTypeId.Scientist);
+                    int scps = alivePlayers.Count(p => p.IsScp);
 
-               hub.characterClassManager.InstanceMode = ClientInstanceMode.DedicatedServer;
+                    if(alivePlayers.Count() <= 1) Round.EndRound(true);
+                    if(chaos >= 1 && mtf == 0 || mtf >= 1 && chaos == 0 && scps == 0) Round.EndRound(true);
 
-               Log.Info(hub.nicknameSync?.DisplayName.ToString() ?? "Null name");
-               Log.Info(hub.characterClassManager.InstanceMode);
-          }*/
+
+                    yield return Timing.WaitForSeconds(2.5f);
+               }
+          }
 
           public void RoundEnd(RoundEndedEventArgs ev)
           {
                Log.Debug("Round End");
 
                if (moneyHintCoroutine.IsRunning) Timing.KillCoroutines(moneyHintCoroutine);
+               if (roundEndCoroutine.IsRunning) Timing.KillCoroutines(roundEndCoroutine);
           }
 
           public void RegisterInDatabase(VerifiedEventArgs ev)
