@@ -26,12 +26,10 @@ namespace FoundationFortune.Events
 	public partial class ServerEvents
 	{
 		private CoroutineHandle moneyHintCoroutine;
-		private CoroutineHandle roundEndCoroutine;
 		private RoundSummary round;
 
 		public void RoundStart()
 		{
-			roundEndCoroutine = Timing.RunCoroutine(RoundEndChecker());
 			moneyHintCoroutine = Timing.RunCoroutine(UpdateMoneyAndHints());
 
 			FoundationFortune.Singleton.BuyingBotIndexation.Clear();
@@ -45,7 +43,7 @@ namespace FoundationFortune.Events
 		{
 			while (true)
 			{
-                IEnumerable<Player> players = Player.List.Where(p => !p.IsNPC);
+				IEnumerable<Player> players = Player.List.Where(p => !p.IsNPC);
 				IEnumerable<Player> alivePlayers = players.Where(p => p.IsAlive);
 				int chaos = alivePlayers.Count(p => p.IsCHI);
 				int mtf = alivePlayers.Count(p => p.IsNTF || p.Role.Type == RoleTypeId.Scientist);
@@ -53,20 +51,34 @@ namespace FoundationFortune.Events
 
 				if (!Round.IsLocked && !Round.IsEnded)
 				{
-                    if (alivePlayers.Count() <= 1) round.ForceEnd();
-                    if (chaos >= 1 && mtf == 0 || mtf >= 1 && chaos == 0 && scps == 0) round.ForceEnd();
-                }
+					if (alivePlayers.Count() <= 1) round.ForceEnd();
+					if (chaos >= 1 && mtf == 0 || mtf >= 1 && chaos == 0 && scps == 0) round.ForceEnd();
+				}
 
 				yield return Timing.WaitForSeconds(1f);
-            }
+			}
 		}
 
-		public void RoundEnd(RoundEndedEventArgs ev)
+		public void RoundEnding(EndingRoundEventArgs ev)
+		{
+			IEnumerable<Player> players = Player.List.Where(p => !p.IsNPC);
+			IEnumerable<Player> alivePlayers = players.Where(p => p.IsAlive);
+			int chaos = alivePlayers.Count(p => p.IsCHI || p.Role.Type == RoleTypeId.ClassD);
+			int mtf = alivePlayers.Count(p => p.IsNTF || p.Role.Type == RoleTypeId.Scientist);
+			int scps = alivePlayers.Count(p => p.IsScp);
+
+			if (!Round.IsLocked && !Round.IsEnded)
+			{
+				if (alivePlayers.Count() <= 1) ev.IsRoundEnded = true;
+				if (chaos >= 1 && mtf == 0 || mtf >= 1 && chaos == 0 && scps == 0) ev.IsRoundEnded = true;
+			}
+		}
+
+		public void RoundEnded(RoundEndedEventArgs ev)
 		{
 			Log.Debug("Round End");
 
 			if (moneyHintCoroutine.IsRunning) Timing.KillCoroutines(moneyHintCoroutine);
-			if (roundEndCoroutine.IsRunning) Timing.KillCoroutines(roundEndCoroutine);
 		}
 
 		public void RegisterInDatabase(VerifiedEventArgs ev)
