@@ -51,8 +51,8 @@ namespace FoundationFortune
         {
             new NPCSpawn { Name = "Buying Bot 1", Badge = "Foundation Fortune", BadgeColor = "pumpkin", IsSellingBot = false, Role = RoleTypeId.ClassD, HeldItem = ItemType.KeycardChaosInsurgency, Scale = new Vector3(1, 1, 1), Room = RoomType.HczNuke },
             new NPCSpawn { Name = "Buying Bot 2", Badge = "Foundation Fortune", BadgeColor = "pumpkin", IsSellingBot = false, Role = RoleTypeId.ClassD, HeldItem = ItemType.KeycardChaosInsurgency, Scale = new Vector3(1, 1, 1), Room = RoomType.Hcz079 },
-            new NPCSpawn { Name = "Selling Bot 3", Badge = "Foundation Fortune", BadgeColor = "yellow", IsSellingBot = true, Role = RoleTypeId.Scientist, HeldItem = ItemType.KeycardChaosInsurgency, Scale = new Vector3(1, 1, 1), Room = RoomType.Hcz096 },
-            new NPCSpawn { Name = "Selling Bot 4", Badge = "Foundation Fortune", BadgeColor = "yellow", IsSellingBot = true, Role = RoleTypeId.Scientist, HeldItem = ItemType.KeycardChaosInsurgency, Scale = new Vector3(1, 1, 1), Room = RoomType.Hcz939 },
+            new NPCSpawn { Name = "Selling Bot 3",Badge = "Foundation Fortune", BadgeColor = "yellow", IsSellingBot = true, Role = RoleTypeId.Scientist, HeldItem = ItemType.KeycardChaosInsurgency, Scale = new Vector3(1, 1, 1), Room = RoomType.Hcz096 },
+            new NPCSpawn { Name = "Selling Bot 4",Badge = "Foundation Fortune", BadgeColor = "yellow", IsSellingBot = true, Role = RoleTypeId.Scientist, HeldItem = ItemType.KeycardChaosInsurgency, Scale = new Vector3(1, 1, 1), Room = RoomType.Hcz939 },
             new NPCSpawn { Name = "Buying Bot 5", Badge = "Foundation Fortune", BadgeColor = "pumpkin", IsSellingBot = false, Role = RoleTypeId.ClassD, HeldItem = ItemType.KeycardChaosInsurgency, Scale = new Vector3(1, 1, 1), Room = RoomType.HczArmory }
         };
 
@@ -72,26 +72,26 @@ namespace FoundationFortune
         [Description("List of items that can be sold.")]
         public List<SellableItem> SellableItems { get; set; } = new List<SellableItem>
         {
-            new SellableItem { ItemType = ItemType.MicroHID, Price = 1200, DisplayName = "Micro HID" },
-            new SellableItem { ItemType = ItemType.SCP500, Price = 1000, DisplayName = "SCP-500" },
+            new SellableItem { Alias = "", ItemType = ItemType.MicroHID, Price = 1200, DisplayName = "Micro HID" },
+            new SellableItem { Alias = "", ItemType = ItemType.SCP500, Price = 1000, DisplayName = "SCP-500" },
         };
 
         [Description("List of items that can be bought.")]
         public List<BuyableItem> BuyableItems { get; set; } = new List<BuyableItem>
         {
-            new BuyableItem { ItemType = ItemType.MicroHID, Price = 500, DisplayName = "Micro HID" },
-            new BuyableItem { ItemType = ItemType.SCP500, Price = 1000, DisplayName = "SCP-500" },
+            new BuyableItem { Alias = "", ItemType = ItemType.MicroHID, Price = 500, DisplayName = "Micro HID" },
+            new BuyableItem { Alias = "", ItemType = ItemType.SCP500, Price = 1000, DisplayName = "SCP-500" },
         };
 
         [Description("List of perks that can be bought.")]
         public List<PerkItem> PerkItems { get; set; } = new List<PerkItem>
         {
-            new PerkItem { PerkType = PerkType.Revival, Price = 3000, DisplayName = "Revival", Description = "This is just warzone 2."},
-            new PerkItem { PerkType = PerkType.ExtraHP, Price = 2200, DisplayName = "Extra HP", Description = "This is just, idk."},
-            new PerkItem { PerkType = PerkType.AHPBoost, Price = 1100, DisplayName = "AHP Boost", Description = "This is just SCP Health scaling on lower values."},
-            new PerkItem { PerkType = PerkType.Invisibility, Price = 1000, DisplayName = "Invisibility", Description = "This is just 268."},
-            new PerkItem { PerkType = PerkType.Regeneration, Price = 500, DisplayName = "Regeneration", Description = "This is just Red Candy."},
-            new PerkItem { PerkType = PerkType.MovementBoost, Price = 300, DisplayName = "Movement Boost", Description = "This is just 207."},
+            new PerkItem { Alias = "", PerkType = PerkType.Revival, Price = 3000, DisplayName = "Revival", Description = "This is just warzone 2."},
+            new PerkItem { Alias = "", PerkType = PerkType.ExtraHP, Price = 2200, DisplayName = "Extra HP", Description = "This is just, idk."},
+            new PerkItem { Alias = "", PerkType = PerkType.AHPBoost, Price = 1100, DisplayName = "AHP Boost", Description = "This is just SCP Health scaling on lower values."},
+            new PerkItem { Alias = "", PerkType = PerkType.Invisibility, Price = 1000, DisplayName = "Invisibility", Description = "This is just 268."},
+            new PerkItem { Alias = "", PerkType = PerkType.Regeneration, Price = 500, DisplayName = "Regeneration", Description = "This is just Red Candy."},
+            new PerkItem { Alias = "", PerkType = PerkType.MovementBoost, Price = 300, DisplayName = "Movement Boost", Description = "This is just 207."},
         };
     }
 
@@ -127,6 +127,7 @@ namespace FoundationFortune
         public PerkType PerkType { get; set; }
         public int Price { get; set; }
         public int Limit { get; set; }
+        public string Alias { get; set; }
         public string DisplayName { get; set; }
         public string Description { get; set; }
     }
@@ -158,6 +159,7 @@ namespace FoundationFortune
         public ItemType ItemType { get; set; }
         public int Price { get; set; }
         public int Limit { get; set; }
+        public string Alias { get; set; }
         public string DisplayName { get; set; }
     }
 }
