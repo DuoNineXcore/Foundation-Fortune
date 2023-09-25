@@ -3,6 +3,7 @@ using Exiled.API.Features;
 using FoundationFortune.API;
 using FoundationFortune.API.Database;
 using FoundationFortune.API.Perks;
+using InventorySystem;
 using InventorySystem.Items.Firearms;
 using System;
 using System.Collections.Generic;
@@ -99,12 +100,44 @@ namespace FoundationFortune.Commands.Buy
 			}
 			else if (Enum.TryParse(arguments.At(0), ignoreCase: true, out ItemType itemType))
 			{
+				BuyableItem buyItem = FoundationFortune.Singleton.Config.BuyableItems.FirstOrDefault(i => i.ItemType == itemType);
 
-			}
-			else
-			{
-				response = GetList();
-				return false;
+				if (buyItem == null)
+				{
+					response = "That is not a purchaseable item!";
+					return false;
+				}
+
+				int money = PlayerDataRepository.GetMoneySaved(player.UserId);
+				if (money < buyItem.Price)
+				{
+					response = $"You are missing ${buyItem.Price - money}!";
+					return false;
+				}
+
+				if (purchases != null && purchases.BoughtItems.ContainsKey(buyItem) && purchases.BoughtItems[buyItem] >= buyItem.Limit)
+				{
+					response = $"You have purchased {buyItem.DisplayName} too many times.";
+					return false;
+				}
+
+				if (purchases.BoughtItems.ContainsKey(buyItem))
+				{
+					purchases.BoughtItems[buyItem]++;
+				}
+				else
+				{
+					purchases = new(player);
+					purchases.BoughtItems.Add(buyItem, 1);
+					PlayerLimits.Add(purchases);
+				}
+
+				PlayerDataRepository.SubtractMoneySaved(player.UserId, buyItem.Price);
+				player.Inventory.ServerAddItem(buyItem.ItemType);
+
+				FoundationFortune.Singleton.serverEvents.EnqueueHint(player, $"<size=27><color=red>-${buyItem.Price}</color> Bought {buyItem.DisplayName}</size>", 0, 5, false, false);
+				response = $"You have successfully bought {buyItem.DisplayName} for ${buyItem.Price}";
+				return true;
 			}
 
 			response = GetList();
