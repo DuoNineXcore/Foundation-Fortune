@@ -10,6 +10,7 @@ using FoundationFortune.API.NPCs;
 using Exiled.API.Enums;
 using Random = UnityEngine.Random;
 using Exiled.API.Features.Doors;
+using Utf8Json.Unity;
 
 namespace FoundationFortune.Events
 {
@@ -24,6 +25,8 @@ namespace FoundationFortune.Events
           private readonly Dictionary<string, float> dropTimestamp = new Dictionary<string, float>();
           private readonly Dictionary<string, (Item item, int price)> itemsBeingSold = new Dictionary<string, (Item, int)>();
 
+          private readonly Vector3 escapePosition = new(1, 1, 1); // MAKE THIS BE THE ESCAPE POSITON
+
           private IEnumerator<float> UpdateMoneyAndHints()
           {
                Log.Debug("UpdateMoneyAndHints::Start");
@@ -32,6 +35,13 @@ namespace FoundationFortune.Events
                     foreach (Player ply in Player.List.Where(p => !p.IsDead && !p.IsNPC))
                     {
                          int moneyOnHold = PlayerDataRepository.GetMoneyOnHold(ply.UserId);
+
+                         if(Vector3.Distance(ply.Position, escapePosition) <= 5)
+                         {
+                              PlayerDataRepository.SubtractMoneyOnHold(ply.UserId, moneyOnHold);
+                              PlayerDataRepository.AddMoneySaved(ply.UserId, moneyOnHold);
+                              moneyOnHold = 0;
+                         }
                          int moneySaved = PlayerDataRepository.GetMoneySaved(ply.UserId);
                          HintAlign? hintAlignment = PlayerDataRepository.GetUserHintAlign(ply.UserId);
 

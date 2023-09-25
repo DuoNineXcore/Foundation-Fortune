@@ -11,6 +11,7 @@ using FoundationFortune.API.NPCs;
 using System.Linq;
 using Exiled.Events.EventArgs.Server;
 using System.Collections.Generic;
+using FoundationFortune.Commands.Buy;
 
 namespace FoundationFortune.Events
 {
@@ -27,6 +28,8 @@ namespace FoundationFortune.Events
 
 		public void RoundStart()
 		{
+			ParentBuyCommand.PlayerLimits.Clear();
+
 			moneyHintCoroutine = Timing.RunCoroutine(UpdateMoneyAndHints());
 
 			FoundationFortune.Singleton.BuyingBotIndexation.Clear();
