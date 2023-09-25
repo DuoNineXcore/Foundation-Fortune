@@ -42,9 +42,12 @@ namespace FoundationFortune.Commands.Buy
 
 			PurchasesObject purchases = PlayerLimits.FirstOrDefault(o => o.Player == player);
 
-			if (Enum.TryParse(arguments.At(0), ignoreCase: true, out PerkType perkType))
+			PerkItem perkItem = FoundationFortune.Singleton.Config.PerkItems.FirstOrDefault(p => p.Alias == arguments.At(0));
+			BuyableItem buyItem = FoundationFortune.Singleton.Config.BuyableItems.FirstOrDefault(p => p.Alias == arguments.At(0));
+
+			if (Enum.TryParse(arguments.At(0), ignoreCase: true, out PerkType perkType) || perkItem != null)
 			{
-				PerkItem perk = FoundationFortune.Singleton.Config.PerkItems.FirstOrDefault(p => p.PerkType == perkType);
+				PerkItem perk = perkItem == null ? FoundationFortune.Singleton.Config.PerkItems.FirstOrDefault(p => p.PerkType == perkType) : perkItem;
 
 				if (perk == null)
 				{
@@ -98,9 +101,10 @@ namespace FoundationFortune.Commands.Buy
 				response = $"You have successfully bought {perk.DisplayName} for ${perk.Price}";
 				return true;
 			}
-			else if (Enum.TryParse(arguments.At(0), ignoreCase: true, out ItemType itemType))
+			else if (Enum.TryParse(arguments.At(0), ignoreCase: true, out ItemType itemType) || buyItem != null)
 			{
-				BuyableItem buyItem = FoundationFortune.Singleton.Config.BuyableItems.FirstOrDefault(i => i.ItemType == itemType);
+				//BuyableItem buyItem = FoundationFortune.Singleton.Config.BuyableItems.FirstOrDefault(i => i.ItemType == itemType);
+				BuyableItem item = buyItem == null ? FoundationFortune.Singleton.Config.BuyableItems.FirstOrDefault(p => p.ItemType == itemType) : buyItem;
 
 				if (buyItem == null)
 				{
