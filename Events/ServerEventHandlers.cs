@@ -28,7 +28,7 @@ namespace FoundationFortune.Events
 
 		public void RoundStart()
 		{
-			ParentBuyCommand.PlayerLimits.Clear();
+			BuyCommand.PlayerLimits.Clear();
 
 			moneyHintCoroutine = Timing.RunCoroutine(UpdateMoneyAndHints());
 
