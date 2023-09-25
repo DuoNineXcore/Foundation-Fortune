@@ -18,15 +18,12 @@ namespace FoundationFortune.Events
 	{
 		Center,
 		Right,
-		Left,
-		TopLeft,
-		TopRight
+		Left
 	}
 
 	public partial class ServerEvents
 	{
 		private CoroutineHandle moneyHintCoroutine;
-		private RoundSummary round;
 
 		public void RoundStart()
 		{
@@ -37,26 +34,6 @@ namespace FoundationFortune.Events
 
 			InitializeWorkstationPositions();
 			InitializeBuyingBots();
-		}
-
-		private IEnumerator<float> RoundEndChecker()
-		{
-			while (true)
-			{
-				IEnumerable<Player> players = Player.List.Where(p => !p.IsNPC);
-				IEnumerable<Player> alivePlayers = players.Where(p => p.IsAlive);
-				int chaos = alivePlayers.Count(p => p.IsCHI);
-				int mtf = alivePlayers.Count(p => p.IsNTF || p.Role.Type == RoleTypeId.Scientist);
-				int scps = alivePlayers.Count(p => p.IsScp);
-
-				if (!Round.IsLocked && !Round.IsEnded)
-				{
-					if (alivePlayers.Count() <= 1) round.ForceEnd();
-					if (chaos >= 1 && mtf == 0 || mtf >= 1 && chaos == 0 && scps == 0) round.ForceEnd();
-				}
-
-				yield return Timing.WaitForSeconds(1f);
-			}
 		}
 
 		public void RoundEnding(EndingRoundEventArgs ev)
@@ -135,7 +112,9 @@ namespace FoundationFortune.Events
 				return;
 			}
 
-			if (IsPlayerNearSellingBot(ev.Player))
+            Npc buyingbot = GetBuyingBotNearPlayer(ev.Player);
+
+            if (IsPlayerNearSellingBot(ev.Player))
 			{
 				if (!confirmSell.ContainsKey(ev.Player.UserId))
 				{
@@ -164,8 +143,8 @@ namespace FoundationFortune.Events
 
 							if (soldItem == ev.Item)
 							{
-								Npc buyingbot = GetBuyingBotNearPlayer(ev.Player);
-								BuyingBot.PlayAudio(buyingbot, "BuySuccess.ogg", 50, false, VoiceChat.VoiceChatChannel.Mimicry);
+                                VoiceChatSettings buyVoiceChatSettings = FoundationFortune.Singleton.Config.VoiceChatSettings.FirstOrDefault(settings => settings.VoiceChatUsageType == VoiceChatUsageType.Buying);
+                                BuyingBot.PlayAudio(buyingbot, buyVoiceChatSettings.AudioFile, buyVoiceChatSettings.Volume, buyVoiceChatSettings.Loop, buyVoiceChatSettings.VoiceChat);
 								EnqueueHint(ev.Player, $"<b><size=24><color=green>+{price}$</color> Sold {FoundationFortune.Singleton.Config.SellableItems.Find(x => x.ItemType == ev.Item.Type).DisplayName}.</color></b></size>", price, 3, false, false);
 								ev.Player.RemoveItem(ev.Item);
 							}
@@ -184,32 +163,14 @@ namespace FoundationFortune.Events
 			else
 			{
 				ev.IsAllowed = true;
-				EnqueueHint(ev.Player, "<b><size=24><color=red>This is not a selling bot.</color></b></size>", 0, 3, false, false);
+                VoiceChatSettings wrongBotSettings = FoundationFortune.Singleton.Config.VoiceChatSettings.FirstOrDefault(settings => settings.VoiceChatUsageType == VoiceChatUsageType.WrongBuyingBot);
+                BuyingBot.PlayAudio(buyingbot, wrongBotSettings.AudioFile, wrongBotSettings.Volume, wrongBotSettings.Loop, wrongBotSettings.VoiceChat);
+                EnqueueHint(ev.Player, "<b><size=24><color=red>This is not a selling bot.</color></b></size>", 0, 3, false, false);
 			}
-
 			ev.IsAllowed = true;
 		}
 
-		public void FuckYourAbility(ActivatingSenseEventArgs ev)
-		{
-			if (ev.Target != null)
-			{
-				if (ev.Target.IsNPC)
-				{
-					ev.IsAllowed = false;
-				}
-			}
-		}
-
-		public void FuckYourOtherAbility(TriggeringBloodlustEventArgs ev)
-		{
-			if (ev.Target != null)
-			{
-				if (ev.Target.IsNPC)
-				{
-					ev.IsAllowed = false;
-				}
-			}
-		}
-	}
+		public void FuckYourAbility(ActivatingSenseEventArgs ev) {if (ev.Target != null && ev.Target.IsNPC) ev.IsAllowed = false;}
+		public void FuckYourOtherAbility(TriggeringBloodlustEventArgs ev) {if (ev.Target != null && ev.Target.IsNPC) ev.IsAllowed = false;}
+    }
 }

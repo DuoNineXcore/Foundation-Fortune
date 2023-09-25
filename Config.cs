@@ -5,23 +5,25 @@ using PlayerRoles;
 using System.Collections.Generic;
 using System.ComponentModel;
 using UnityEngine;
+using VoiceChat;
 
 namespace FoundationFortune
 {
-	public class Config : IConfig
-	{
+    public class Config : IConfig
+    {
+        [Description("Plugin Settings")]
         public bool IsEnabled { get; set; } = true;
-
         public bool Debug { get; set; } = true;
 
-		[Description("Number of hints that can be shown")]
-		public int MaxHintsToShow { get; set; } = 3;
+        [Description("Number of hints that can be shown")]
+        public int MaxHintsToShow { get; set; } = 3;
 
         [Description("Killing player event.")]
         public int KillReward { get; set; } = 300;
         public string KillHint { get; set; } = "<b><size=24><color=green>+$300</color> Killed [victim]. </b></size>";
         public bool KillRewardTransfer { get; set; } = false;
         public bool KillRewardTransferAll { get; set; } = false;
+        public bool KillRewardScpOnly { get; set; } = false;
 
         [Description("Escaping player event.")]
         public int EscapeReward { get; set; } = 300;
@@ -29,8 +31,8 @@ namespace FoundationFortune
         public bool EscapeRewardTransfer { get; set; } = true;
         public bool EscapeRewardTransferAll { get; set; } = false;
 
-        [Description("Amount of Coins to drop. NOTE: the value of the coins will be divided by the amount of coins. so if there's 10 coins a coin will be worth a tenth of the player's on hold money account.")]
-        public int CoinsToDrop { get; set; } = 10;
+        [Description("Amount of Death Coins to drop. NOTE: the value of the coins will be divided by the amount of coins. so if there's 10 coins a coin will be worth a tenth of the player's on hold money account.")]
+        public int DeathCoinsToDrop { get; set; } = 10;
 
         [Description("Lifespan of each hint.")]
         public float MaxHintAge { get; set; } = 3f;
@@ -46,7 +48,7 @@ namespace FoundationFortune
         public string SellingBotHint { get; set; } = "<b><size=24>You're around a Selling bot. Drop Items twice to sell them.</size></b>";
         public float BuyingBotRadius { get; set; } = 3f;
         public bool BuyingBotFixedLocation { get; set; } = true;
-        public List<NPCSpawn>BuyingBotSpawnSettings { get; set; } = new List<NPCSpawn>
+        public List<NPCSpawn> BuyingBotSpawnSettings { get; set; } = new List<NPCSpawn>
         {
             new NPCSpawn { Name = "Buying Bot 1", Badge = "Foundation Fortune", BadgeColor = "pumpkin", IsSellingBot = false, Role = RoleTypeId.ClassD, HeldItem = ItemType.KeycardChaosInsurgency, Scale = new Vector3(1, 1, 1), Room = RoomType.HczNuke },
             new NPCSpawn { Name = "Buying Bot 2", Badge = "Foundation Fortune", BadgeColor = "pumpkin", IsSellingBot = false, Role = RoleTypeId.ClassD, HeldItem = ItemType.KeycardChaosInsurgency, Scale = new Vector3(1, 1, 1), Room = RoomType.Hcz079 },
@@ -57,6 +59,16 @@ namespace FoundationFortune
 
         [Description("The time you have to sell an item after asking for confirmation.")]
         public float SellingConfirmationTime { get; set; } = 5f;
+
+        [Description("How Should the bots use their voice chat feature?")]
+        public List<VoiceChatSettings> VoiceChatSettings { get; set; } = new List<VoiceChatSettings>()
+        {
+            new VoiceChatSettings { VoiceChatUsageType = VoiceChatUsageType.Selling, VoiceChat = VoiceChatChannel.Mimicry, Loop = false, AudioFile = "BuySuccess.ogg", Volume = 50},
+            new VoiceChatSettings { VoiceChatUsageType = VoiceChatUsageType.Buying, VoiceChat = VoiceChatChannel.Mimicry, Loop = false, AudioFile = "BuySuccess.ogg", Volume = 50},
+            new VoiceChatSettings { VoiceChatUsageType = VoiceChatUsageType.Revival, VoiceChat = VoiceChatChannel.Intercom, Loop = false, AudioFile = "BuySuccess.ogg", Volume = 50},
+            new VoiceChatSettings { VoiceChatUsageType = VoiceChatUsageType.WrongBuyingBot, VoiceChat = VoiceChatChannel.Mimicry, Loop = false, AudioFile = "BuySuccess.ogg", Volume = 50},
+            new VoiceChatSettings { VoiceChatUsageType = VoiceChatUsageType.NotEnoughMoney, VoiceChat = VoiceChatChannel.Mimicry, Loop = false, AudioFile = "BuySuccess.ogg", Volume = 50}
+        };
 
         [Description("List of items that can be sold.")]
         public List<SellableItem> SellableItems { get; set; } = new List<SellableItem>
@@ -84,10 +96,30 @@ namespace FoundationFortune
         };
     }
 
+    public enum VoiceChatUsageType
+    {
+        Selling,
+        Buying,
+        Revival,
+        NotEnoughMoney,
+        WrongBuyingBot
+    }
+
+    public class VoiceChatSettings
+    {
+        public VoiceChatChannel VoiceChat { get; set; }
+        public byte Volume { get; set; }
+        public string AudioFile { get; set; }
+        public VoiceChatUsageType VoiceChatUsageType { get; set; }
+        public bool Loop { get; set; }
+    }
+
     public class SellableItem
     {
         public ItemType ItemType { get; set; }
         public int Price { get; set; }
+        public int Limit { get; set; }
+        public string Alias { get; set; }
         public string DisplayName { get; set; }
     }
 
@@ -95,6 +127,7 @@ namespace FoundationFortune
     {
         public PerkType PerkType { get; set; }
         public int Price { get; set; }
+        public int Limit { get; set; }
         public string DisplayName { get; set; }
         public string Description { get; set; }
     }
@@ -125,6 +158,7 @@ namespace FoundationFortune
     {
         public ItemType ItemType { get; set; }
         public int Price { get; set; }
+        public int Limit { get; set; }
         public string DisplayName { get; set; }
     }
 }

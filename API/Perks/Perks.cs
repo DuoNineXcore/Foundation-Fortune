@@ -3,6 +3,7 @@ using Exiled.API.Features;
 using FoundationFortune.API.NPCs;
 using InventorySystem.Items.Usables.Scp330;
 using PlayerRoles;
+using System.Linq;
 
 namespace FoundationFortune.API.Perks
 {
@@ -36,10 +37,11 @@ namespace FoundationFortune.API.Perks
         {
             Player targetToRevive = Player.Get(targetName);
             Npc buyingbot = FoundationFortune.Singleton.serverEvents.GetBuyingBotNearPlayer(reviver);
+            VoiceChatSettings revivalVoiceChatSettings = FoundationFortune.Singleton.Config.VoiceChatSettings.FirstOrDefault(settings => settings.VoiceChatUsageType == VoiceChatUsageType.Revival);
 
-            if (targetToRevive != null && targetToRevive.Role == RoleTypeId.Spectator)
+            if (revivalVoiceChatSettings != null)
             {
-                BuyingBot.PlayAudio(buyingbot, "BuySuccess.ogg", 70, false, VoiceChat.VoiceChatChannel.Intercom);
+                BuyingBot.PlayAudio(buyingbot, revivalVoiceChatSettings.AudioFile, revivalVoiceChatSettings.Volume, revivalVoiceChatSettings.Loop, revivalVoiceChatSettings.VoiceChat);
                 RevivePlayer(reviver, targetToRevive);
                 return true;
             }
