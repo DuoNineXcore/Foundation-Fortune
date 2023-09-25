@@ -124,7 +124,8 @@
         }
     }
 
-    /*[HarmonyPatch(typeof(RoundSummary), nameof(RoundSummary._ProcessServerSideCode))]
+    /*
+    [HarmonyPatch(typeof(RoundSummary), nameof(RoundSummary._ProcessServerSideCode))]
     internal static class _ProcessServerSideCode
     {
         static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
@@ -149,7 +150,8 @@
 
             return newInstructions.AsEnumerable();
         }
-    }*/
+    }
+    */
 
     [HarmonyPatch(typeof(FootstepRippleTrigger), nameof(FootstepRippleTrigger.OnFootstepPlayed))]
      internal static class OnFootstepPlayed

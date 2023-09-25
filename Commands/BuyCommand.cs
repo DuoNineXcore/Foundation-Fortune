@@ -5,6 +5,7 @@ using FoundationFortune.API.Database;
 using FoundationFortune.API.Perks;
 using InventorySystem;
 using InventorySystem.Items.Firearms;
+using InventorySystem.Items.Usables;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,7 +18,7 @@ namespace FoundationFortune.Commands.Buy
 	[CommandHandler(typeof(RemoteAdminCommandHandler))]
 	public sealed class BuyCommand : ICommand
 	{
-		private List<PurchasesObject> PlayerLimits = new();
+		public static List<PurchasesObject> PlayerLimits = new();
 		private Perks perks = new();
 
 		public string Command { get; } = "buy";
@@ -103,10 +104,11 @@ namespace FoundationFortune.Commands.Buy
 			}
 			else if (Enum.TryParse(arguments.At(0), ignoreCase: true, out ItemType itemType) || buyItem != null)
 			{
-				//BuyableItem buyItem = FoundationFortune.Singleton.Config.BuyableItems.FirstOrDefault(i => i.ItemType == itemType);
-				BuyableItem item = buyItem == null ? FoundationFortune.Singleton.Config.BuyableItems.FirstOrDefault(p => p.ItemType == itemType) : buyItem;
+                BuyableItem item = buyItem == null
+                    ? FoundationFortune.Singleton.Config.BuyableItems.FirstOrDefault(p => p.ItemType == itemType || p.Alias.Contains(itemType.ToString()))
+                    : buyItem;
 
-				if (buyItem == null)
+                if (buyItem == null)
 				{
 					response = "That is not a purchaseable item!";
 					return false;
@@ -152,12 +154,12 @@ namespace FoundationFortune.Commands.Buy
 		{
 			string itemsToBuy = "\n<color=green>Items to buy:</color>\n" +
 							string.Join("\n", FoundationFortune.Singleton.Config.BuyableItems
-							    .Select(buyableItem => $"{buyableItem.ItemType} - {buyableItem.DisplayName} - {buyableItem.Price}$")) +
+							    .Select(buyableItem => $"{buyableItem.ItemType} - {buyableItem.DisplayName} ({buyableItem.Alias}) - {buyableItem.Price}$")) +
 							"\n";
 
 			string perksToBuy = "<color=green>Perks to buy:</color>\n" +
 							string.Join("\n", FoundationFortune.Singleton.Config.PerkItems
-							    .Select(perkItem => $"{perkItem.DisplayName} - {perkItem.Price}$ - {perkItem.Description}")) +
+							    .Select(perkItem => $"{perkItem.DisplayName} ({perkItem.Alias}) - {perkItem.Price}$ - {perkItem.Description}")) +
 							"\n";
 			return itemsToBuy + perksToBuy;
 		}

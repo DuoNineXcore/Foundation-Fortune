@@ -56,8 +56,6 @@ namespace FoundationFortune.Events
 
 		public void RoundEnded(RoundEndedEventArgs ev)
 		{
-			Log.Debug("Round End");
-
 			if (moneyHintCoroutine.IsRunning) Timing.KillCoroutines(moneyHintCoroutine);
 		}
 

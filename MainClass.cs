@@ -1,25 +1,18 @@
-﻿using PlayerRoles;
-using LiteDB;
-using MEC;
-using System.IO;
-using System;
+﻿using Exiled.API.Features;
+using Exiled.CustomItems.API.Features;
 using FoundationFortune.API.Database;
 using FoundationFortune.Events;
-using Exiled.API.Features;
-using Exiled.API.Features.Attributes;
-using Exiled.CustomItems.API.Features;
-using Exiled.API.Features.Spawn;
-using System.Collections.Generic;
-using Exiled.Events.EventArgs.Player;
-using FoundationFortune.API.Items;
 using HarmonyLib;
+using LiteDB;
+using MEC;
 using SCPSLAudioApi;
-using FoundationFortune.API.NPCs;
-using System.Reflection;
+using System;
+using System.Collections.Generic;
+using System.IO;
 
 namespace FoundationFortune
 {
-	public class FoundationFortune : Plugin<Config>
+    public class FoundationFortune : Plugin<Config>
 	{
 		public override string Author => "DuoNineXcore";
 		public override string Name => "Foundation Fortune";

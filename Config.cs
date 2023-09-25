@@ -72,26 +72,26 @@ namespace FoundationFortune
         [Description("List of items that can be sold.")]
         public List<SellableItem> SellableItems { get; set; } = new List<SellableItem>
         {
-            new SellableItem { Alias = "", ItemType = ItemType.MicroHID, Price = 1200, DisplayName = "Micro HID" },
-            new SellableItem { Alias = "", ItemType = ItemType.SCP500, Price = 1000, DisplayName = "SCP-500" },
+            new SellableItem { Limit = 1, ItemType = ItemType.MicroHID, Price = 1200, DisplayName = "Micro HID" },
+            new SellableItem { Limit = 1, ItemType = ItemType.SCP500, Price = 1000, DisplayName = "SCP-500" },
         };
 
         [Description("List of items that can be bought.")]
-        public List<BuyableItem> BuyableItems { get; set; } = new List<BuyableItem>
+        public List<BuyableItem>BuyableItems { get; set; } = new List<BuyableItem>
         {
-            new BuyableItem { Alias = "", ItemType = ItemType.MicroHID, Price = 500, DisplayName = "Micro HID" },
-            new BuyableItem { Alias = "", ItemType = ItemType.SCP500, Price = 1000, DisplayName = "SCP-500" },
+            new BuyableItem { Limit = 1, Alias = "Micro", ItemType = ItemType.MicroHID, Price = 500, DisplayName = "Micro HID" },
+            new BuyableItem { Limit = 1, Alias = "500", ItemType = ItemType.SCP500, Price = 1000, DisplayName = "SCP-500" },
         };
 
         [Description("List of perks that can be bought.")]
         public List<PerkItem> PerkItems { get; set; } = new List<PerkItem>
         {
-            new PerkItem { Alias = "", PerkType = PerkType.Revival, Price = 3000, DisplayName = "Revival", Description = "This is just warzone 2."},
-            new PerkItem { Alias = "", PerkType = PerkType.ExtraHP, Price = 2200, DisplayName = "Extra HP", Description = "This is just, idk."},
-            new PerkItem { Alias = "", PerkType = PerkType.AHPBoost, Price = 1100, DisplayName = "AHP Boost", Description = "This is just SCP Health scaling on lower values."},
-            new PerkItem { Alias = "", PerkType = PerkType.Invisibility, Price = 1000, DisplayName = "Invisibility", Description = "This is just 268."},
-            new PerkItem { Alias = "", PerkType = PerkType.Regeneration, Price = 500, DisplayName = "Regeneration", Description = "This is just Red Candy."},
-            new PerkItem { Alias = "", PerkType = PerkType.MovementBoost, Price = 300, DisplayName = "Movement Boost", Description = "This is just 207."},
+            new PerkItem { Limit = 1, Alias = "Rev", PerkType = PerkType.Revival, Price = 3000, DisplayName = "Revival", Description = "This is just warzone 2."},
+            new PerkItem { Limit = 1, Alias = "EHP", PerkType = PerkType.ExtraHP, Price = 2200, DisplayName = "Extra HP", Description = "This is just, idk."},
+            new PerkItem { Limit = 1, Alias = "AHP", PerkType = PerkType.AHPBoost, Price = 1100, DisplayName = "AHP Boost", Description = "This is just SCP Health scaling on lower values."},
+            new PerkItem { Limit = 1, Alias = "Invis", PerkType = PerkType.Invisibility, Price = 1000, DisplayName = "Invisibility", Description = "This is just 268."},
+            new PerkItem { Limit = 1, Alias = "Regen", PerkType = PerkType.Regeneration, Price = 500, DisplayName = "Regeneration", Description = "This is just Red Candy."},
+            new PerkItem { Limit = 1, Alias = "Move", PerkType = PerkType.MovementBoost, Price = 300, DisplayName = "Movement Boost", Description = "This is just 207."},
         };
     }
 

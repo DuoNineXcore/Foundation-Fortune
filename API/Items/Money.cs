@@ -45,9 +45,9 @@ namespace FoundationFortune.API.Items
 
                 PlayerDataRepository.EmptyMoneyOnHold(ev.Player.UserId);
 
-                int coinValue = moneyBeforeDeath / FoundationFortune.Singleton.Config.CoinsToDrop;
+                int coinValue = moneyBeforeDeath / FoundationFortune.Singleton.Config.DeathCoinsToDrop;
 
-                for (int i = 0; i < FoundationFortune.Singleton.Config.CoinsToDrop; i++)
+                for (int i = 0; i < FoundationFortune.Singleton.Config.DeathCoinsToDrop; i++)
                 {
                     if (TrySpawn(Id, ev.Player.Position, out Pickup coin))
                     {
