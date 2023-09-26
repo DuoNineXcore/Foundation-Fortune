@@ -1,5 +1,6 @@
 ﻿using Exiled.API.Features;
 using System.Collections.Generic;
+using FoundationFortune.Configs;
 
 namespace FoundationFortune.API
 {

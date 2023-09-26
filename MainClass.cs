@@ -1,6 +1,7 @@
 ﻿using Exiled.API.Features;
 using Exiled.CustomItems.API.Features;
 using FoundationFortune.API.Database;
+using FoundationFortune.Configs;
 using FoundationFortune.Events;
 using HarmonyLib;
 using LiteDB;
@@ -12,11 +13,12 @@ using System.IO;
 
 namespace FoundationFortune
 {
-    public class FoundationFortune : Plugin<Config>
+    public class FoundationFortune : Plugin<PluginConfigs, PluginTranslations>
 	{
-		public override string Author => "DuoNineXcore";
+		public override string Author => "DuoNineXcore & Misfiy";
 		public override string Name => "Foundation Fortune";
-		public override string Prefix => "foundationfortune";
+		public override string Prefix => "ff";
+		public override Version Version => new(1, 0, 0);
 
 		private Harmony _harmony;
 
@@ -33,7 +35,7 @@ namespace FoundationFortune
 			RegisterEvents();
 			Startup.SetupDependencies();
 			CustomItem.RegisterItems();
-			if (_harmony is null)
+			if (_harmony == null)
 			{
 				_harmony = new("FoundationFortune");
 				_harmony.PatchAll();

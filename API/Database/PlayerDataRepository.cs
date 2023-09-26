@@ -7,38 +7,26 @@ namespace FoundationFortune.API.Database
 {
     public static class PlayerDataRepository
     {
-        public static void InsertPlayer(PlayerData player)
-        {
-            var playersCollection = FoundationFortune.Singleton.db.GetCollection<PlayerData>("players");
-            playersCollection.Insert(player);
-        }
+        private static LiteCollection<PlayerData> PlayersCollection => (LiteCollection<PlayerData>)FoundationFortune.Singleton.db.GetCollection<PlayerData>("players");
 
-        public static PlayerData GetPlayerById(string userId)
-        {
-            var playersCollection = FoundationFortune.Singleton.db.GetCollection<PlayerData>("players");
-            return playersCollection.FindOne(p => p.UserId == userId);
-        }
+        public static void InsertPlayer(PlayerData player) => PlayersCollection.Insert(player);
 
-        public static bool GetHintMinmode(string userId)
-        {
-            var playersCollection = FoundationFortune.Singleton.db.GetCollection<PlayerData>("players");
-            var player = playersCollection.FindOne(p => p.UserId == userId);
+        public static PlayerData GetPlayerById(string userId) => PlayersCollection.FindOne(p => p.UserId == userId);
 
-            return player?.HintMinmode ?? false;
-        }
+        public static bool GetHintMinmode(string userId) => PlayersCollection.FindOne(p => p.UserId == userId)?.HintMinmode ?? false;
+
+        public static int GetMoneyOnHold(string userId) => PlayersCollection.FindOne(p => p.UserId == userId)?.MoneyOnHold ?? 0;
+
+        public static int GetMoneySaved(string userId) => PlayersCollection.FindOne(p => p.UserId == userId)?.MoneySaved ?? 0;
 
         public static bool SetHintMinmode(string userId, bool enable)
         {
-            var playersCollection = FoundationFortune.Singleton.db.GetCollection<PlayerData>("players");
-            var player = playersCollection.FindOne(p => p.UserId == userId);
-
+            var player = GetPlayerById(userId);
             if (player != null)
             {
                 player.HintMinmode = enable;
-                playersCollection.Update(player);
-                return true;
+                return PlayersCollection.Update(player);
             }
-
             return false;
         }
 
@@ -46,9 +34,7 @@ namespace FoundationFortune.API.Database
         {
             try
             {
-                var playersCollection = FoundationFortune.Singleton.db.GetCollection<PlayerData>("players");
-                var player = playersCollection.FindOne(p => p.UserId == userId);
-                return player?.HintAlign ?? HintAlign.Center;
+                return PlayersCollection.FindOne(p => p.UserId == userId)?.HintAlign ?? HintAlign.Center;
             }
             catch (Exception ex)
             {
@@ -61,143 +47,68 @@ namespace FoundationFortune.API.Database
         {
             try
             {
-                var playersCollection = FoundationFortune.Singleton.db.GetCollection<PlayerData>("players");
-                var player = playersCollection.FindOne(p => p.UserId == userId);
-
+                var player = GetPlayerById(userId);
                 if (player != null)
                 {
                     player.HintAlign = hintAlign;
-                    return playersCollection.Update(player);
+                    return PlayersCollection.Update(player);
                 }
             }
             catch (Exception ex)
             {
                 Log.Error($"Error retrieving hint alignment for user {userId}: {ex.Message}");
-                return false;
             }
             return false;
         }
 
-        public static void SetMoneySaved(string userId, int amount)
+        public static void ModifyMoney(string userId, int amount, bool subtract = false, bool hold = false, bool saved = true)
         {
-            var playersCollection = FoundationFortune.Singleton.db.GetCollection<PlayerData>("players");
-            var player = playersCollection.FindOne(p => p.UserId == userId);
-
+            var player = GetPlayerById(userId);
             if (player != null)
             {
-                player.MoneySaved = amount;
-                playersCollection.Update(player);
+                if (hold)
+                {
+                    if (subtract) player.MoneyOnHold -= amount;
+                    else player.MoneyOnHold += amount;
+                }
+                else if (saved)
+                {
+                    if (subtract) player.MoneySaved -= amount;
+                    else player.MoneySaved += amount;
+                }
+                PlayersCollection.Update(player);
             }
         }
 
-        public static void AddMoneyOnHold(string userId, int amount)
-        {
-            var playersCollection = FoundationFortune.Singleton.db.GetCollection<PlayerData>("players");
-            var player = playersCollection.FindOne(p => p.UserId == userId);
 
+        public static void EmptyMoney(string userId, bool onHold = false, bool saved = false)
+        {
+            var player = GetPlayerById(userId);
             if (player != null)
             {
-                player.MoneyOnHold += amount;
-                playersCollection.Update(player);
+                if (onHold) player.MoneyOnHold = 0;
+                if (saved) player.MoneySaved = 0;
+                PlayersCollection.Update(player);
             }
         }
 
-        public static void AddMoneySaved(string userId, int amount)
+        public static void TransferMoney(string userId, bool onHoldToSaved = false)
         {
-            var playersCollection = FoundationFortune.Singleton.db.GetCollection<PlayerData>("players");
-            var player = playersCollection.FindOne(p => p.UserId == userId);
-
+            var player = GetPlayerById(userId);
             if (player != null)
             {
-                player.MoneySaved += amount;
-                playersCollection.Update(player);
-            }
-        }
+                if (onHoldToSaved)
+                {
+                    player.MoneySaved += player.MoneyOnHold;
+                    player.MoneyOnHold = 0;
+                }
+                else
+                {
+                    player.MoneyOnHold += player.MoneySaved;
+                    player.MoneySaved = 0;
+                }
 
-        public static int GetMoneyOnHold(string userId)
-        {
-            var playersCollection = FoundationFortune.Singleton.db.GetCollection<PlayerData>("players");
-            var player = playersCollection.FindOne(p => p.UserId == userId);
-
-            return player?.MoneyOnHold ?? 0;
-        }
-
-        public static int GetMoneySaved(string userId)
-        {
-            var playersCollection = FoundationFortune.Singleton.db.GetCollection<PlayerData>("players");
-            var player = playersCollection.FindOne(p => p.UserId == userId);
-
-            return player?.MoneySaved ?? 0;
-        }
-
-        public static void TransferAllMoneyToSaved(string userId)
-        {
-            int moneyOnHold = GetMoneyOnHold(userId);
-            int moneySaved = GetMoneySaved(userId);
-
-            moneySaved += moneyOnHold;
-
-            SetMoneySaved(userId, moneySaved);
-        }
-
-        public static void SubtractMoneySaved(string userId, int amount)
-        {
-            var playersCollection = FoundationFortune.Singleton.db.GetCollection<PlayerData>("players");
-            var player = playersCollection.FindOne(p => p.UserId == userId);
-
-            if (player != null)
-            {
-                player.MoneySaved -= amount;
-                playersCollection.Update(player);
-            }
-        }
-
-        public static void SubtractMoneyOnHold(string userId, int amount)
-        {
-            var playersCollection = FoundationFortune.Singleton.db.GetCollection<PlayerData>("players");
-            var player = playersCollection.FindOne(p => p.UserId == userId);
-
-            if (player != null)
-            {
-                player.MoneyOnHold -= amount;
-                playersCollection.Update(player);
-            }
-        }
-
-        public static void EmptyMoneyOnHold(string userId)
-        {
-            var playersCollection = FoundationFortune.Singleton.db.GetCollection<PlayerData>("players");
-            var player = playersCollection.FindOne(p => p.UserId == userId);
-
-            if (player != null)
-            {
-                player.MoneyOnHold = 0;
-                playersCollection.Update(player);
-            }
-        }
-
-        public static void EmptyMoneySaved(string userId)
-        {
-            var playersCollection = FoundationFortune.Singleton.db.GetCollection<PlayerData>("players");
-            var player = playersCollection.FindOne(p => p.UserId == userId);
-
-            if (player != null)
-            {
-                player.MoneySaved = 0;
-                playersCollection.Update(player);
-            }
-        }
-
-        public static void TransferMoneyOnHoldToSaved(string userId)
-        {
-            var playersCollection = FoundationFortune.Singleton.db.GetCollection<PlayerData>("players");
-            var player = playersCollection.FindOne(p => p.UserId == userId);
-
-            if (player != null)
-            {
-                player.MoneySaved += player.MoneyOnHold;
-                player.MoneyOnHold = 0;
-                playersCollection.Update(player);
+                PlayersCollection.Update(player);
             }
         }
     }
@@ -209,7 +120,7 @@ namespace FoundationFortune.API.Database
         public string UserId { get; set; }
         public int MoneyOnHold { get; set; }
         public int MoneySaved { get; set; }
-        public bool HintMinmode { get; set; } 
+        public bool HintMinmode { get; set; }
         public HintAlign HintAlign { get; set; }
     }
 }

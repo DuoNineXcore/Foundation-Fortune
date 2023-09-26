@@ -20,6 +20,12 @@ namespace FoundationFortune.Commands.FortuneCommands
 
         public bool Execute(ArraySegment<string> args, ICommandSender sender, out string response)
         {
+            if (!sender.CheckPermission("ff.npc"))
+            {
+                response = "You do not have permission to use this section.";
+                return false;
+            }
+
             if (args.Count < 1)
             {
                 response = "Usage: foundationfortune npc <add/remove/list/flush>";
@@ -46,6 +52,12 @@ namespace FoundationFortune.Commands.FortuneCommands
 
         private bool AddBuyingBot(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
+            if (!sender.CheckPermission("ff.npc.add"))
+            {
+                response = "You do not have permission to use this command.";
+                return false;
+            }
+
             if (arguments.Count < 9)
             {
                 response = "Usage: foundationfortune npc add <Name> <Badge> <Color> <Role> <HeldItem> <ScaleX> <ScaleY> <ScaleZ>";
@@ -98,6 +110,12 @@ namespace FoundationFortune.Commands.FortuneCommands
 
         private bool RemoveBuyingBot(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
+            if (!sender.CheckPermission("ff.npc.remove"))
+            {
+                response = "You do not have permission to use this command.";
+                return false;
+            }
+
             if (arguments.Count < 2)
             {
                 response = "Usage: foundationfortune npc remove <IndexationNumber>";
@@ -125,6 +143,12 @@ namespace FoundationFortune.Commands.FortuneCommands
 
         private bool ListBuyingBots(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
+            if (!sender.CheckPermission("ff.npc.list"))
+            {
+                response = "You do not have permission to use this command.";
+                return false;
+            }
+
             if (FoundationFortune.Singleton == null)
             {
                 response = "FoundationFortune.Singleton is null.";
@@ -158,6 +182,12 @@ namespace FoundationFortune.Commands.FortuneCommands
 
         private bool FlushBuyingBots(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
+            if (!sender.CheckPermission("ff.npc.flush"))
+            {
+                response = "You do not have permission to use this command.";
+                return false;
+            }
+
             var buyingBots = FoundationFortune.Singleton.BuyingBotIndexation.Values.ToList();
 
             foreach (var botInfo in buyingBots)

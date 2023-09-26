@@ -16,6 +16,12 @@ namespace FoundationFortune.Commands.FortuneCommands
 
         public bool Execute(ArraySegment<string> args, ICommandSender sender, out string response)
         {
+            if (!sender.CheckPermission("ff.database"))
+            {
+                response = "You do not have permission to use this section.";
+                return false;
+            }
+
             if (args.Count < 1)
             {
                 response = "Usage: foundationfortune database <flush/addmoney/removemoney>";
@@ -40,9 +46,10 @@ namespace FoundationFortune.Commands.FortuneCommands
 
         private bool FlushDatabase(ICommandSender sender, out string response)
         {
+            var pluginTranslations = FoundationFortune.Singleton.Translation;
             if (!sender.CheckPermission("ff.database.flush"))
             {
-                response = "You don't have permission to use this command!";
+                response = "You do not have permission to use this command.";
                 return false;
             }
 
@@ -51,10 +58,8 @@ namespace FoundationFortune.Commands.FortuneCommands
                 int? moneyOnHold = PlayerDataRepository.GetMoneyOnHold(player.UserId);
                 int? moneySaved = PlayerDataRepository.GetMoneySaved(player.UserId);
 
-                FoundationFortune.Singleton.serverEvents.EnqueueHint(player, $"<size=24><color=red>-${moneyOnHold} (On Hold) -${moneySaved} (Saved)</color> Database Flushed.</size>", 0, 5f, false, false);
-
-                PlayerDataRepository.EmptyMoneyOnHold(player.UserId);
-                PlayerDataRepository.EmptyMoneySaved(player.UserId);
+                FoundationFortune.Singleton.serverEvents.EnqueueHint(player, $"{pluginTranslations.FlushedDatabase}", 0, 5f, false, false);
+                PlayerDataRepository.EmptyMoney(player.UserId, true, true);
             }
 
             response = "Flushed Database.";
@@ -63,6 +68,13 @@ namespace FoundationFortune.Commands.FortuneCommands
 
         private bool AddMoneyToDatabase(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
+            var pluginTranslations = FoundationFortune.Singleton.Translation;
+            if (!sender.CheckPermission("ff.database.addmoney"))
+            {
+                response = "You do not have permission to use this command.";
+                return false;
+            }
+
             if (arguments.Count < 3)
             {
                 response = "Usage: foundationfortune database addmoney <self/steamid/all> [amount]";
@@ -88,7 +100,7 @@ namespace FoundationFortune.Commands.FortuneCommands
                         return false;
                     }
 
-                    FoundationFortune.Singleton.serverEvents.EnqueueHint(ply, $"<color=green>${amount}.</color> Admin Command.", amount, 5f, false, false);
+                    FoundationFortune.Singleton.serverEvents.EnqueueHint(ply, $"{pluginTranslations.SelfAddMoney}", amount, 5f, false, false);
                     response = $"Gave {amount} money to player '{ply}'.";
                     return true;
 
@@ -101,7 +113,7 @@ namespace FoundationFortune.Commands.FortuneCommands
 
                     foreach (var player in Player.List)
                     {
-                        FoundationFortune.Singleton.serverEvents.EnqueueHint(player, $"<color=green>${allAmount}.</color> Admin Command.", allAmount, 5f, false, false);
+                        FoundationFortune.Singleton.serverEvents.EnqueueHint(player, $"{pluginTranslations.AllAddMoney}", allAmount, 5f, false, false);
                     }
 
                     response = $"Gave {allAmount} money to all players.";
@@ -118,7 +130,7 @@ namespace FoundationFortune.Commands.FortuneCommands
 
                     if (targetPlayer != null)
                     {
-                        FoundationFortune.Singleton.serverEvents.EnqueueHint(targetPlayer, $"<color=green>${steamIdAmount}.</color> Admin Command.", steamIdAmount, 5f, false, false);
+                        FoundationFortune.Singleton.serverEvents.EnqueueHint(targetPlayer, $"{pluginTranslations.SteamIDAddMoney}", steamIdAmount, 5f, false, false);
                     }
 
                     response = $"Gave {steamIdAmount} money to player '{addmoneytarget}'.";
@@ -128,6 +140,13 @@ namespace FoundationFortune.Commands.FortuneCommands
 
         private bool RemoveMoneyFromDatabase(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
+            var pluginTranslations = FoundationFortune.Singleton.Translation;
+            if (!sender.CheckPermission("ff.database.removemoney"))
+            {
+                response = "You do not have permission to use this command.";
+                return false;
+            }
+
             if (arguments.Count < 3)
             {
                 response = "Usage: foundationfortune database removemoney <self/steamid/all> [amount] [subtractSaved] [subtractOnHold]";
@@ -169,15 +188,15 @@ namespace FoundationFortune.Commands.FortuneCommands
 
                         if (subtractSaved)
                         {
-                            PlayerDataRepository.SubtractMoneySaved(ply.UserId, amount);
+                            PlayerDataRepository.ModifyMoney(ply.UserId, amount, true, false, true);
                         }
 
                         if (subtractOnHold)
                         {
-                            PlayerDataRepository.SubtractMoneyOnHold(ply.UserId, amount);
+                            PlayerDataRepository.ModifyMoney(ply.UserId, amount, true, true, false);
                         }
 
-                        FoundationFortune.Singleton.serverEvents.EnqueueHint(ply, $"<color=red>-${amount}.</color> Admin Command.", 0, 5f, false, false);
+                        FoundationFortune.Singleton.serverEvents.EnqueueHint(ply, $"{pluginTranslations.SelfRemoveMoney}", 0, 5f, false, false);
                         response = $"Removed {amount} money from player '{ply}' (Saved: {subtractSaved}, On-Hold: {subtractOnHold}).";
                         return true;
 
@@ -192,7 +211,8 @@ namespace FoundationFortune.Commands.FortuneCommands
 
                             foreach (var player in Player.List)
                             {
-                                PlayerDataRepository.SubtractMoneySaved(player.UserId, allAmount);
+                                FoundationFortune.Singleton.serverEvents.EnqueueHint(player, $"{pluginTranslations.AllRemoveMoney}", 0, 5f, false, false);
+                                PlayerDataRepository.ModifyMoney(player.UserId, allAmount, true, false, true);
                             }
                         }
 
@@ -206,7 +226,8 @@ namespace FoundationFortune.Commands.FortuneCommands
 
                             foreach (var player in Player.List)
                             {
-                                PlayerDataRepository.SubtractMoneyOnHold(player.UserId, allAmount);
+                                FoundationFortune.Singleton.serverEvents.EnqueueHint(player, $"{pluginTranslations.AllRemoveMoney}", 0, 5f, false, false);
+                                PlayerDataRepository.ModifyMoney(player.UserId, allAmount, true, true, false);
                             }
                         }
 
@@ -227,15 +248,15 @@ namespace FoundationFortune.Commands.FortuneCommands
                             {
                                 if (subtractSaved)
                                 {
-                                    PlayerDataRepository.SubtractMoneySaved(targetPlayer.UserId, steamIdAmount);
+                                    PlayerDataRepository.ModifyMoney(targetPlayer.UserId, steamIdAmount, true, false, false);
                                 }
 
                                 if (subtractOnHold)
                                 {
-                                    PlayerDataRepository.SubtractMoneyOnHold(targetPlayer.UserId, steamIdAmount);
+                                    PlayerDataRepository.ModifyMoney(targetPlayer.UserId, steamIdAmount, true, false, true);
                                 }
 
-                                FoundationFortune.Singleton.serverEvents.EnqueueHint(targetPlayer, $"<color=red>-${steamIdAmount}.</color> Admin Command.", 0, 5f, false, false);
+                                FoundationFortune.Singleton.serverEvents.EnqueueHint(targetPlayer, $"{pluginTranslations.SteamIDRemoveMoney}", 0, 5f, false, false);
                             }
                         }
 

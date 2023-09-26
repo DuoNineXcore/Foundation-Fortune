@@ -6,9 +6,9 @@ using UnityEngine;
 using VoiceChat;
 using System.ComponentModel;
 
-namespace FoundationFortune
+namespace FoundationFortune.Configs
 {
-    public class Config : IConfig
+    public class PluginConfigs : IConfig
     {
         [Description("Plugin Settings")]
         public bool IsEnabled { get; set; } = true;
@@ -19,14 +19,12 @@ namespace FoundationFortune
 
         [Description("Killing player event.")]
         public int KillReward { get; set; } = 300;
-        public string KillHint { get; set; } = "<b><size=24><color=green>+$300</color> Killed [victim]. </b></size>";
         public bool KillRewardTransfer { get; set; } = false;
         public bool KillRewardTransferAll { get; set; } = false;
         public bool KillRewardScpOnly { get; set; } = false;
 
         [Description("Escaping player event.")]
         public int EscapeReward { get; set; } = 300;
-        public string EscapeHint { get; set; } = "<b><size=24><color=green>+$300</color> Escaped.</b></size>";
         public bool EscapeRewardTransfer { get; set; } = true;
         public bool EscapeRewardTransferAll { get; set; } = false;
 
@@ -38,13 +36,10 @@ namespace FoundationFortune
 
         [Description("Selling Workstation Settings.")]
         public bool UseSellingWorkstation { get; set; } = false;
-        public string SellingWorkstationHint { get; set; } = "<b><size=24>>>You're on a Selling Workstation!<<</size></b>";
         public float SellingWorkstationRadius { get; set; } = 3f;
 
         [Description("Buying/Selling Bot Settings.")]
         public bool UseBuyingBot { get; set; } = true;
-        public string BuyingBotHint { get; set; } = "<b><size=24>You're around a buying bot. Type .buy list in the console.</size></b>";
-        public string SellingBotHint { get; set; } = "<b><size=24>You're around a Selling bot. Drop Items twice to sell them.</size></b>";
         public float BuyingBotRadius { get; set; } = 3f;
         public bool BuyingBotFixedLocation { get; set; } = true;
         public List<NPCSpawn> BuyingBotSpawnSettings { get; set; } = new List<NPCSpawn>

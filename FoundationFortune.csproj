@@ -75,25 +75,21 @@
     <Compile Include="API\Items\Money.cs" />
     <Compile Include="API\NPCs\BuyingBot.cs" />
     <Compile Include="API\Database\PlayerDataRepository.cs" />
-    <Compile Include="unused\BountySystem.cs" />
     <Compile Include="API\Perks\Perks.cs" />
     <Compile Include="API\PurchasesObject.cs" />
     <Compile Include="Commands\BuyCommand.cs" />
-    <Compile Include="unused\Buy\BuyItem.cs" />
-    <Compile Include="unused\Buy\BuyList.cs" />
-    <Compile Include="unused\Buy\ParentBuyCommand.cs" />
-    <Compile Include="unused\Buy\BuyPerk.cs" />
     <Compile Include="Commands\FortuneCommands\DatabaseCommand.cs" />
     <Compile Include="Commands\FortuneCommands\HintCommand.cs" />
     <Compile Include="Commands\FortuneCommands\NpcCommand.cs" />
     <Compile Include="Commands\FortuneCommands\ParentFortuneCommand.cs" />
-    <Compile Include="Config.cs" />
+    <Compile Include="Configs\PluginConfigs.cs" />
     <Compile Include="Patches\BuyingBotPatches.cs" />
-    <Compile Include="unused\FoundationFortune.cs" />
     <Compile Include="Events\ServerEventMethods.cs" />
     <Compile Include="Events\ServerEventHandlers.cs" />
     <Compile Include="MainClass.cs" />
+    <Compile Include="Configs\PluginTranslations.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Events\ServerEventBounty.cs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="EXILED">

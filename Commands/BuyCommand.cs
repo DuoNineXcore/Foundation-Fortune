@@ -4,15 +4,13 @@ using FoundationFortune.API;
 using FoundationFortune.API.Database;
 using FoundationFortune.API.Perks;
 using InventorySystem;
-using InventorySystem.Items.Firearms;
-using InventorySystem.Items.Usables;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Utils.NonAllocLINQ;
+using FoundationFortune.Configs;
 
-namespace FoundationFortune.Commands.Buy
+namespace FoundationFortune.Commands.BuyCommand
 {
 	[CommandHandler(typeof(ClientCommandHandler))]
 	[CommandHandler(typeof(RemoteAdminCommandHandler))]
@@ -23,7 +21,7 @@ namespace FoundationFortune.Commands.Buy
 
 		public string Command { get; } = "buy";
 		public string[] Aliases { get; } = new string[] { "b" };
-		public string Description { get; } = "You buy stuff.. What else did you expect?";
+		public string Description { get; } = "Buy items, wow.";
 
 		public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
 		{
@@ -31,7 +29,7 @@ namespace FoundationFortune.Commands.Buy
 
 			if (!FoundationFortune.Singleton.serverEvents.IsPlayerOnSellingWorkstation(player) && !FoundationFortune.Singleton.serverEvents.IsPlayerOnBuyingBotRadius(player))
 			{
-				response = "You must be at a buying station to buy an item!";
+				response = "You must be at a buying station to buy an item.";
 				return false;
 			}
 
@@ -86,7 +84,7 @@ namespace FoundationFortune.Commands.Buy
 						return false;
 					}
 
-					PlayerDataRepository.SubtractMoneySaved(player.UserId, perk.Price);
+					PlayerDataRepository.ModifyMoney(player.UserId, perk.Price, true, true, false);
 					perks.GrantPerk(player, perkType);
 
 					if (purchases.BoughtPerks.ContainsKey(perk))
@@ -138,10 +136,10 @@ namespace FoundationFortune.Commands.Buy
 					PlayerLimits.Add(purchases);
 				}
 
-				PlayerDataRepository.SubtractMoneySaved(player.UserId, buyItem.Price);
+				PlayerDataRepository.ModifyMoney(player.UserId, buyItem.Price, true, true);
 				player.Inventory.ServerAddItem(buyItem.ItemType);
 
-				FoundationFortune.Singleton.serverEvents.EnqueueHint(player, $"<size=27><color=red>-${buyItem.Price}</color> Bought {buyItem.DisplayName}</size>", 0, 5, false, false);
+				FoundationFortune.Singleton.serverEvents.EnqueueHint(player, $"{FoundationFortune.Singleton.Translation.BuyItemSuccess}", 0, 5, false, false);
 				response = $"You have successfully bought {buyItem.DisplayName} for ${buyItem.Price}";
 				return true;
 			}

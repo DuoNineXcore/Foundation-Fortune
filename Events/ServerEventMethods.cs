@@ -10,6 +10,7 @@ using FoundationFortune.API.NPCs;
 using Exiled.API.Enums;
 using Random = UnityEngine.Random;
 using Exiled.API.Features.Doors;
+using FoundationFortune.Configs;
 
 namespace FoundationFortune.Events
 {
@@ -27,7 +28,6 @@ namespace FoundationFortune.Events
 
         private IEnumerator<float> UpdateMoneyAndHints()
         {
-            Log.Debug("UpdateMoneyAndHints::Start");
             while (true)
             {
                 foreach (Player ply in Player.List.Where(p => !p.IsDead && !p.IsNPC))
@@ -36,8 +36,8 @@ namespace FoundationFortune.Events
 
                     if (IsPlayerInSafeZone(ply) && moneyOnHold != 0)
                     {
-                        PlayerDataRepository.SubtractMoneyOnHold(ply.UserId, moneyOnHold / 10);
-                        PlayerDataRepository.AddMoneySaved(ply.UserId, moneyOnHold / 10);
+                        PlayerDataRepository.ModifyMoney(ply.UserId, moneyOnHold / 10, true, true, false);
+                        PlayerDataRepository.ModifyMoney(ply.UserId, moneyOnHold / 10, false, false, true);
                     }
                     int moneySaved = PlayerDataRepository.GetMoneySaved(ply.UserId);
                     HintAlign? hintAlignment = PlayerDataRepository.GetUserHintAlign(ply.UserId);
@@ -78,16 +78,16 @@ namespace FoundationFortune.Events
             {
                 if (!confirmSell.ContainsKey(ply.UserId))
                 {
-                    hintMessage += $"<align={hintAlignment}>{FoundationFortune.Singleton.Config.SellingWorkstationHint}</align>";
+                    hintMessage += $"<align={hintAlignment}>{FoundationFortune.Singleton.Translation.SellingWorkstation}</align>";
                 }
                 else if (confirmSell[ply.UserId])
                 {
-                    hintMessage += $"<align={hintAlignment}>{FoundationFortune.Singleton.Config.SellingWorkstationHint}</align>";
+                    hintMessage += $"<align={hintAlignment}>{FoundationFortune.Singleton.Translation.SellingWorkstation}</align>";
 
                     if (itemsBeingSold.TryGetValue(ply.UserId, out var soldItemData))
                     {
                         int price = soldItemData.price;
-                        hintMessage += $"<align={hintAlignment}>\n<b><size=24>This item is worth <color=green>${price}</color>, Confirm sale? ({GetConfirmationTimeLeft(ply)} seconds left)</size></b></align>";
+                        hintMessage += $"<align={hintAlignment}>\n{FoundationFortune.Singleton.Translation.ItemConfirmation}</align>";
                     }
                 }
             }
@@ -102,16 +102,16 @@ namespace FoundationFortune.Events
                 BuyingBot.LookAt(npc, ply.Position);
                 if (!confirmSell.ContainsKey(ply.UserId))
                 {
-                    hintMessage += $"<align={hintAlignment}>{FoundationFortune.Singleton.Config.BuyingBotHint}</align>";
+                    hintMessage += $"<align={hintAlignment}>{FoundationFortune.Singleton.Translation.BuyingBot}</align>";
                 }
                 else if (confirmSell[ply.UserId])
                 {
-                    hintMessage += $"<align={hintAlignment}>{FoundationFortune.Singleton.Config.BuyingBotHint}</align>";
+                    hintMessage += $"<align={hintAlignment}>{FoundationFortune.Singleton.Translation.BuyingBot}</align>";
 
                     if (itemsBeingSold.TryGetValue(ply.UserId, out var soldItemData))
                     {
                         int price = soldItemData.price;
-                        hintMessage += $"<align={hintAlignment}>\n<b><size=24>This item is worth <color=green>${price}</color>, Confirm sale? ({GetConfirmationTimeLeft(ply)} seconds left)</size></b></align>";
+                        hintMessage += $"<align={hintAlignment}>\n{FoundationFortune.Singleton.Translation.ItemConfirmation}</align>";
                     }
                 }
             }
@@ -157,15 +157,15 @@ namespace FoundationFortune.Events
 
             if (transferAllToSavings)
             {
-                PlayerDataRepository.TransferAllMoneyToSaved(player.UserId);
+                PlayerDataRepository.TransferMoney(player.UserId, true);
             }
             else if (transferToSavings)
             {
-                PlayerDataRepository.TransferMoneyOnHoldToSaved(player.UserId);
+                PlayerDataRepository.ModifyMoney(player.UserId, reward, false, false, true);
             }
             else
             {
-                PlayerDataRepository.AddMoneyOnHold(player.UserId, reward);
+                PlayerDataRepository.ModifyMoney(player.UserId, reward, false, true, false);
             }
 
             recentHints[player.UserId].Enqueue(new HintEntry(hint, expirationTime, reward));

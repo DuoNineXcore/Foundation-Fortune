@@ -41,9 +41,9 @@ namespace FoundationFortune.API.Items
             int moneyBeforeDeath = PlayerDataRepository.GetMoneyOnHold(ev.Player.UserId);
             if (moneyBeforeDeath > 0)
             {
-                FoundationFortune.Singleton.serverEvents.EnqueueHint(ev.Player, $"<size=24><color=red>$-{moneyBeforeDeath}.</color> You died.</size>", 0, 5f, false, false);
+                FoundationFortune.Singleton.serverEvents.EnqueueHint(ev.Player, $"{FoundationFortune.Singleton.Translation.Death}", 0, 5f, false, false);
 
-                PlayerDataRepository.EmptyMoneyOnHold(ev.Player.UserId);
+                PlayerDataRepository.EmptyMoney(ev.Player.UserId, true, false);
 
                 int coinValue = moneyBeforeDeath / FoundationFortune.Singleton.Config.DeathCoinsToDrop;
 
@@ -51,7 +51,7 @@ namespace FoundationFortune.API.Items
                 {
                     if (TrySpawn(Id, ev.Player.Position, out Pickup coin))
                     {
-                        Log.Debug($"Spawned coin at Pos:{coin.Position} Rot:{coin.Rotation}, Serial: {coin.Serial}, Value: {coinValue}");
+                        Log.Debug($"Spawned coin at Pos:{coin.Position} Rotation:{coin.Rotation}, Serial: {coin.Serial}, Value: {coinValue}");
                         droppedCoins[coin.Serial] = (coinValue, ev.Player);
                     }
                 }
@@ -66,7 +66,7 @@ namespace FoundationFortune.API.Items
                 if (droppedCoins.TryGetValue(item.Serial, out var coinData))
                 {
                     int coinValue = coinData.coinValue;
-                    FoundationFortune.Singleton.serverEvents.EnqueueHint(player, $"<b><size=24><color=green>+{coinValue}$</color> Picked up Death Coin.</b></size>", coinValue, 3, false, false);
+                    FoundationFortune.Singleton.serverEvents.EnqueueHint(player, $"{FoundationFortune.Singleton.Translation.DeathCoinPickup}", coinValue, 3, false, false);
                     droppedCoins.Remove(item.Serial);
                 }
                 item.Destroy();

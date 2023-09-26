@@ -4,11 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-//COMING SOON//
-
-namespace FoundationFortune.API.Perks
+namespace FoundationFortune.Events
 {
-    public class BountySystem
+    public partial class ServerEvents
     {
     }
 }

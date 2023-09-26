@@ -3,6 +3,7 @@ using Exiled.API.Features;
 using FoundationFortune.API.NPCs;
 using InventorySystem.Items.Usables.Scp330;
 using PlayerRoles;
+using FoundationFortune.Configs;
 using System.Linq;
 
 namespace FoundationFortune.API.Perks
@@ -47,7 +48,7 @@ namespace FoundationFortune.API.Perks
             }
             else
             {
-                FoundationFortune.Singleton.serverEvents.EnqueueHint(reviver, $"<b><size=24>No dead player with Name: '{targetName}' found nearby to revive.</b></size>", 0, 3, false, false);
+                FoundationFortune.Singleton.serverEvents.EnqueueHint(reviver, $"{FoundationFortune.Singleton.Translation.RevivalNoDeadPlayer}", 0, 3, false, false);
                 return false;
             }
         }
@@ -60,7 +61,7 @@ namespace FoundationFortune.API.Perks
 
             foreach (var ply in Player.List)
             {
-                FoundationFortune.Singleton.serverEvents.EnqueueHint(ply, $"<b><size=24><color={reviver.Role.Color.ToHex()}>{reviver.Nickname}</color> Has Revived {targetToRevive.Nickname}</b></size>", 0, 3, false, false);
+                FoundationFortune.Singleton.serverEvents.EnqueueHint(ply, $"{FoundationFortune.Singleton.Translation.RevivalSuccess}", 0, 3, false, false);
             }
         }
     }
