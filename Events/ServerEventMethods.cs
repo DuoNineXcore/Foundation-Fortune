@@ -11,6 +11,7 @@ using Exiled.API.Enums;
 using Random = UnityEngine.Random;
 using Exiled.API.Features.Doors;
 using FoundationFortune.Configs;
+using Exiled.API.Extensions;
 
 namespace FoundationFortune.Events
 {
@@ -46,7 +47,11 @@ namespace FoundationFortune.Events
 
                     if (!PlayerDataRepository.GetHintMinmode(ply.UserId))
                     {
-                        hintMessage += $"\n<align={hintAlignment}><b><size=24>Money On Hold: <color={ply.ReferenceHub.roleManager.CurrentRole.RoleColor.ToHex()}>${moneyOnHold}</color></size>\n<size=24>Money Saved: <color={ply.ReferenceHub.roleManager.CurrentRole.RoleColor.ToHex()}>${moneySaved}</color></size><align=left></b>\n";
+                              string moneySavedString = FoundationFortune.Singleton.Translation.DefaultHint
+                                   .Replace("%rolecolor%", ply.Role.Color.ToHex())
+                                   .Replace("%moneyOnHold", moneyOnHold.ToString())
+                                   .Replace("%mneySaved%", moneySaved.ToString());
+                        hintMessage += $"\n<align={hintAlignment}>{moneySavedString}<align=left>\n";
                     }
 
                     HandleWorkstationMessages(ply, ref hintMessage);
@@ -87,7 +92,7 @@ namespace FoundationFortune.Events
                     if (itemsBeingSold.TryGetValue(ply.UserId, out var soldItemData))
                     {
                         int price = soldItemData.price;
-                        hintMessage += $"<align={hintAlignment}>\n{FoundationFortune.Singleton.Translation.ItemConfirmation}</align>";
+                        hintMessage += $"<align={hintAlignment}>\n{FoundationFortune.Singleton.Translation.ItemConfirmation.Replace("%price%", price.ToString()).Replace("%time%", GetConfirmationTimeLeft(ply).ToString())}</align>";
                     }
                 }
             }
@@ -111,7 +116,7 @@ namespace FoundationFortune.Events
                     if (itemsBeingSold.TryGetValue(ply.UserId, out var soldItemData))
                     {
                         int price = soldItemData.price;
-                        hintMessage += $"<align={hintAlignment}>\n{FoundationFortune.Singleton.Translation.ItemConfirmation}</align>";
+                        hintMessage += $"<align={hintAlignment}>\n{FoundationFortune.Singleton.Translation.ItemConfirmation.Replace("%price%", price.ToString())}</align>";
                     }
                 }
             }

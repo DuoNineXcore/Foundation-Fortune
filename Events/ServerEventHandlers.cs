@@ -89,7 +89,7 @@ namespace FoundationFortune.Events
 			if (ev.Attacker != null && ev.Attacker != ev.Player && ev.Attacker.IsScp)
 			{
 				var config = FoundationFortune.Singleton.Config;
-				var killHint = FoundationFortune.Singleton.Translation.KillHint.Replace("[victim]", ev.Player.Nickname);
+				var killHint = FoundationFortune.Singleton.Translation.KillHint.Replace("%victim%", ev.Player.Nickname);
 				EnqueueHint(ev.Attacker, killHint, config.KillReward, config.MaxHintAge, config.KillRewardTransfer, config.KillRewardTransferAll);
 			}
 			if (ev.Player.IsNPC)
@@ -147,12 +147,12 @@ namespace FoundationFortune.Events
 							{
 								VoiceChatSettings buyVoiceChatSettings = FoundationFortune.Singleton.Config.VoiceChatSettings.FirstOrDefault(settings => settings.VoiceChatUsageType == VoiceChatUsageType.Buying);
 								BuyingBot.PlayAudio(buyingbot, buyVoiceChatSettings.AudioFile, buyVoiceChatSettings.Volume, buyVoiceChatSettings.Loop, buyVoiceChatSettings.VoiceChat);
-								EnqueueHint(ev.Player, $"<b><size=24><color=green>+{price}$</color> Sold {FoundationFortune.Singleton.Config.SellableItems.Find(x => x.ItemType == ev.Item.Type).DisplayName}.</color></b></size>", price, 3, false, false);
+								EnqueueHint(ev.Player, FoundationFortune.Singleton.Translation.SellSuccess.Replace("%price%", price.ToString()).Replace("%itemName%", FoundationFortune.Singleton.Config.SellableItems.Find(x => x.ItemType == ev.Item.Type).DisplayName), price, 3, false, false);
 								ev.Player.RemoveItem(ev.Item);
 							}
 							else
 							{
-								EnqueueHint(ev.Player, $"{translation.SaleCancelled}", 0, 3, false, false);
+								EnqueueHint(ev.Player, translation.SaleCancelled, 0, 3, false, false);
 							}
 
 							itemsBeingSold.Remove(ev.Player.UserId);
@@ -167,7 +167,7 @@ namespace FoundationFortune.Events
 				ev.IsAllowed = true;
 				VoiceChatSettings wrongBotSettings = FoundationFortune.Singleton.Config.VoiceChatSettings.FirstOrDefault(settings => settings.VoiceChatUsageType == VoiceChatUsageType.WrongBuyingBot);
 				BuyingBot.PlayAudio(buyingbot, wrongBotSettings.AudioFile, wrongBotSettings.Volume, wrongBotSettings.Loop, wrongBotSettings.VoiceChat);
-				EnqueueHint(ev.Player, "<b><size=24><color=red>This is not a selling bot.</color></b></size>", 0, 3, false, false);
+				EnqueueHint(ev.Player, FoundationFortune.Singleton.Translation.WrongBot, 0, 3, false, false);
 			}
 			ev.IsAllowed = true;
 		}

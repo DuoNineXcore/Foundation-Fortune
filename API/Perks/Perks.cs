@@ -48,7 +48,7 @@ namespace FoundationFortune.API.Perks
             }
             else
             {
-                FoundationFortune.Singleton.serverEvents.EnqueueHint(reviver, $"{FoundationFortune.Singleton.Translation.RevivalNoDeadPlayer}", 0, 3, false, false);
+                FoundationFortune.Singleton.serverEvents.EnqueueHint(reviver, FoundationFortune.Singleton.Translation.RevivalNoDeadPlayer.Replace("%targetName%", targetName), 0, 3, false, false);
                 return false;
             }
         }
@@ -61,7 +61,7 @@ namespace FoundationFortune.API.Perks
 
             foreach (var ply in Player.List)
             {
-                FoundationFortune.Singleton.serverEvents.EnqueueHint(ply, $"{FoundationFortune.Singleton.Translation.RevivalSuccess}", 0, 3, false, false);
+                FoundationFortune.Singleton.serverEvents.EnqueueHint(ply, FoundationFortune.Singleton.Translation.RevivalSuccess.Replace("%rolecolor%", reviver.Role.Color.ToHex()).Replace("%nickname%", reviver.Nickname), 0, 3, false, false);
             }
         }
     }
