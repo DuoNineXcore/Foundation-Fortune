@@ -25,21 +25,23 @@ namespace FoundationFortune.Commands.BuyCommand
 
 		public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
 		{
-			Player player = Player.Get(sender);
+            Player player = Player.Get(sender);
 
-			if (!FoundationFortune.Singleton.serverEvents.IsPlayerOnSellingWorkstation(player) && !FoundationFortune.Singleton.serverEvents.IsPlayerOnBuyingBotRadius(player))
-			{
-				response = "You must be at a buying station to buy an item.";
-				return false;
-			}
+            if (!FoundationFortune.Singleton.serverEvents.IsPlayerOnSellingWorkstation(player) && !FoundationFortune.Singleton.serverEvents.IsPlayerOnBuyingBotRadius(player))
+            {
+                response = "You must be at a buying station to buy an item.";
+                return false;
+            }
 
-			if (arguments.Count != 1)
-			{
-				response = GetList();
-				return false;
-			}
+            if (arguments.Count != 1)
+            {
+                response = GetList();
+                return false;
+            }
 
-			PurchasesObject purchases = PlayerLimits.FirstOrDefault(o => o.Player == player);
+            Log.Debug($"Input argument: {arguments.At(0)}");
+
+            PurchasesObject purchases = PlayerLimits.FirstOrDefault(o => o.Player == player);
 
 			PerkItem perkItem = FoundationFortune.Singleton.Config.PerkItems.FirstOrDefault(p => p.Alias == arguments.At(0));
 			BuyableItem buyItem = FoundationFortune.Singleton.Config.BuyableItems.FirstOrDefault(p => p.Alias == arguments.At(0));

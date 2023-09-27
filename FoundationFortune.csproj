@@ -83,11 +83,13 @@
     <Compile Include="Commands\FortuneCommands\NpcCommand.cs" />
     <Compile Include="Commands\FortuneCommands\ParentFortuneCommand.cs" />
     <Compile Include="Configs\PluginConfigs.cs" />
-    <Compile Include="Patches\BuyingBotPatches.cs" />
+    <Compile Include="Patches\Transpilers.cs" />
     <Compile Include="Events\ServerEventMethods.cs" />
     <Compile Include="Events\ServerEventHandlers.cs" />
     <Compile Include="MainClass.cs" />
     <Compile Include="Configs\PluginTranslations.cs" />
+    <Compile Include="Patches\Postfixes.cs" />
+    <Compile Include="Patches\Prefixes.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Events\ServerEventBounty.cs" />
   </ItemGroup>

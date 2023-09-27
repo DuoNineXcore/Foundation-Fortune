@@ -1,59 +1,17 @@
-﻿namespace FoundationFortune.Patches
+﻿using HarmonyLib;
+using NorthwoodLib.Pools;
+using PlayerRoles.FirstPersonControl.Thirdperson;
+using PlayerRoles.PlayableScps.Scp096;
+using PlayerRoles.PlayableScps.Scp173;
+using PlayerRoles.PlayableScps.Scp939.Ripples;
+using System.Collections.Generic;
+using System.Reflection.Emit;
+using FoundationFortune.API.NPCs;
+using PlayerRoles.PlayableScps.Scp939;
+using Exiled.API.Enums;
+
+namespace FoundationFortune.Patches
 {
-    using HarmonyLib;
-    using Exiled.API.Features;
-    using System.Text;
-    using NorthwoodLib.Pools;
-    using PlayerRoles;
-    using PlayerRoles.FirstPersonControl.Thirdperson;
-    using PlayerRoles.PlayableScps.Scp096;
-    using PlayerRoles.PlayableScps.Scp173;
-    using PlayerRoles.PlayableScps.Scp939;
-    using PlayerRoles.PlayableScps.Scp939.Ripples;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Reflection.Emit;
-    using PlayerRoles.PlayableScps.Scp079;
-    using API.NPCs;
-    using System.Reflection;
-
-    [HarmonyPatch(typeof(Scp079ScannerTracker), nameof(Scp079ScannerTracker.AddTarget))]
-    internal static class Scp079TargetAddPatch
-    {
-        private static bool Prefix(Scp079ScannerTracker __instance, ReferenceHub hub)
-        {
-            Player player = Player.Get(hub);
-            if (player is null || player is not null && player.IsNPC) return false;
-            return true;
-        }
-    }
-
-    [HarmonyPatch(typeof(Scp079Recontainer), nameof(Scp079Recontainer.OnServerRoleChanged))]
-    internal static class Scp079RecontainPatch
-    {
-        private static bool Prefix(Scp079Recontainer __instance, ReferenceHub hub)
-        {
-            Player player = Player.Get(hub);
-            if (player == null) return true;
-            if (player.IsNPC) return false;
-
-            return true;
-        }
-    }
-
-    [HarmonyPatch(typeof(NineTailedFoxAnnouncer), nameof(NineTailedFoxAnnouncer.AnnounceScpTermination))]
-    internal static class TerminationPatch
-    {
-        [HarmonyPrefix]
-        private static bool Prefix(ReferenceHub scp)
-        {
-            var BuyingBot = Player.Get(scp);
-            if (BuyingBot == null) return false;
-            if (BuyingBot.IsNPC) return false;
-            return true;
-        }
-    }
-
     [HarmonyPatch(typeof(Scp096TargetsTracker), nameof(Scp096TargetsTracker.UpdateTarget))]
     internal static class UpdateTarget
     {
@@ -137,24 +95,6 @@
                 yield return instruction;
 
             ListPool<CodeInstruction>.Shared.Return(newInstructions);
-        }
-    }
-
-    [HarmonyPatch(typeof(RoundSummary), nameof(RoundSummary.CountTeam))]
-    internal static class CountTeam
-    {
-        private static void Postfix(Team team, ref int __result)
-        {
-            __result -= Player.List.Count(player => player.IsNPC && player.Role.Team == team);
-        }
-    }
-
-    [HarmonyPatch(typeof(RoundSummary), nameof(RoundSummary.CountRole))]
-    internal static class CountRole
-    {
-        private static void Postfix(RoleTypeId role, ref int __result)
-        {
-            __result -= Player.List.Count(player => player.IsNPC && player.Role.Type == role);
         }
     }
 }

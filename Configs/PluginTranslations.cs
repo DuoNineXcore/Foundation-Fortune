@@ -10,7 +10,7 @@ namespace FoundationFortune.Configs
 {
     public class PluginTranslations : ITranslation
     {
-        [Description("MINORS ‼️‼️‼️‼️‼️‼️‼️‼️‼️‼️‼️‼️‼️‼️‼️")]
+        [Description("RAAAAAAHHHHHHHHHHHHHHHHHHHHHHHHHHH")]
         public string KillHint { get; set; } = "<b><size=24><color=green>+$300</color> Killed [victim]. </b></size>";
         public string EscapeHint { get; set; } = "<b><size=24><color=green>+$300</color> Escaped.</b></size>";
 
