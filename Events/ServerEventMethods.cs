@@ -49,8 +49,8 @@ namespace FoundationFortune.Events
                     {
                               string moneySavedString = FoundationFortune.Singleton.Translation.DefaultHint
                                    .Replace("%rolecolor%", ply.Role.Color.ToHex())
-                                   .Replace("%moneyOnHold", moneyOnHold.ToString())
-                                   .Replace("%mneySaved%", moneySaved.ToString());
+                                   .Replace("%moneyOnHold%", moneyOnHold.ToString())
+                                   .Replace("%moneySaved%", moneySaved.ToString());
                         hintMessage += $"\n<align={hintAlignment}>{moneySavedString}<align=left>\n";
                     }
 
