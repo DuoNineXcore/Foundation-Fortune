@@ -37,10 +37,16 @@ namespace FoundationFortune.API.Perks
         public bool GrantRevivalPerk(Player reviver, string targetName)
         {
             Player targetToRevive = Player.Get(targetName);
+
+               if(targetToRevive == null)
+               {
+                    return false;
+               }
+
             Npc buyingbot = FoundationFortune.Singleton.serverEvents.GetBuyingBotNearPlayer(reviver);
             VoiceChatSettings revivalVoiceChatSettings = FoundationFortune.Singleton.Config.VoiceChatSettings.FirstOrDefault(settings => settings.VoiceChatUsageType == VoiceChatUsageType.Revival);
 
-            if (revivalVoiceChatSettings != null)
+            if (revivalVoiceChatSettings != null && targetToRevive.IsDead)
             {
                 BuyingBot.PlayAudio(buyingbot, revivalVoiceChatSettings.AudioFile, revivalVoiceChatSettings.Volume, revivalVoiceChatSettings.Loop, revivalVoiceChatSettings.VoiceChat);
                 RevivePlayer(reviver, targetToRevive);
@@ -59,9 +65,9 @@ namespace FoundationFortune.API.Perks
             targetToRevive.Heal(50);
             targetToRevive.Teleport(reviver.Position);
 
-            foreach (var ply in Player.List)
+            foreach (var ply in Player.List.Where(p => !p.IsNPC))
             {
-                FoundationFortune.Singleton.serverEvents.EnqueueHint(ply, FoundationFortune.Singleton.Translation.RevivalSuccess.Replace("%rolecolor%", reviver.Role.Color.ToHex()).Replace("%nickname%", reviver.Nickname), 0, 3, false, false);
+                FoundationFortune.Singleton.serverEvents.EnqueueHint(ply, FoundationFortune.Singleton.Translation.RevivalSuccess.Replace("%rolecolor%", reviver.Role.Color.ToHex()).Replace("%nickname%", reviver.Nickname).Replace("%target%", targetToRevive.Nickname), 0, 3, false, false);
             }
         }
     }

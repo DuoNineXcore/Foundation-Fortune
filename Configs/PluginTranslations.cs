@@ -29,7 +29,7 @@ namespace FoundationFortune.Configs
 		public string Death { get; set; } = "<b><size=24><color=red>$-%moneyBeforeDeath%.</color> You died.</b></size>";
 		public string DeathCoinPickup { get; set; } = "<b><size=24><color=green>+%coinValue%</color> Picked up Death Coin.</b></size>";
 		public string RevivalNoDeadPlayer { get; set; } = "<b><size=24>No dead player with Name: '%targetName%' found nearby to revive.</b></size>";
-		public string RevivalSuccess { get; set; } = "<b><size=24><color=%rolecolor%>%nickname%</color> Has Revived <color={reviver.Role.Color.ToHex()}>{targetToRevive.Nickname}</color></b></size>";
+		public string RevivalSuccess { get; set; } = "<b><size=24><color=%rolecolor%>%nickname%</color> Has Revived <color=%rolecolor%>%target%</color></b></size>";
 
 		[Description("FF Database Hints")]
 		public string FlushedDatabase { get; set; } = "<b><size=24><color=red>-${moneyOnHold} (On Hold) -${moneySaved} (Saved)</color> Database Flushed.</size></b>";

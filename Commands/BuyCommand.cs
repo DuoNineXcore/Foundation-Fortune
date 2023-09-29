@@ -33,13 +33,32 @@ namespace FoundationFortune.Commands.BuyCommand
 				return false;
 			}
 
+			if (arguments.Count < 1)
+			{
+				response = GetList();
+				return false;
+			}
+
 			Log.Debug($"Input argument: {arguments.At(0)}");
 
-			if (TryPurchasePerk(player, arguments.At(0), out response) || TryPurchaseItem(player, arguments.At(0), out response)) return true;
-            else if (Enum.TryParse(arguments.At(0), ignoreCase: true, out PerkType perkType) && perkType == PerkType.Revival)
-            if (TryPurchaseRevivalPerk(player, arguments.At(1), out response)) return true;
 
-            response = GetList();
+			if (Enum.TryParse(arguments.At(0), ignoreCase: true, out PerkType perkType) && perkType == PerkType.Revival || FoundationFortune.Singleton.Config.PerkItems.Any(p => p.PerkType == PerkType.Revival && arguments.At(0).ToLower() == p.Alias.ToLower()))
+			{
+				if (arguments.Count < 2)
+				{
+					response = "You must specify a valid player to revive!";
+					return false;
+				}
+				if (TryPurchaseRevivalPerk(player, string.Join(" ", arguments.Skip(0).Skip(1)), out response)) return true;
+				else return false;
+			}
+			else if (TryPurchasePerk(player, arguments.At(0), out response) || TryPurchaseItem(player, arguments.At(0), out response))
+			{
+				Log.Debug("Successfully bought perk: " + arguments.At(0));
+				return true;
+			}
+
+			response = GetList();
 			return false;
 		}
 
@@ -52,9 +71,16 @@ namespace FoundationFortune.Commands.BuyCommand
 
 			if (CanPurchase(player, revivalPerkPrice))
 			{
-				perks.GrantRevivalPerk(player, targetName);
-				response = $"You have successfully bought Revival Perk for ${revivalPerkPrice} to revive '{targetName}'.";
-				return true;
+				if (perks.GrantRevivalPerk(player, targetName))
+				{
+					response = $"You have successfully bought Revival Perk for ${revivalPerkPrice} to revive '{targetName}'.";
+					return true;
+				}
+				else
+				{
+					response = "That player either doesn't exist or hasnt died yet!";
+					return false;
+				}
 			}
 
 			response = $"You don't have enough money to purchase the Revival Perk to revive '{targetName}'.";
@@ -69,9 +95,9 @@ namespace FoundationFortune.Commands.BuyCommand
 
 			if (perkItem != null && CanPurchase(player, perkItem.Price))
 			{
-                FoundationFortune.Singleton.serverEvents.EnqueueHint(player, $"<color=red>-${perkItem.Price}</color> Bought {perkItem.Alias}", 0, 3, false, false);
-                PlayerDataRepository.ModifyMoney(player.UserId, perkItem.Price, true, false, true);
-                perks.GrantPerk(player, perkItem.PerkType);
+				FoundationFortune.Singleton.serverEvents.EnqueueHint(player, $"<color=red>-${perkItem.Price}</color> Bought {perkItem.Alias}", 0, 3, false, false);
+				PlayerDataRepository.ModifyMoney(player.UserId, perkItem.Price, true, false, true);
+				perks.GrantPerk(player, perkItem.PerkType);
 				response = $"You have successfully bought {perkItem.DisplayName} for ${perkItem.Price}";
 				return true;
 			}
