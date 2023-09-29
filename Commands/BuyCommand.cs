@@ -17,149 +17,105 @@ namespace FoundationFortune.Commands.BuyCommand
 	public sealed class BuyCommand : ICommand
 	{
 		public static List<PurchasesObject> PlayerLimits = new();
-		private Perks perks = new();
 
 		public string Command { get; } = "buy";
 		public string[] Aliases { get; } = new string[] { "b" };
 		public string Description { get; } = "Buy items, wow.";
+		private Perks perks = new();
 
 		public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
 		{
-            Player player = Player.Get(sender);
+			Player player = Player.Get(sender);
 
-            if (!FoundationFortune.Singleton.serverEvents.IsPlayerOnSellingWorkstation(player) && !FoundationFortune.Singleton.serverEvents.IsPlayerOnBuyingBotRadius(player))
-            {
-                response = "You must be at a buying station to buy an item.";
-                return false;
-            }
-
-            if (arguments.Count != 1)
-            {
-                response = GetList();
-                return false;
-            }
-
-            Log.Debug($"Input argument: {arguments.At(0)}");
-
-            PurchasesObject purchases = PlayerLimits.FirstOrDefault(o => o.Player == player);
-
-			PerkItem perkItem = FoundationFortune.Singleton.Config.PerkItems.FirstOrDefault(p => p.Alias == arguments.At(0));
-			BuyableItem buyItem = FoundationFortune.Singleton.Config.BuyableItems.FirstOrDefault(p => p.Alias == arguments.At(0));
-
-			if (Enum.TryParse(arguments.At(0), ignoreCase: true, out PerkType perkType) || perkItem != null)
+			if (!FoundationFortune.Singleton.serverEvents.IsPlayerOnSellingWorkstation(player) && !FoundationFortune.Singleton.serverEvents.IsPlayerOnBuyingBotRadius(player))
 			{
-				PerkItem perk = perkItem == null ? FoundationFortune.Singleton.Config.PerkItems.FirstOrDefault(p => p.PerkType == perkType) : perkItem;
+				response = "You must be at a buying station to buy an item.";
+				return false;
+			}
 
-				if (perk == null)
-				{
-					response = "That is not a purchasable perk!";
-					return false;
-				}
+			Log.Debug($"Input argument: {arguments.At(0)}");
 
-				if (purchases != null && purchases.BoughtPerks.ContainsKey(perk) && purchases.BoughtPerks[perk] >= perk.Limit)
-				{
-					response = $"You have purchased {perk.DisplayName} too many times.";
-					return false;
-				}
+			if (TryPurchasePerk(player, arguments.At(0), out response) || TryPurchaseItem(player, arguments.At(0), out response)) return true;
+            else if (Enum.TryParse(arguments.At(0), ignoreCase: true, out PerkType perkType) && perkType == PerkType.Revival)
+            if (TryPurchaseRevivalPerk(player, arguments.At(1), out response)) return true;
 
-				if (perkType == PerkType.Revival)
-				{
-					string targetName = string.Join(" ", arguments.Skip(1));
+            response = GetList();
+			return false;
+		}
 
-					if (perks.GrantRevivalPerk(player, targetName))
-					{
-						response = $"You have successfully revived '{targetName}' with the {perk.DisplayName} perk.";
-					}
-					else
-					{
-						response = $"Failed to revive the player named '{targetName}' with the {perk.DisplayName} perk.";
-						return false;
-					}
-				}
-				else
-				{
-					int money = PlayerDataRepository.GetMoneySaved(player.UserId);
+		private bool TryPurchaseRevivalPerk(Player player, string targetName, out string response)
+		{
+			int revivalPerkPrice = FoundationFortune.Singleton.Config.PerkItems
+				.Where(perk => perk.PerkType == PerkType.Revival)
+				.Select(perk => perk.Price)
+				.FirstOrDefault();
 
-					if (money < perk.Price)
-					{
-						response = $"You are missing ${perk.Price - money}!";
-						return false;
-					}
-
-					PlayerDataRepository.ModifyMoney(player.UserId, perk.Price, true, true, false);
-					perks.GrantPerk(player, perkType);
-
-					if (purchases.BoughtPerks.ContainsKey(perk))
-					{
-						purchases.BoughtPerks[perk]++;
-					}
-					else
-					{
-						purchases.BoughtPerks.Add(perk, 1);
-					}
-				}
-
-				response = $"You have successfully bought {perk.DisplayName} for ${perk.Price}";
+			if (CanPurchase(player, revivalPerkPrice))
+			{
+				perks.GrantRevivalPerk(player, targetName);
+				response = $"You have successfully bought Revival Perk for ${revivalPerkPrice} to revive '{targetName}'.";
 				return true;
 			}
-			else if (Enum.TryParse(arguments.At(0), ignoreCase: true, out ItemType itemType) || buyItem != null)
+
+			response = $"You don't have enough money to purchase the Revival Perk to revive '{targetName}'.";
+			return false;
+		}
+
+		private bool TryPurchasePerk(Player player, string aliasOrEnum, out string response)
+		{
+			PerkItem perkItem = FoundationFortune.Singleton.Config.PerkItems.FirstOrDefault(p =>
+				p.Alias.Equals(aliasOrEnum, StringComparison.OrdinalIgnoreCase) ||
+				p.PerkType.ToString().Equals(aliasOrEnum, StringComparison.OrdinalIgnoreCase));
+
+			if (perkItem != null && CanPurchase(player, perkItem.Price))
 			{
-                BuyableItem item = buyItem == null
-                    ? FoundationFortune.Singleton.Config.BuyableItems.FirstOrDefault(p => p.ItemType == itemType || p.Alias.Contains(itemType.ToString()))
-                    : buyItem;
+                FoundationFortune.Singleton.serverEvents.EnqueueHint(player, $"<color=red>-${perkItem.Price}</color> Bought {perkItem.Alias}", 0, 3, false, false);
+                PlayerDataRepository.ModifyMoney(player.UserId, perkItem.Price, true, false, true);
+                perks.GrantPerk(player, perkItem.PerkType);
+				response = $"You have successfully bought {perkItem.DisplayName} for ${perkItem.Price}";
+				return true;
+			}
 
-                if (buyItem == null)
-				{
-					response = "That is not a purchaseable item!";
-					return false;
-				}
+			response = "That is not a purchasable perk or you don't have enough money!";
+			return false;
+		}
 
-				int money = PlayerDataRepository.GetMoneySaved(player.UserId);
-				if (money < buyItem.Price)
-				{
-					response = $"You are missing ${buyItem.Price - money}!";
-					return false;
-				}
+		private bool TryPurchaseItem(Player player, string aliasOrEnum, out string response)
+		{
+			BuyableItem buyItem = FoundationFortune.Singleton.Config.BuyableItems.FirstOrDefault(p =>
+				p.Alias.Equals(aliasOrEnum, StringComparison.OrdinalIgnoreCase) ||
+				p.ItemType.ToString().Equals(aliasOrEnum, StringComparison.OrdinalIgnoreCase));
 
-				if (purchases != null && purchases.BoughtItems.ContainsKey(buyItem) && purchases.BoughtItems[buyItem] >= buyItem.Limit)
-				{
-					response = $"You have purchased {buyItem.DisplayName} too many times.";
-					return false;
-				}
-
-				if (purchases.BoughtItems.ContainsKey(buyItem))
-				{
-					purchases.BoughtItems[buyItem]++;
-				}
-				else
-				{
-					purchases = new(player);
-					purchases.BoughtItems.Add(buyItem, 1);
-					PlayerLimits.Add(purchases);
-				}
-
-				PlayerDataRepository.ModifyMoney(player.UserId, buyItem.Price, true, true);
-				player.Inventory.ServerAddItem(buyItem.ItemType);
-
-				FoundationFortune.Singleton.serverEvents.EnqueueHint(player, $"{FoundationFortune.Singleton.Translation.BuyItemSuccess}", 0, 5, false, false);
+			if (buyItem != null && CanPurchase(player, buyItem.Price))
+			{
+				FoundationFortune.Singleton.serverEvents.EnqueueHint(player, $"<color=red>-${buyItem.Price}</color> Bought {buyItem.Alias}", 0, 3, false, false);
+				PlayerDataRepository.ModifyMoney(player.UserId, buyItem.Price, true, false, true);
+				player.AddItem(buyItem.ItemType);
 				response = $"You have successfully bought {buyItem.DisplayName} for ${buyItem.Price}";
 				return true;
 			}
 
-			response = GetList();
+			response = "That is not a purchaseable item or you don't have enough money!";
 			return false;
+		}
+
+		private bool CanPurchase(Player player, int price)
+		{
+			int money = PlayerDataRepository.GetMoneySaved(player.UserId);
+			if (money < price) return false;
+			return true;
 		}
 
 		private string GetList()
 		{
-			string itemsToBuy = "\n<color=green>Items to buy:</color>\n" +
+			string itemsToBuy = "\n<color=green>Available Items:</color>\n" +
 							string.Join("\n", FoundationFortune.Singleton.Config.BuyableItems
-							    .Select(buyableItem => $"{buyableItem.ItemType} - {buyableItem.DisplayName} ({buyableItem.Alias}) - {buyableItem.Price}$")) +
+								.Select(buyableItem => $"{buyableItem.ItemType} - {buyableItem.DisplayName} ({buyableItem.Alias}) - {buyableItem.Price}$")) +
 							"\n";
 
-			string perksToBuy = "<color=green>Perks to buy:</color>\n" +
+			string perksToBuy = "<color=cyan>Available Perks:</color>\n" +
 							string.Join("\n", FoundationFortune.Singleton.Config.PerkItems
-							    .Select(perkItem => $"{perkItem.DisplayName} ({perkItem.Alias}) - {perkItem.Price}$ - {perkItem.Description}")) +
+								.Select(perkItem => $"{perkItem.DisplayName} ({perkItem.Alias}) - {perkItem.Price}$ - {perkItem.Description}")) +
 							"\n";
 			return itemsToBuy + perksToBuy;
 		}
