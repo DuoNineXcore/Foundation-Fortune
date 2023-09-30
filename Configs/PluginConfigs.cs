@@ -50,6 +50,14 @@ namespace FoundationFortune.Configs
             new NPCSpawn { Name = "Selling Bot 4",Badge = "Foundation Fortune", BadgeColor = "yellow", IsSellingBot = true, Role = RoleTypeId.Scientist, HeldItem = ItemType.KeycardChaosInsurgency, Scale = new Vector3(1, 1, 1), Room = RoomType.Hcz939 },
             new NPCSpawn { Name = "Buying Bot 5", Badge = "Foundation Fortune", BadgeColor = "pumpkin", IsSellingBot = false, Role = RoleTypeId.ClassD, HeldItem = ItemType.KeycardChaosInsurgency, Scale = new Vector3(1, 1, 1), Room = RoomType.HczArmory }
         };
+        public List<RoomType> SpawnableRooms { get; set; } = new List<RoomType>()
+        {
+			RoomType.Hcz079,
+			RoomType.Hcz096,
+			RoomType.Hcz939,
+			RoomType.HczHid,
+	          RoomType.Hcz106
+	   };
 
         [Description("The time you have to sell an item after asking for confirmation.")]
         public float SellingConfirmationTime { get; set; } = 5f;

@@ -254,7 +254,7 @@ namespace FoundationFortune.Events
             else
             {
                 Log.Debug($"Bots spawned randomly.");
-                var rooms = Room.List.ToList();
+                var rooms = Room.List.Where(r => FoundationFortune.Singleton.Config.SpawnableRooms.Contains(r.Type)).ToList();
                 var availableIndexes = Enumerable.Range(0, rooms.Count).ToList();
 
                 availableIndexes.Clear();
