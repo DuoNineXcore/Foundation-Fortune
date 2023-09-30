@@ -72,11 +72,13 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="API\Models\Classes.cs" />
+    <Compile Include="API\Models\Enums.cs" />
     <Compile Include="API\Items\Money.cs" />
     <Compile Include="API\NPCs\BuyingBot.cs" />
     <Compile Include="API\Database\PlayerDataRepository.cs" />
     <Compile Include="API\Perks\Perks.cs" />
-    <Compile Include="API\PurchasesObject.cs" />
+    <Compile Include="API\Models\ObjectPurchases.cs" />
     <Compile Include="Commands\BuyCommand.cs" />
     <Compile Include="Commands\FortuneCommands\DatabaseCommand.cs" />
     <Compile Include="Commands\FortuneCommands\HintCommand.cs" />

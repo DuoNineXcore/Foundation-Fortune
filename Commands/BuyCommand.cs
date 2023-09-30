@@ -1,6 +1,6 @@
 ﻿using CommandSystem;
 using Exiled.API.Features;
-using FoundationFortune.API;
+using FoundationFortune.API.Models;
 using FoundationFortune.API.Database;
 using FoundationFortune.API.Perks;
 using InventorySystem;
@@ -16,7 +16,7 @@ namespace FoundationFortune.Commands.BuyCommand
 	[CommandHandler(typeof(RemoteAdminCommandHandler))]
 	public sealed class BuyCommand : ICommand
 	{
-		public static List<PurchasesObject> PlayerLimits = new();
+		public static List<ObjectPurchases> PlayerLimits = new();
 
 		public string Command { get; } = "buy";
 		public string[] Aliases { get; } = new string[] { "b" };

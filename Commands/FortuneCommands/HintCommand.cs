@@ -4,6 +4,7 @@ using FoundationFortune.Events;
 using RemoteAdmin;
 using System;
 using Exiled.API.Features;
+using FoundationFortune.API.Models;
 
 namespace FoundationFortune.Commands.FortuneCommands
 {

@@ -4,6 +4,7 @@ using FoundationFortune.API.NPCs;
 using InventorySystem.Items.Usables.Scp330;
 using PlayerRoles;
 using FoundationFortune.Configs;
+using FoundationFortune.API.Models;
 using System.Linq;
 
 namespace FoundationFortune.API.Perks

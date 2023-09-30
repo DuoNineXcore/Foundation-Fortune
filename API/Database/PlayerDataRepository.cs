@@ -1,6 +1,7 @@
 ﻿using Exiled.API.Features;
 using FoundationFortune.Events;
 using LiteDB;
+using FoundationFortune.API.Models;
 using System;
 
 namespace FoundationFortune.API.Database
@@ -111,16 +112,5 @@ namespace FoundationFortune.API.Database
                 PlayersCollection.Update(player);
             }
         }
-    }
-
-    public class PlayerData
-    {
-        public ObjectId Id { get; set; }
-        public string Username { get; set; }
-        public string UserId { get; set; }
-        public int MoneyOnHold { get; set; }
-        public int MoneySaved { get; set; }
-        public bool HintMinmode { get; set; }
-        public HintAlign HintAlign { get; set; }
     }
 }

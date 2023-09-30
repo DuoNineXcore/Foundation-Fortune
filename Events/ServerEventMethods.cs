@@ -12,6 +12,7 @@ using Random = UnityEngine.Random;
 using Exiled.API.Features.Doors;
 using FoundationFortune.Configs;
 using Exiled.API.Extensions;
+using FoundationFortune.API.Models;
 
 namespace FoundationFortune.Events
 {
@@ -254,7 +255,7 @@ namespace FoundationFortune.Events
             else
             {
                 Log.Debug($"Bots spawned randomly.");
-                var rooms = Room.List.Where(r => FoundationFortune.Singleton.Config.SpawnableRooms.Contains(r.Type)).ToList();
+                var rooms = Room.List.Where(r => FoundationFortune.Singleton.Config.BuyingBotRandomRooms.Contains(r.Type)).ToList();
                 var availableIndexes = Enumerable.Range(0, rooms.Count).ToList();
 
                 availableIndexes.Clear();
@@ -366,21 +367,6 @@ namespace FoundationFortune.Events
             bool isSellingBot = FoundationFortune.Singleton.Config.BuyingBotSpawnSettings.Any(c => c.Name == npc.Nickname && c.IsSellingBot);
             if (isSellingBot) return true;
             return false;
-        }
-
-
-        private class HintEntry
-        {
-            public string Text { get; }
-            public float Timestamp { get; }
-            public int Reward { get; }
-
-            public HintEntry(string text, float timestamp, int reward)
-            {
-                Text = text;
-                Timestamp = timestamp;
-                Reward = reward;
-            }
         }
     }
 }

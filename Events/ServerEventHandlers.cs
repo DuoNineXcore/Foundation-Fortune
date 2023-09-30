@@ -12,18 +12,10 @@ using System.Linq;
 using Exiled.Events.EventArgs.Server;
 using System.Collections.Generic;
 using FoundationFortune.Commands.BuyCommand;
-using Exiled.Events.EventArgs.Scp939;
-using FoundationFortune.Configs;
+using FoundationFortune.API.Models;
 
 namespace FoundationFortune.Events
 {
-	public enum HintAlign
-	{
-		Center,
-		Right,
-		Left
-	}
-
 	public partial class ServerEvents
 	{
 		private CoroutineHandle moneyHintCoroutine;

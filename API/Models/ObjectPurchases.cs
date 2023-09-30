@@ -1,16 +1,15 @@
 ﻿using Exiled.API.Features;
 using System.Collections.Generic;
-using FoundationFortune.Configs;
 
-namespace FoundationFortune.API
+namespace FoundationFortune.API.Models
 {
-	public class PurchasesObject
+	public class ObjectPurchases
 	{
 		public Player Player;
 		public Dictionary<BuyableItem, int> BoughtItems = new();
 		public Dictionary<PerkItem, int> BoughtPerks = new();
 
-		public PurchasesObject(Player player)
+		public ObjectPurchases(Player player)
 		{
 			Player = player;
 		}

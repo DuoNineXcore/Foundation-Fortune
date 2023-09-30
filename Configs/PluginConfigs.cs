@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using VoiceChat;
 using System.ComponentModel;
+using FoundationFortune.API.Models;
+using VoiceChatSettings = FoundationFortune.API.Models.VoiceChatSettings;
 
 namespace FoundationFortune.Configs
 {
@@ -42,6 +44,7 @@ namespace FoundationFortune.Configs
         public bool UseBuyingBot { get; set; } = true;
         public float BuyingBotRadius { get; set; } = 3f;
         public bool BuyingBotFixedLocation { get; set; } = true;
+
         public List<NPCSpawn> BuyingBotSpawnSettings { get; set; } = new List<NPCSpawn>
         {
             new NPCSpawn { Name = "Buying Bot 1", Badge = "Foundation Fortune", BadgeColor = "pumpkin", IsSellingBot = false, Role = RoleTypeId.ClassD, HeldItem = ItemType.KeycardChaosInsurgency, Scale = new Vector3(1, 1, 1), Room = RoomType.HczNuke },
@@ -50,14 +53,18 @@ namespace FoundationFortune.Configs
             new NPCSpawn { Name = "Selling Bot 4",Badge = "Foundation Fortune", BadgeColor = "yellow", IsSellingBot = true, Role = RoleTypeId.Scientist, HeldItem = ItemType.KeycardChaosInsurgency, Scale = new Vector3(1, 1, 1), Room = RoomType.Hcz939 },
             new NPCSpawn { Name = "Buying Bot 5", Badge = "Foundation Fortune", BadgeColor = "pumpkin", IsSellingBot = false, Role = RoleTypeId.ClassD, HeldItem = ItemType.KeycardChaosInsurgency, Scale = new Vector3(1, 1, 1), Room = RoomType.HczArmory }
         };
-        public List<RoomType> SpawnableRooms { get; set; } = new List<RoomType>()
+
+        public List<RoomType> BuyingBotRandomRooms { get; set; } = new List<RoomType>()
         {
-			RoomType.Hcz079,
-			RoomType.Hcz096,
-			RoomType.Hcz939,
-			RoomType.HczHid,
-	          RoomType.Hcz106
-	   };
+			RoomType.EzCafeteria,
+			RoomType.EzCollapsedTunnel,
+			RoomType.HczStraight,
+			RoomType.HczNuke,
+	        RoomType.HczTesla,
+            RoomType.LczClassDSpawn,
+            RoomType.EzCheckpointHallway,
+            RoomType.HczServers,
+	    };
 
         [Description("The time you have to sell an item after asking for confirmation.")]
         public float SellingConfirmationTime { get; set; } = 5f;
@@ -96,73 +103,5 @@ namespace FoundationFortune.Configs
             new PerkItem { Limit = 1, Alias = "Regen", PerkType = PerkType.Regeneration, Price = 500, DisplayName = "Regeneration", Description = "This is just Red Candy."},
             new PerkItem { Limit = 1, Alias = "Move", PerkType = PerkType.MovementBoost, Price = 300, DisplayName = "Movement Boost", Description = "This is just 207."},
         };
-    }
-
-    public enum VoiceChatUsageType
-    {
-        Selling,
-        Buying,
-        Revival,
-        NotEnoughMoney,
-        WrongBuyingBot
-    }
-
-    public class VoiceChatSettings
-    {
-        public VoiceChatChannel VoiceChat { get; set; }
-        public byte Volume { get; set; }
-        public string AudioFile { get; set; }
-        public VoiceChatUsageType VoiceChatUsageType { get; set; }
-        public bool Loop { get; set; }
-    }
-
-    public class SellableItem
-    {
-        public ItemType ItemType { get; set; }
-        public int Price { get; set; }
-        public int Limit { get; set; }
-        public string Alias { get; set; }
-        public string DisplayName { get; set; }
-    }
-
-    public class PerkItem
-    {
-        public PerkType PerkType { get; set; }
-        public int Price { get; set; }
-        public int Limit { get; set; }
-        public string Alias { get; set; }
-        public string DisplayName { get; set; }
-        public string Description { get; set; }
-    }
-
-    public enum PerkType
-    {
-        Revival,
-        ExtraHP,
-        AHPBoost,
-        Invisibility,
-        Regeneration,
-        MovementBoost
-    }
-
-    public class NPCSpawn
-    {
-        public string Name { get; set; }
-        public string Badge { get; set; }
-        public string BadgeColor { get; set; }
-        public bool IsSellingBot { get; set; }
-        public RoleTypeId Role { get; set; }
-        public ItemType HeldItem { get; set; }
-        public Vector3 Scale { get; set; }
-        public RoomType Room { get; set; }
-    }
-
-    public class BuyableItem
-    {
-        public ItemType ItemType { get; set; }
-        public int Price { get; set; }
-        public int Limit { get; set; }
-        public string Alias { get; set; }
-        public string DisplayName { get; set; }
     }
 }
