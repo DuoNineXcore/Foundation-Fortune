@@ -248,10 +248,40 @@ namespace FoundationFortune.Events
                             Log.Debug($"Teleported BuyingBot with indexation {indexation} to room {roomType}, Pos: {bot.Position}, Rot: {bot.Rotation}");
                         });
                     }
-                    else
+                    else Log.Warn($"Invalid indexation {indexation + 1} for BuyingBot");
+                }
+            }
+            else
+            {
+                Log.Debug($"Bots spawned randomly.");
+                var rooms = Room.List.ToList();
+                var availableIndexes = Enumerable.Range(0, rooms.Count).ToList();
+
+                availableIndexes.Clear();
+                availableIndexes.AddRange(Enumerable.Range(0, rooms.Count));
+
+                foreach (var kvp in FoundationFortune.Singleton.BuyingBotIndexation)
+                {
+                    var bot = kvp.Value.bot;
+
+                    if (availableIndexes.Count > 0)
                     {
-                        Log.Warn($"Invalid indexation {indexation + 1} for BuyingBot");
+                        int randomIndex = Random.Range(0, availableIndexes.Count);
+                        int indexation = availableIndexes[randomIndex];
+                        availableIndexes.RemoveAt(randomIndex);
+
+                        RoomType roomType = rooms[indexation].Type;
+                        Door door = rooms[indexation].Doors.First();
+                        Vector3 Position = door.Position + door.Transform.rotation * new Vector3(1, 1, 1);
+
+                        Timing.CallDelayed(1f, () =>
+                        {
+                            bot.Teleport(Position);
+                            buyingBotPositions[bot] = bot.Position;
+                            Log.Debug($"Teleported BuyingBot to room {roomType}, Pos: {bot.Position}, Rot: {bot.Rotation}");
+                        });
                     }
+                    else Log.Warn($"No available rooms for BuyingBot.");
                 }
             }
         }
@@ -262,31 +292,14 @@ namespace FoundationFortune.Events
             return distanceSqr <= RadiusSqr;
         }
 
-        private List<Vector3> GetRandomSpawnPositions(int count)
-        {
-            List<Vector3> spawnPositions = new();
-            for (int i = 0; i < count; i++)
-            {
-                Vector3 position = new(Random.Range(-10f, 10f), 0f, Random.Range(-10f, 10f));
-                spawnPositions.Add(position);
-            }
-            return spawnPositions;
-        }
-
         public bool IsPlayerOnSellingWorkstation(Player player)
         {
-            if (workstationPositions.Count == 0)
-            {
-                return false;
-            }
+            if (workstationPositions.Count == 0) return false;
 
             foreach (var workstationPosition in workstationPositions.Values)
             {
                 float distance = Vector3.Distance(player.Position, workstationPosition);
-                if (distance <= FoundationFortune.Singleton.Config.SellingWorkstationRadius)
-                {
-                    return true;
-                }
+                if (distance <= FoundationFortune.Singleton.Config.SellingWorkstationRadius) return true;
             }
             return false;
         }
@@ -341,10 +354,7 @@ namespace FoundationFortune.Events
 
                 float distance = Vector3.Distance(player.Position, botPosition);
 
-                if (distance <= buyingBotRadius)
-                {
-                    return kvp.Key;
-                }
+                if (distance <= buyingBotRadius) return kvp.Key;
             }
             return null;
         }
@@ -353,10 +363,8 @@ namespace FoundationFortune.Events
         {
             bool isNearBot = IsPlayerOnBuyingBotRadius(player, out Npc npc);
             if (!isNearBot || npc == null) return false;
-
             bool isSellingBot = FoundationFortune.Singleton.Config.BuyingBotSpawnSettings.Any(c => c.Name == npc.Nickname && c.IsSellingBot);
             if (isSellingBot) return true;
-
             return false;
         }
 

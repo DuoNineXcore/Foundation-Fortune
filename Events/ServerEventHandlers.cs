@@ -56,8 +56,6 @@ namespace FoundationFortune.Events
 			}
 		}
 
-		public void RoundEnded(RoundEndedEventArgs ev) { if (moneyHintCoroutine.IsRunning) Timing.KillCoroutines(moneyHintCoroutine); }
-
 		public void RegisterInDatabase(VerifiedEventArgs ev)
 		{
 			var existingPlayer = PlayerDataRepository.GetPlayerById(ev.Player.UserId);
@@ -78,13 +76,10 @@ namespace FoundationFortune.Events
 
 		public void SpawningNpc(SpawningEventArgs ev)
 		{
-			if (ev.Player.IsNPC)
-			{
-				RoundSummary.singleton.Network_chaosTargetCount -= 1;
-			}
-		}
+			if (ev.Player.IsNPC) RoundSummary.singleton.Network_chaosTargetCount -= 1;
+        }
 
-		public void KillingReward(DiedEventArgs ev)
+        public void KillingReward(DiedEventArgs ev)
 		{
 			if (ev.Attacker != null && ev.Attacker != ev.Player && ev.Attacker.IsScp)
 			{
@@ -92,11 +87,8 @@ namespace FoundationFortune.Events
 				var killHint = FoundationFortune.Singleton.Translation.KillHint.Replace("%victim%", ev.Player.Nickname);
 				EnqueueHint(ev.Attacker, killHint, config.KillReward, config.MaxHintAge, config.KillRewardTransfer, config.KillRewardTransferAll);
 			}
-			if (ev.Player.IsNPC)
-			{
-				RoundSummary.singleton.Network_chaosTargetCount += 2;
-			}
-		}
+			if (ev.Player.IsNPC) RoundSummary.singleton.Network_chaosTargetCount += 2;
+        }
 
 		public void EscapingReward(EscapingEventArgs ev)
 		{
@@ -172,7 +164,8 @@ namespace FoundationFortune.Events
 			ev.IsAllowed = true;
 		}
 
-		public void FuckYourAbility(ActivatingSenseEventArgs ev) { if (ev.Target != null && ev.Target.IsNPC) ev.IsAllowed = false; }
+        public void RoundEnded(RoundEndedEventArgs ev) { if (moneyHintCoroutine.IsRunning) Timing.KillCoroutines(moneyHintCoroutine); }
+        public void FuckYourAbility(ActivatingSenseEventArgs ev) { if (ev.Target != null && ev.Target.IsNPC) ev.IsAllowed = false; }
 		public void FuckYourOtherAbility(TriggeringBloodlustEventArgs ev) { if (ev.Target != null && ev.Target.IsNPC) ev.IsAllowed = false; }
 	}
 }
