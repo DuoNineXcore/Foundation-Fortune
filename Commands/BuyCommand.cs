@@ -8,7 +8,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Utils.NonAllocLINQ;
-using FoundationFortune.Configs;
+using FoundationFortune.API.Models.Enums;
+using FoundationFortune.API.Models.Classes;
+using FoundationFortune.Events;
 
 namespace FoundationFortune.Commands.BuyCommand
 {
@@ -16,8 +18,6 @@ namespace FoundationFortune.Commands.BuyCommand
 	[CommandHandler(typeof(RemoteAdminCommandHandler))]
 	public sealed class BuyCommand : ICommand
 	{
-		public static List<ObjectPurchases> PlayerLimits = new();
-
 		public string Command { get; } = "buy";
 		public string[] Aliases { get; } = new string[] { "b" };
 		public string Description { get; } = "Buy items, wow.";
@@ -27,9 +27,9 @@ namespace FoundationFortune.Commands.BuyCommand
 		{
 			Player player = Player.Get(sender);
 
-			if (!FoundationFortune.Singleton.serverEvents.IsPlayerOnSellingWorkstation(player) && !FoundationFortune.Singleton.serverEvents.IsPlayerOnBuyingBotRadius(player))
+			if (!FoundationFortune.Singleton.serverEvents.IsPlayerOnSellingWorkstation(player) && !FoundationFortune.Singleton.serverEvents.IsPlayerNearBuyingBot(player))
 			{
-				response = "You must be at a buying station to buy an item.";
+				response = "You must be at a Selling Workstation / Buying Bot to buy an item.";
 				return false;
 			}
 
@@ -40,7 +40,6 @@ namespace FoundationFortune.Commands.BuyCommand
 			}
 
 			Log.Debug($"Input argument: {arguments.At(0)}");
-
 
 			if (Enum.TryParse(arguments.At(0), ignoreCase: true, out PerkType perkType) && perkType == PerkType.Revival || FoundationFortune.Singleton.Config.PerkItems.Any(p => p.PerkType == PerkType.Revival && arguments.At(0).ToLower() == p.Alias.ToLower()))
 			{
@@ -93,39 +92,51 @@ namespace FoundationFortune.Commands.BuyCommand
 				p.Alias.Equals(aliasOrEnum, StringComparison.OrdinalIgnoreCase) ||
 				p.PerkType.ToString().Equals(aliasOrEnum, StringComparison.OrdinalIgnoreCase));
 
-			if (perkItem != null && CanPurchase(player, perkItem.Price))
+			if (perkItem != null && CanPurchase(player, perkItem.Price) && !ExceedsPerkLimit(player, perkItem))
 			{
 				FoundationFortune.Singleton.serverEvents.EnqueueHint(player, $"<color=red>-${perkItem.Price}</color> Bought {perkItem.Alias}", 0, 3, false, false);
-				PlayerDataRepository.ModifyMoney(player.UserId, perkItem.Price, true, false, true);
-				perks.GrantPerk(player, perkItem.PerkType);
+                PlayerDataRepository.ModifyMoney(player.UserId, perkItem.Price, true, false, true);
+                perks.GrantPerk(player, perkItem.PerkType);
+				ServerEvents.AddToPlayerLimits(player, perkItem);
 				response = $"You have successfully bought {perkItem.DisplayName} for ${perkItem.Price}";
 				return true;
 			}
-
-			response = "That is not a purchasable perk or you don't have enough money!";
-			return false;
-		}
-
-		private bool TryPurchaseItem(Player player, string aliasOrEnum, out string response)
-		{
-			BuyableItem buyItem = FoundationFortune.Singleton.Config.BuyableItems.FirstOrDefault(p =>
-				p.Alias.Equals(aliasOrEnum, StringComparison.OrdinalIgnoreCase) ||
-				p.ItemType.ToString().Equals(aliasOrEnum, StringComparison.OrdinalIgnoreCase));
-
-			if (buyItem != null && CanPurchase(player, buyItem.Price))
+			else if (perkItem != null && CanPurchase(player, perkItem.Price) && ExceedsPerkLimit(player, perkItem))
 			{
-				FoundationFortune.Singleton.serverEvents.EnqueueHint(player, $"<color=red>-${buyItem.Price}</color> Bought {buyItem.Alias}", 0, 3, false, false);
-				PlayerDataRepository.ModifyMoney(player.UserId, buyItem.Price, true, false, true);
-				player.AddItem(buyItem.ItemType);
-				response = $"You have successfully bought {buyItem.DisplayName} for ${buyItem.Price}";
-				return true;
-			}
+                response = $"You have exceeded the Perk Limit for the Perk '{perkItem.DisplayName}'";
+                return true;
+            }
 
-			response = "That is not a purchaseable item or you don't have enough money!";
+			response = "That is not a purchasable perk, you don't have enough money";
 			return false;
 		}
 
-		private bool CanPurchase(Player player, int price)
+        private bool TryPurchaseItem(Player player, string aliasOrEnum, out string response)
+        {
+            BuyableItem buyItem = FoundationFortune.Singleton.Config.BuyableItems.FirstOrDefault(p =>
+                p.Alias.Equals(aliasOrEnum, StringComparison.OrdinalIgnoreCase) ||
+                p.ItemType.ToString().Equals(aliasOrEnum, StringComparison.OrdinalIgnoreCase));
+
+            if (buyItem != null && CanPurchase(player, buyItem.Price) && !ExceedsItemLimit(player, buyItem))
+            {
+                FoundationFortune.Singleton.serverEvents.EnqueueHint(player, $"<color=red>-${buyItem.Price}</color> Bought {buyItem.Alias}", 0, 3, false, false);
+                PlayerDataRepository.ModifyMoney(player.UserId, buyItem.Price, true, false, true);
+                player.AddItem(buyItem.ItemType);
+                ServerEvents.AddToPlayerLimits(player, buyItem);
+                response = $"You have successfully bought {buyItem.DisplayName} for ${buyItem.Price}";
+                return true;
+            }
+            else if (buyItem != null && CanPurchase(player, buyItem.Price) && ExceedsItemLimit(player, buyItem))
+            {
+                response = $"You have exceeded the Item Limit for the Item '{buyItem.DisplayName}'";
+                return true;
+            }
+
+            response = "That is not a purchaseable item or you don't have enough money!";
+            return false;
+        }
+
+        private bool CanPurchase(Player player, int price)
 		{
 			int money = PlayerDataRepository.GetMoneySaved(player.UserId);
 			if (money < price) return false;
@@ -145,5 +156,27 @@ namespace FoundationFortune.Commands.BuyCommand
 							"\n";
 			return itemsToBuy + perksToBuy;
 		}
-	}
+
+        private bool ExceedsPerkLimit(Player player, PerkItem perkItem)
+        {
+            var playerLimit = FoundationFortune.PlayerLimits.FirstOrDefault(p => p.Player.UserId == player.UserId);
+            if (playerLimit != null)
+            {
+                var perkCount = playerLimit.BoughtPerks.Count(pair => pair.Key.PerkType == perkItem.PerkType);
+                return perkCount >= perkItem.Limit;
+            }
+            return false;
+        }
+
+        private bool ExceedsItemLimit(Player player, BuyableItem buyItem)
+        {
+            var playerLimit = FoundationFortune.PlayerLimits.FirstOrDefault(p => p.Player.UserId == player.UserId);
+            if (playerLimit != null)
+            {
+                var itemCount = playerLimit.BoughtItems.Count(pair => pair.Key.ItemType == buyItem.ItemType);
+                return itemCount >= buyItem.Limit;
+            }
+            return false;
+        }
+    }
 }

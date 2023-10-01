@@ -4,7 +4,7 @@ using FoundationFortune.Events;
 using RemoteAdmin;
 using System;
 using Exiled.API.Features;
-using FoundationFortune.API.Models;
+using FoundationFortune.API.Models.Enums;
 
 namespace FoundationFortune.Commands.FortuneCommands
 {
@@ -12,7 +12,7 @@ namespace FoundationFortune.Commands.FortuneCommands
     {
         public string Command { get; } = "hint";
         public string Description { get; } = "Hint stuff";
-        public string[] Aliases { get; } = new string[] { "h" };
+        public string[] Aliases { get; } = new string[] { "hn" };
 
         public bool Execute(ArraySegment<string> args, ICommandSender sender, out string response)
         {
@@ -38,7 +38,7 @@ namespace FoundationFortune.Commands.FortuneCommands
 
         private bool ToggleHintMinmode(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
-            if (!(sender is PlayerCommandSender playerSender))
+            if (sender is not PlayerCommandSender playerSender)
             {
                 response = "Only players can use this command.";
                 return false;
@@ -75,7 +75,7 @@ namespace FoundationFortune.Commands.FortuneCommands
 
         private bool SetHintAlignment(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
-            if (!(sender is PlayerCommandSender playerSender))
+            if (sender is not PlayerCommandSender playerSender)
             {
                 response = "Only players can use this command.";
                 return false;

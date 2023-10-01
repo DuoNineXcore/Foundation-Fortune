@@ -78,8 +78,8 @@
     <Compile Include="API\NPCs\BuyingBot.cs" />
     <Compile Include="API\Database\PlayerDataRepository.cs" />
     <Compile Include="API\Perks\Perks.cs" />
-    <Compile Include="API\Models\ObjectPurchases.cs" />
     <Compile Include="Commands\BuyCommand.cs" />
+    <Compile Include="Commands\FortuneCommands\BountyCommand.cs" />
     <Compile Include="Commands\FortuneCommands\DatabaseCommand.cs" />
     <Compile Include="Commands\FortuneCommands\HintCommand.cs" />
     <Compile Include="Commands\FortuneCommands\NpcCommand.cs" />

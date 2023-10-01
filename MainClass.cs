@@ -10,7 +10,8 @@ using SCPSLAudioApi;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using FoundationFortune.API.Models;
+using FoundationFortune.API.Models.Enums;
+using FoundationFortune.API.Models.Classes;
 
 namespace FoundationFortune
 {
@@ -25,8 +26,8 @@ namespace FoundationFortune
 
 		public static FoundationFortune Singleton;
 		public Dictionary<string, (Npc? bot, int indexation)> BuyingBotIndexation { get; private set; } = new Dictionary<string, (Npc? bot, int indexation)>();
-		public Dictionary<string, List<PerkType>> purchasedPerks = new Dictionary<string, List<PerkType>>();
-		public ServerEvents serverEvents = new();
+        public static List<ObjectInteractions> PlayerLimits = new();
+        public ServerEvents serverEvents = new();
 		public LiteDatabase db;
 
 		public override void OnEnabled()

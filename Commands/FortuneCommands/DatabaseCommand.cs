@@ -12,7 +12,7 @@ namespace FoundationFortune.Commands.FortuneCommands
     {
         public string Command { get; } = "database";
         public string Description { get; } = "Database stuff";
-        public string[] Aliases { get; } = new string[] { "d" };
+        public string[] Aliases { get; } = new string[] { "db" };
 
         public bool Execute(ArraySegment<string> args, ICommandSender sender, out string response)
         {
@@ -86,7 +86,7 @@ namespace FoundationFortune.Commands.FortuneCommands
             switch (addmoneytarget)
             {
                 case "self":
-                    if (!(sender is PlayerCommandSender self))
+                    if (sender is not PlayerCommandSender self)
                     {
                         response = "Command sender is not a player.";
                         return false;
@@ -178,7 +178,7 @@ namespace FoundationFortune.Commands.FortuneCommands
                 switch (target)
                 {
                     case "self":
-                        if (!(sender is PlayerCommandSender self))
+                        if (sender is not PlayerCommandSender self)
                         {
                             response = "Command sender is not a player.";
                             return false;

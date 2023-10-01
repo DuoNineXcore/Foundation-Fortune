@@ -1,4 +1,4 @@
-﻿namespace FoundationFortune.API.Models
+﻿namespace FoundationFortune.API.Models.Enums
 {
     public enum HintAlign
     {
@@ -13,7 +13,9 @@
         Buying,
         Revival,
         NotEnoughMoney,
-        WrongBuyingBot
+        WrongBuyingBot,
+        BuyingBotInRange,
+        SellingBotInRange,
     }
 
     public enum PerkType

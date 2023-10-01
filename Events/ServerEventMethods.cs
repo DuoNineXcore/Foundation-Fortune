@@ -12,7 +12,9 @@ using Random = UnityEngine.Random;
 using Exiled.API.Features.Doors;
 using FoundationFortune.Configs;
 using Exiled.API.Extensions;
-using FoundationFortune.API.Models;
+using FoundationFortune.API.Models.Enums;
+using FoundationFortune.API.Models.Classes;
+using System;
 
 namespace FoundationFortune.Events
 {
@@ -41,6 +43,7 @@ namespace FoundationFortune.Events
                         PlayerDataRepository.ModifyMoney(ply.UserId, moneyOnHold / 10, true, true, false);
                         PlayerDataRepository.ModifyMoney(ply.UserId, moneyOnHold / 10, false, false, true);
                     }
+
                     int moneySaved = PlayerDataRepository.GetMoneySaved(ply.UserId);
                     HintAlign? hintAlignment = PlayerDataRepository.GetUserHintAlign(ply.UserId);
 
@@ -48,15 +51,29 @@ namespace FoundationFortune.Events
 
                     if (!PlayerDataRepository.GetHintMinmode(ply.UserId))
                     {
-                              string moneySavedString = FoundationFortune.Singleton.Translation.DefaultHint
-                                   .Replace("%rolecolor%", ply.Role.Color.ToHex())
-                                   .Replace("%moneyOnHold%", moneyOnHold.ToString())
-                                   .Replace("%moneySaved%", moneySaved.ToString());
-                        hintMessage += $"\n<align={hintAlignment}>{moneySavedString}<align=left>\n";
+                        string moneySavedString = FoundationFortune.Singleton.Translation.MoneyCounterSaved
+                            .Replace("%rolecolor%", ply.Role.Color.ToHex())
+                            .Replace("%moneySaved%", moneySaved.ToString());
+                        string moneyHoldString = FoundationFortune.Singleton.Translation.MoneyCounterOnHold
+                            .Replace("%rolecolor%", ply.Role.Color.ToHex())
+                            .Replace("%moneyOnHold%", moneyOnHold.ToString());
+
+                        hintMessage += $"\n<align={hintAlignment}>{moneySavedString}{moneyHoldString}<align=left>\n";
                     }
 
                     HandleWorkstationMessages(ply, ref hintMessage);
                     HandleBuyingBotMessages(ply, ref hintMessage);
+
+                    Bounty bounty = BountiedPlayers.FirstOrDefault(b => b.Player == ply);
+                    if (bounty != null)
+                    {
+                        TimeSpan timeLeft = bounty.ExpirationTime - DateTime.Now;
+                        string bountyMessage = ply.UserId == bounty.Player.UserId
+                            ? FoundationFortune.Singleton.Translation.SelfBounty.Replace("%duration%", timeLeft.ToString(@"hh\:mm\:ss"))
+                            : FoundationFortune.Singleton.Translation.OtherBounty.Replace("%player%", bounty.Player.Nickname).Replace("%duration%", timeLeft.ToString(@"hh\:mm\:ss"));
+
+                        hintMessage += $"<align={hintAlignment}>\n{bountyMessage}</align>";
+                    }
 
                     string recentHintsText = GetRecentHints(ply.UserId);
                     if (!string.IsNullOrEmpty(recentHintsText))
@@ -102,22 +119,32 @@ namespace FoundationFortune.Events
         private void HandleBuyingBotMessages(Player ply, ref string hintMessage)
         {
             HintAlign? hintAlignment = PlayerDataRepository.GetUserHintAlign(ply.UserId);
+            Npc npc = GetBuyingBotNearPlayer(ply);
 
-            if (IsPlayerOnBuyingBotRadius(ply, out Npc npc))
+            if (IsPlayerNearBuyingBot(ply, npc))
+            {
+                BuyingBot.LookAt(npc, ply.Position);
+                hintMessage += $"<align={hintAlignment}>{FoundationFortune.Singleton.Translation.BuyingBot}</align>";
+            }
+            else if (IsPlayerNearSellingBot(ply))
             {
                 BuyingBot.LookAt(npc, ply.Position);
                 if (!confirmSell.ContainsKey(ply.UserId))
                 {
-                    hintMessage += $"<align={hintAlignment}>{FoundationFortune.Singleton.Translation.BuyingBot}</align>";
+                    hintMessage += $"<align={hintAlignment}>{FoundationFortune.Singleton.Translation.SellingBot}</align>";
                 }
                 else if (confirmSell[ply.UserId])
                 {
-                    hintMessage += $"<align={hintAlignment}>{FoundationFortune.Singleton.Translation.BuyingBot}</align>";
+                    hintMessage += $"<align={hintAlignment}>{FoundationFortune.Singleton.Translation.SellingBot}</align>";
 
                     if (itemsBeingSold.TryGetValue(ply.UserId, out var soldItemData))
                     {
                         int price = soldItemData.price;
-                        hintMessage += $"<align={hintAlignment}>\n{FoundationFortune.Singleton.Translation.ItemConfirmation.Replace("%price%", price.ToString())}</align>";
+                        string confirmationHint = FoundationFortune.Singleton.Translation.ItemConfirmation
+                            .Replace("%price%", price.ToString())
+                            .Replace("%time%", GetConfirmationTimeLeft(ply));
+
+                        hintMessage += $"<align={hintAlignment}>\n{confirmationHint}</align>";
                     }
                 }
             }
@@ -360,13 +387,93 @@ namespace FoundationFortune.Events
             return null;
         }
 
+        public bool IsPlayerNearBuyingBot(Player player)
+        {
+            bool isNearBot = IsPlayerOnBuyingBotRadius(player, out Npc npc);
+            if (!isNearBot || npc == null) return false;
+            bool isBuyingBot = FoundationFortune.Singleton.Config.BuyingBotSpawnSettings.Any(c => c.Name == npc.Nickname && !c.IsSellingBot);
+            return isBuyingBot;
+        }
+
         public bool IsPlayerNearSellingBot(Player player)
         {
             bool isNearBot = IsPlayerOnBuyingBotRadius(player, out Npc npc);
             if (!isNearBot || npc == null) return false;
             bool isSellingBot = FoundationFortune.Singleton.Config.BuyingBotSpawnSettings.Any(c => c.Name == npc.Nickname && c.IsSellingBot);
-            if (isSellingBot) return true;
-            return false;
+            return isSellingBot;
+        }
+
+        public bool IsPlayerNearBuyingBot(Player player, Npc? npc)
+        {
+            bool isNearBot = IsPlayerOnBuyingBotRadius(player, out npc);
+            if (!isNearBot || npc == null) return false;
+            bool isBuyingBot = FoundationFortune.Singleton.Config.BuyingBotSpawnSettings.Any(c => c.Name == npc.Nickname && !c.IsSellingBot);
+            return isBuyingBot;
+        }
+
+        public bool IsPlayerNearSellingBot(Player player, Npc? npc)
+        {
+            bool isNearBot = IsPlayerOnBuyingBotRadius(player, out npc);
+            if (!isNearBot || npc == null) return false;
+            bool isSellingBot = FoundationFortune.Singleton.Config.BuyingBotSpawnSettings.Any(c => c.Name == npc.Nickname && c.IsSellingBot);
+            return isSellingBot;
+        }
+
+        public static void AddToPlayerLimits(Player player, PerkItem perkItem)
+        {
+            var playerLimit = FoundationFortune.PlayerLimits.FirstOrDefault(p => p.Player.UserId == player.UserId);
+            if (playerLimit == null)
+            {
+                playerLimit = new ObjectInteractions(player);
+                FoundationFortune.PlayerLimits.Add(playerLimit);
+            }
+
+            if (playerLimit.BoughtPerks.ContainsKey(perkItem))
+            {
+                playerLimit.BoughtPerks[perkItem]++;
+            }
+            else
+            {
+                playerLimit.BoughtPerks[perkItem] = 1;
+            }
+        }
+
+        public static void AddToPlayerLimits(Player player, BuyableItem buyItem)
+        {
+            var playerLimit = FoundationFortune.PlayerLimits.FirstOrDefault(p => p.Player.UserId == player.UserId);
+            if (playerLimit == null)
+            {
+                playerLimit = new ObjectInteractions(player);
+                FoundationFortune.PlayerLimits.Add(playerLimit);
+            }
+
+            if (playerLimit.BoughtItems.ContainsKey(buyItem))
+            {
+                playerLimit.BoughtItems[buyItem]++;
+            }
+            else
+            {
+                playerLimit.BoughtItems[buyItem] = 1;
+            }
+        }
+
+        public static void AddToPlayerLimits(Player player, SellableItem sellItem)
+        {
+            var playerLimit = FoundationFortune.PlayerLimits.FirstOrDefault(p => p.Player.UserId == player.UserId);
+            if (playerLimit == null)
+            {
+                playerLimit = new ObjectInteractions(player);
+                FoundationFortune.PlayerLimits.Add(playerLimit);
+            }
+
+            if (playerLimit.SoldItems.ContainsKey(sellItem))
+            {
+                playerLimit.SoldItems[sellItem]++;
+            }
+            else
+            {
+                playerLimit.SoldItems[sellItem] = 1;
+            }
         }
     }
 }

@@ -5,8 +5,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using VoiceChat;
 using System.ComponentModel;
-using FoundationFortune.API.Models;
-using VoiceChatSettings = FoundationFortune.API.Models.VoiceChatSettings;
+using FoundationFortune.API.Models.Classes;
+using FoundationFortune.API.Models.Enums;
+using VoiceChatSettings = FoundationFortune.API.Models.Classes.VoiceChatSettings;
+using System;
 
 namespace FoundationFortune.Configs
 {
@@ -24,6 +26,15 @@ namespace FoundationFortune.Configs
         public bool KillRewardTransfer { get; set; } = false;
         public bool KillRewardTransferAll { get; set; } = false;
         public bool KillRewardScpOnly { get; set; } = false;
+
+        [Description("Revival Settings.")]
+        public bool HuntReviver { get; set; } = true;
+        public int RevivedPlayerHealth { get; set; } = 30;
+        public bool ResetRevivedInventory { get; set; } = false;
+        public int RevivalBountyKillReward { get; set; } = 5000;
+        public int RevivalBountyTimeSeconds { get; set; } = 300;
+        public int RevivalBountyKillRewardTransfer { get; set; }
+        public int RevivalBountyKillRewardTransferAll { get; set; }
 
         [Description("Escaping player event.")]
         public int EscapeReward { get; set; } = 300;
@@ -76,7 +87,9 @@ namespace FoundationFortune.Configs
             new VoiceChatSettings { VoiceChatUsageType = VoiceChatUsageType.Buying, VoiceChat = VoiceChatChannel.Mimicry, Loop = false, AudioFile = "BuySuccess.ogg", Volume = 50},
             new VoiceChatSettings { VoiceChatUsageType = VoiceChatUsageType.Revival, VoiceChat = VoiceChatChannel.Intercom, Loop = false, AudioFile = "BuySuccess.ogg", Volume = 50},
             new VoiceChatSettings { VoiceChatUsageType = VoiceChatUsageType.WrongBuyingBot, VoiceChat = VoiceChatChannel.Mimicry, Loop = false, AudioFile = "BuySuccess.ogg", Volume = 50},
-            new VoiceChatSettings { VoiceChatUsageType = VoiceChatUsageType.NotEnoughMoney, VoiceChat = VoiceChatChannel.Mimicry, Loop = false, AudioFile = "BuySuccess.ogg", Volume = 50}
+            new VoiceChatSettings { VoiceChatUsageType = VoiceChatUsageType.NotEnoughMoney, VoiceChat = VoiceChatChannel.Mimicry, Loop = false, AudioFile = "BuySuccess.ogg", Volume = 50},
+            new VoiceChatSettings { VoiceChatUsageType = VoiceChatUsageType.BuyingBotInRange, VoiceChat = VoiceChatChannel.Mimicry, Loop = false, AudioFile = "BuySuccess.ogg", Volume = 50},
+            new VoiceChatSettings { VoiceChatUsageType = VoiceChatUsageType.SellingBotInRange, VoiceChat = VoiceChatChannel.Mimicry, Loop = false, AudioFile = "BuySuccess.ogg", Volume = 50}
         };
 
         [Description("List of items that can be sold.")]

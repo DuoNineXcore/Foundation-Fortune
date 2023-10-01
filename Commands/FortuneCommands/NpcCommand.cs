@@ -16,7 +16,7 @@ namespace FoundationFortune.Commands.FortuneCommands
     {
         public string Command { get; } = "npc";
         public string Description { get; } = "Npc stuff";
-        public string[] Aliases { get; } = new string[] { "n" };
+        public string[] Aliases { get; } = new string[] { "nc" };
 
         public bool Execute(ArraySegment<string> args, ICommandSender sender, out string response)
         {

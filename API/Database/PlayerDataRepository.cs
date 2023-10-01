@@ -1,7 +1,8 @@
 ﻿using Exiled.API.Features;
 using FoundationFortune.Events;
 using LiteDB;
-using FoundationFortune.API.Models;
+using FoundationFortune.API.Models.Enums;
+using FoundationFortune.API.Models.Classes;
 using System;
 
 namespace FoundationFortune.API.Database
@@ -9,15 +10,10 @@ namespace FoundationFortune.API.Database
     public static class PlayerDataRepository
     {
         private static LiteCollection<PlayerData> PlayersCollection => (LiteCollection<PlayerData>)FoundationFortune.Singleton.db.GetCollection<PlayerData>("players");
-
         public static void InsertPlayer(PlayerData player) => PlayersCollection.Insert(player);
-
         public static PlayerData GetPlayerById(string userId) => PlayersCollection.FindOne(p => p.UserId == userId);
-
         public static bool GetHintMinmode(string userId) => PlayersCollection.FindOne(p => p.UserId == userId)?.HintMinmode ?? false;
-
         public static int GetMoneyOnHold(string userId) => PlayersCollection.FindOne(p => p.UserId == userId)?.MoneyOnHold ?? 0;
-
         public static int GetMoneySaved(string userId) => PlayersCollection.FindOne(p => p.UserId == userId)?.MoneySaved ?? 0;
 
         public static bool SetHintMinmode(string userId, bool enable)

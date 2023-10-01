@@ -1,49 +1,39 @@
-﻿namespace FoundationFortune.API.NPCs
+﻿using Exiled.API.Enums;
+using Exiled.API.Extensions;
+using Exiled.API.Features;
+using Exiled.API.Features.Components;
+using Exiled.API.Features.Items;
+using MEC;
+using Mirror;
+using PlayerRoles;
+using PlayerRoles.FirstPersonControl;
+using PlayerRoles.PlayableScps.Subroutines;
+using SCPSLAudioApi.AudioCore;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using UnityEngine;
+using VoiceChat;
+using FoundationFortune.API.Models.Classes;
+
+namespace FoundationFortune.API.NPCs
 {
-	 using Exiled.API.Enums;
-	 using Exiled.API.Extensions;
-	 using Exiled.API.Features;
-	 using Exiled.API.Features.Components;
-	 using Exiled.API.Features.Items;
-	 using MEC;
-	 using Mirror;
-	 using PlayerRoles;
-	 using PlayerRoles.FirstPersonControl;
-	 using PlayerRoles.PlayableScps.Subroutines;
-	 using SCPSLAudioApi.AudioCore;
-	 using System;
-	 using System.Collections.Generic;
-	 using System.IO;
-	 using System.Linq;
-	 using UnityEngine;
-	 using VoiceChat;
-
-    public class BuyingBotComponent : MonoBehaviour
-    {
-        internal Npc BuyingBotNPC;
-        internal Player ply;
-    }
-
     public static class BuyingBot
     {
+        public static readonly IReadOnlyList<string> allowedBuyingBotNameColors;
+
         static BuyingBot()
         {
             ServerRoles serverRoles = NetworkManager.singleton.playerPrefab.GetComponent<ServerRoles>();
-
             List<string> allowedColors = new(serverRoles.NamedColors.Length);
-
             foreach (ServerRoles.NamedColor namedColor in serverRoles.NamedColors)
             {
-                if (namedColor.Restricted)
-                    continue;
-
+                if (namedColor.Restricted) continue;
                 allowedColors.Add(namedColor.Name);
             }
-
             allowedBuyingBotNameColors = allowedColors;
         }
-
-        public static readonly IReadOnlyList<string> allowedBuyingBotNameColors;
 
         public static bool RemoveBuyingBot(int indexationNumber)
         {
@@ -77,21 +67,13 @@
                 int currentIndexationNumber = botData.indexation;
                 int newIndexationNumber = currentIndexationNumber + 1;
 
-                while (FoundationFortune.Singleton.BuyingBotIndexation.Values.Any(data => data.indexation == newIndexationNumber))
-                {
-                    newIndexationNumber++;
-                }
-
+                while (FoundationFortune.Singleton.BuyingBotIndexation.Values.Any(data => data.indexation == newIndexationNumber)) newIndexationNumber++;
                 FoundationFortune.Singleton.BuyingBotIndexation[target] = (botData.bot, newIndexationNumber);
                 return newIndexationNumber;
             }
 
             int nextAvailableIndex = 0;
-            while (FoundationFortune.Singleton.BuyingBotIndexation.Values.Any(data => data.indexation == nextAvailableIndex))
-            {
-                nextAvailableIndex++;
-            }
-
+            while (FoundationFortune.Singleton.BuyingBotIndexation.Values.Any(data => data.indexation == nextAvailableIndex)) nextAvailableIndex++;
             return nextAvailableIndex;
         }
 
@@ -153,19 +135,12 @@
             {
             }
 
-            if (RecyclablePlayerId.FreeIds.Contains(id))
-            {
-                RecyclablePlayerId.FreeIds.RemoveFromQueue(id);
-            }
-            else if (RecyclablePlayerId._autoIncrement >= id)
-            {
-                id = ++RecyclablePlayerId._autoIncrement;
-            }
+            if (RecyclablePlayerId.FreeIds.Contains(id)) RecyclablePlayerId.FreeIds.RemoveFromQueue(id);
+            else if (RecyclablePlayerId._autoIncrement >= id) id = ++RecyclablePlayerId._autoIncrement;
 
             NetworkServer.AddPlayerForConnection(new FakeConnection(id), gameObject);
             try
             {
-                //npc.ReferenceHub.characterClassManager.SyncedUserId = "FoundationFortune";
                 npc.ReferenceHub.characterClassManager.InstanceMode = ClientInstanceMode.DedicatedServer;
             }
             catch (Exception e)

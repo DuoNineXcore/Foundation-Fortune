@@ -3,8 +3,12 @@ using LiteDB;
 using PlayerRoles;
 using UnityEngine;
 using VoiceChat;
+using Exiled.API.Features;
+using FoundationFortune.API.Models.Enums;
+using System;
+using System.Collections.Generic;
 
-namespace FoundationFortune.API.Models
+namespace FoundationFortune.API.Models.Classes
 {
     public class HintEntry
     {
@@ -17,6 +21,41 @@ namespace FoundationFortune.API.Models
             Text = text;
             Timestamp = timestamp;
             Reward = reward;
+        }
+    }
+
+    public class BuyingBotComponent : MonoBehaviour
+    {
+        internal Npc BuyingBotNPC;
+        internal Player ply;
+    }
+
+    public class Bounty
+    {
+        public Player Player { get; }
+        public bool IsBountied { get; set; }
+        public int Value { get; }
+        public DateTime ExpirationTime { get; }
+
+        public Bounty(Player player, bool isBountied, int value, DateTime expirationTime)
+        {
+            Player = player;
+            IsBountied = isBountied;
+            Value = value;
+            ExpirationTime = expirationTime;
+        }
+    }
+
+    public class ObjectInteractions
+    {
+        public Player Player;
+        public Dictionary<BuyableItem, int> BoughtItems = new();
+        public Dictionary<PerkItem, int> BoughtPerks = new();
+        public Dictionary<SellableItem, int> SoldItems = new();
+
+        public ObjectInteractions(Player player)
+        {
+            Player = player;
         }
     }
 
