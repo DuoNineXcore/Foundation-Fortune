@@ -94,14 +94,19 @@ namespace FoundationFortune.Commands.BuyCommand
 
 			if (perkItem != null && CanPurchase(player, perkItem.Price) && !ExceedsPerkLimit(player, perkItem))
 			{
-				FoundationFortune.Singleton.serverEvents.EnqueueHint(player, $"<color=red>-${perkItem.Price}</color> Bought {perkItem.Alias}", 0, 3, false, false);
+				string BoughtHint = FoundationFortune.Singleton.Translation.BuyItemSuccess
+					.Replace("%perkItem%", perkItem.Alias)
+					.Replace("%perkPrice%", perkItem.Price.ToString());
+
+				FoundationFortune.Singleton.serverEvents.EnqueueHint(player, $"{BoughtHint}", 0, 3, false, false);
                 PlayerDataRepository.ModifyMoney(player.UserId, perkItem.Price, true, false, true);
-                perks.GrantPerk(player, perkItem.PerkType);
 				ServerEvents.AddToPlayerLimits(player, perkItem);
+
+				perks.GrantPerk(player, perkItem.PerkType);
 				response = $"You have successfully bought {perkItem.DisplayName} for ${perkItem.Price}";
 				return true;
 			}
-			else if (perkItem != null && CanPurchase(player, perkItem.Price) && ExceedsPerkLimit(player, perkItem))
+			else if (perkItem != null && ExceedsPerkLimit(player, perkItem))
 			{
                 response = $"You have exceeded the Perk Limit for the Perk '{perkItem.DisplayName}'";
                 return true;
@@ -119,14 +124,17 @@ namespace FoundationFortune.Commands.BuyCommand
 
             if (buyItem != null && CanPurchase(player, buyItem.Price) && !ExceedsItemLimit(player, buyItem))
             {
-                FoundationFortune.Singleton.serverEvents.EnqueueHint(player, $"<color=red>-${buyItem.Price}</color> Bought {buyItem.Alias}", 0, 3, false, false);
+                string BoughtHint = FoundationFortune.Singleton.Translation.BuyItemSuccess
+                    .Replace("%perkItem%", buyItem.Alias)
+                    .Replace("%perkPrice%", buyItem.Price.ToString());
+                FoundationFortune.Singleton.serverEvents.EnqueueHint(player, $"{BoughtHint}", 0, 3, false, false);
                 PlayerDataRepository.ModifyMoney(player.UserId, buyItem.Price, true, false, true);
                 player.AddItem(buyItem.ItemType);
                 ServerEvents.AddToPlayerLimits(player, buyItem);
                 response = $"You have successfully bought {buyItem.DisplayName} for ${buyItem.Price}";
                 return true;
             }
-            else if (buyItem != null && CanPurchase(player, buyItem.Price) && ExceedsItemLimit(player, buyItem))
+            else if (buyItem != null && ExceedsItemLimit(player, buyItem))
             {
                 response = $"You have exceeded the Item Limit for the Item '{buyItem.DisplayName}'";
                 return true;

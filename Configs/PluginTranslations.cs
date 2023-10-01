@@ -29,7 +29,7 @@ namespace FoundationFortune.Configs
 		public string SaleCancelled { get; set; } = "<b><size=24><color=red>Item changed. Sale canceled.</color></b></size>";
 		public string SellSuccess { get; set; } = "<b><size=24><color=green>+%price%$</color> Sold %itemName%.</color></b></size>";
 		public string ItemConfirmation { get; set; } = "<b><size=24>This item is worth <color=green>%price%</color>, Confirm sale? (%time% seconds left)</size></b></align>";
-		public string BuyItemSuccess { get; set; } = "<b><size=24><color=red>-${buyItem.Price}</color> Bought {buyItem.DisplayName}</b></size>";
+		public string BuyItemSuccess { get; set; } = "<b><size=24><color=red>-$%itemPrice%</color> Bought %itemName%.</b></size>";
 
 		[Description("Death Coins")]
 		public string DeathCoinPickup { get; set; } = "<b><size=24><color=green>+%coinValue%</color> Picked up Death Coin.</b></size>";
