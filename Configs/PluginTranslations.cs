@@ -10,7 +10,7 @@ namespace FoundationFortune.Configs
 {
 	public class PluginTranslations : ITranslation
 	{
-		[Description("Player Event Hints")]
+		[Description("Server Events")]
 		public string Kill { get; set; } = "<b><size=24><color=green>+$300</color>%victim%'s Termination.</b></size>";
 		public string Escape { get; set; } = "<b><size=24><color=green>+$300</color>Successfully Escaped.</b></size>";
         public string Death { get; set; } = "<b><size=24><color=red>$-%moneyBeforeDeath%.</color> You died.</b></size>";
@@ -31,7 +31,12 @@ namespace FoundationFortune.Configs
 		public string ItemConfirmation { get; set; } = "<b><size=24>This item is worth <color=green>%price%</color>, Confirm sale? (%time% seconds left)</size></b></align>";
 		public string BuyItemSuccess { get; set; } = "<b><size=24><color=red>-$%itemPrice%</color> Bought %itemName%.</b></size>";
 
-		[Description("Death Coins")]
+		[Description("Extraction Event")]
+        public string ExtractionZoneStart = "<b><size=24>A money extraction zone has opened up. Room: %room% Time Left: %time%</b></size>";
+		public string ExtractionTimer = "<b><size=24>You're in the extraction zone, extracting money in %time% seconds.</b></size>";
+        public string ExtractingHint = "<b><size=24>Extracting Money.</b></size>";
+
+        [Description("Death Coins")]
 		public string DeathCoinPickup { get; set; } = "<b><size=24><color=green>+%coinValue%</color> Picked up Death Coin.</b></size>";
 
 		[Description("Revival System Hints")]

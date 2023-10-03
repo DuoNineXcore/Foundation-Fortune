@@ -49,9 +49,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\Documents\C# References\Mirror.dll</HintPath>
     </Reference>
-    <Reference Include="NWAPIPermissionSystem">
-      <HintPath>..\..\..\Documents\C# References\NWAPIPermissionSystem.dll</HintPath>
-    </Reference>
     <Reference Include="Pooling, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\Documents\C# References\Pooling.dll</HintPath>
@@ -85,15 +82,17 @@
     <Compile Include="Commands\FortuneCommands\NpcCommand.cs" />
     <Compile Include="Commands\FortuneCommands\ParentFortuneCommand.cs" />
     <Compile Include="Configs\PluginConfigs.cs" />
+    <Compile Include="Events\ServerHintSystem.cs" />
+    <Compile Include="Events\ServerExtractionEvent.cs" />
     <Compile Include="Patches\Transpilers.cs" />
-    <Compile Include="Events\ServerEventMethods.cs" />
-    <Compile Include="Events\ServerEventHandlers.cs" />
+    <Compile Include="Events\ServerEventsMethods.cs" />
+    <Compile Include="Events\ServerSLEvents.cs" />
     <Compile Include="MainClass.cs" />
     <Compile Include="Configs\PluginTranslations.cs" />
     <Compile Include="Patches\Postfixes.cs" />
     <Compile Include="Patches\Prefixes.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Events\ServerEventBounty.cs" />
+    <Compile Include="Events\ServerBountyEvent.cs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="EXILED">

@@ -22,10 +22,7 @@ namespace FoundationFortune.Events
         public void StopBounty(Player player)
         {
             Bounty bounty = BountiedPlayers.FirstOrDefault(b => b.Player == player);
-            if (bounty != null)
-            {
-                BountiedPlayers.Remove(bounty);
-            }
+            if (bounty != null) BountiedPlayers.Remove(bounty);
         }
     }
 }

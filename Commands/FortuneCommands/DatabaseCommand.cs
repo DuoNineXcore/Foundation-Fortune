@@ -58,7 +58,10 @@ namespace FoundationFortune.Commands.FortuneCommands
                 int? moneyOnHold = PlayerDataRepository.GetMoneyOnHold(player.UserId);
                 int? moneySaved = PlayerDataRepository.GetMoneySaved(player.UserId);
 
-                FoundationFortune.Singleton.serverEvents.EnqueueHint(player, $"{pluginTranslations.FlushedDatabase}", 0, 5f, false, false);
+                string FlushedDatabase = pluginTranslations.FlushedDatabase
+                    .Replace("%moneyOnHold%", moneyOnHold.ToString())
+                    .Replace("%moneySaved%", moneySaved.ToString());
+                FoundationFortune.Singleton.serverEvents.EnqueueHint(player, $"{FlushedDatabase}", 0, 5f, false, false);
                 PlayerDataRepository.EmptyMoney(player.UserId, true, true);
             }
 
@@ -100,7 +103,8 @@ namespace FoundationFortune.Commands.FortuneCommands
                         return false;
                     }
 
-                    FoundationFortune.Singleton.serverEvents.EnqueueHint(ply, $"{pluginTranslations.SelfAddMoney}", amount, 5f, false, false);
+                    string SelfAddMoney = pluginTranslations.AllAddMoney.Replace("%amount%", amount.ToString());
+                    FoundationFortune.Singleton.serverEvents.EnqueueHint(ply, $"{SelfAddMoney}", amount, 5f, false, false);
                     response = $"Gave {amount} money to player '{ply}'.";
                     return true;
 
@@ -111,11 +115,8 @@ namespace FoundationFortune.Commands.FortuneCommands
                         return false;
                     }
 
-                    foreach (var player in Player.List)
-                    {
-                        FoundationFortune.Singleton.serverEvents.EnqueueHint(player, $"{pluginTranslations.AllAddMoney}", allAmount, 5f, false, false);
-                    }
-
+                    string AllAddMoney = pluginTranslations.AllAddMoney.Replace("%amount%", allAmount.ToString());
+                    foreach (var player in Player.List) FoundationFortune.Singleton.serverEvents.EnqueueHint(player, $"{AllAddMoney}", allAmount, 5f, false, false);
                     response = $"Gave {allAmount} money to all players.";
                     return true;
 
@@ -127,12 +128,8 @@ namespace FoundationFortune.Commands.FortuneCommands
                     }
 
                     var targetPlayer = Player.Get(addmoneytarget);
-
-                    if (targetPlayer != null)
-                    {
-                        FoundationFortune.Singleton.serverEvents.EnqueueHint(targetPlayer, $"{pluginTranslations.SteamIDAddMoney}", steamIdAmount, 5f, false, false);
-                    }
-
+                    string SteamIDAddMoney = pluginTranslations.SteamIDAddMoney.Replace("%amount%", steamIdAmount.ToString());
+                    if (targetPlayer != null) FoundationFortune.Singleton.serverEvents.EnqueueHint(targetPlayer, $"{SteamIDAddMoney}", steamIdAmount, 5f, false, false);
                     response = $"Gave {steamIdAmount} money to player '{addmoneytarget}'.";
                     return true;
             }
@@ -165,15 +162,8 @@ namespace FoundationFortune.Commands.FortuneCommands
                     return false;
                 }
 
-                if (arguments.Count >= 4)
-                {
-                    bool.TryParse(arguments.At(3), out subtractSaved);
-                }
-
-                if (arguments.Count >= 5)
-                {
-                    bool.TryParse(arguments.At(4), out subtractOnHold);
-                }
+                if (arguments.Count >= 4) bool.TryParse(arguments.At(3), out subtractSaved);
+                if (arguments.Count >= 5) bool.TryParse(arguments.At(4), out subtractOnHold);
 
                 switch (target)
                 {
@@ -186,17 +176,12 @@ namespace FoundationFortune.Commands.FortuneCommands
 
                         var ply = Player.Get(self);
 
-                        if (subtractSaved)
-                        {
-                            PlayerDataRepository.ModifyMoney(ply.UserId, amount, true, false, true);
-                        }
+                        if (subtractSaved) PlayerDataRepository.ModifyMoney(ply.UserId, amount, true, false, true);
+                        if (subtractOnHold) PlayerDataRepository.ModifyMoney(ply.UserId, amount, true, true, false);
 
-                        if (subtractOnHold)
-                        {
-                            PlayerDataRepository.ModifyMoney(ply.UserId, amount, true, true, false);
-                        }
+                        string SelfRemoveMoney = pluginTranslations.SelfRemoveMoney.Replace("%amount%", amount.ToString());
 
-                        FoundationFortune.Singleton.serverEvents.EnqueueHint(ply, $"{pluginTranslations.SelfRemoveMoney}", 0, 5f, false, false);
+                        FoundationFortune.Singleton.serverEvents.EnqueueHint(ply, $"{SelfRemoveMoney}", 0, 5f, false, false);
                         response = $"Removed {amount} money from player '{ply}' (Saved: {subtractSaved}, On-Hold: {subtractOnHold}).";
                         return true;
 
@@ -211,7 +196,8 @@ namespace FoundationFortune.Commands.FortuneCommands
 
                             foreach (var player in Player.List)
                             {
-                                FoundationFortune.Singleton.serverEvents.EnqueueHint(player, $"{pluginTranslations.AllRemoveMoney}", 0, 5f, false, false);
+                                string AllRemoveMoney = pluginTranslations.AllRemoveMoney.Replace("%amount%", allAmount.ToString());
+                                FoundationFortune.Singleton.serverEvents.EnqueueHint(player, $"{AllRemoveMoney}", 0, 5f, false, false);
                                 PlayerDataRepository.ModifyMoney(player.UserId, allAmount, true, false, true);
                             }
                         }
@@ -226,7 +212,8 @@ namespace FoundationFortune.Commands.FortuneCommands
 
                             foreach (var player in Player.List)
                             {
-                                FoundationFortune.Singleton.serverEvents.EnqueueHint(player, $"{pluginTranslations.AllRemoveMoney}", 0, 5f, false, false);
+                                string AllRemoveMoney = pluginTranslations.AllRemoveMoney.Replace("%amount%", allAmount.ToString());
+                                FoundationFortune.Singleton.serverEvents.EnqueueHint(player, $"{AllRemoveMoney}", 0, 5f, false, false);
                                 PlayerDataRepository.ModifyMoney(player.UserId, allAmount, true, true, false);
                             }
                         }
@@ -246,17 +233,11 @@ namespace FoundationFortune.Commands.FortuneCommands
                             var targetPlayer = Player.Get(target);
                             if (targetPlayer != null)
                             {
-                                if (subtractSaved)
-                                {
-                                    PlayerDataRepository.ModifyMoney(targetPlayer.UserId, steamIdAmount, true, false, false);
-                                }
+                                if (subtractSaved) PlayerDataRepository.ModifyMoney(targetPlayer.UserId, steamIdAmount, true, false, false);
+                                if (subtractOnHold) PlayerDataRepository.ModifyMoney(targetPlayer.UserId, steamIdAmount, true, false, true);
 
-                                if (subtractOnHold)
-                                {
-                                    PlayerDataRepository.ModifyMoney(targetPlayer.UserId, steamIdAmount, true, false, true);
-                                }
-
-                                FoundationFortune.Singleton.serverEvents.EnqueueHint(targetPlayer, $"{pluginTranslations.SteamIDRemoveMoney}", 0, 5f, false, false);
+                                string SteamIdRemoveMoney = pluginTranslations.AllRemoveMoney.Replace("%amount%", steamIdAmount.ToString());
+                                FoundationFortune.Singleton.serverEvents.EnqueueHint(targetPlayer, $"{SteamIdRemoveMoney}", 0, 5f, false, false);
                             }
                         }
 

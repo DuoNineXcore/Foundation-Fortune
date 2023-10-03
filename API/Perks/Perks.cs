@@ -63,8 +63,10 @@ namespace FoundationFortune.API.Perks
 
             var Config = FoundationFortune.Singleton.Config;
 
-            targetToRevive.Role.Set(reviver.Role, RoleSpawnFlags.None);
-            targetToRevive.Health = 30;
+            if (Config.ResetRevivedInventory) targetToRevive.Role.Set(reviver.Role, RoleSpawnFlags.None);
+            else targetToRevive.Role.Set(reviver.Role);
+
+            targetToRevive.Health = Config.RevivedPlayerHealth;
             targetToRevive.Teleport(reviver.Position);
 
             if (Config.HuntReviver)
