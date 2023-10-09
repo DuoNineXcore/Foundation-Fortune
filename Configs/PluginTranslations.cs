@@ -32,9 +32,10 @@ namespace FoundationFortune.Configs
 		public string BuyItemSuccess { get; set; } = "<b><size=24><color=red>-$%itemPrice%</color> Bought %itemName%.</b></size>";
 
 		[Description("Extraction Event")]
-        public string ExtractionZoneStart = "<b><size=24>A money extraction zone has opened up. Room: %room% Time Left: %time%</b></size>";
+        public string ExtractionEvent = "<b><size=24>A <color=green>Money</color> Extraction Zone has opened up. \\nRoom: %room% Time Left: %time%</b></size>";
 		public string ExtractionTimer = "<b><size=24>You're in the extraction zone, extracting money in %time% seconds.</b></size>";
-        public string ExtractingHint = "<b><size=24>Extracting Money.</b></size>";
+        public string ExtractionStart = "<b><size=24>Extracting Money.</b></size>";
+		public string ExtractionNoMoney = "<b><size=24>You do not have any On Hold Money.</b></size>";
 
         [Description("Death Coins")]
 		public string DeathCoinPickup { get; set; } = "<b><size=24><color=green>+%coinValue%</color> Picked up Death Coin.</b></size>";

@@ -1,8 +1,6 @@
 ﻿using Exiled.API.Features;
 using Exiled.CustomItems.API.Features;
-using FoundationFortune.API.Database;
 using FoundationFortune.Configs;
-using FoundationFortune.Events;
 using HarmonyLib;
 using LiteDB;
 using MEC;
@@ -10,8 +8,8 @@ using SCPSLAudioApi;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using FoundationFortune.API.Models.Enums;
 using FoundationFortune.API.Models.Classes;
+using FoundationFortune.API.HintSystem;
 
 namespace FoundationFortune
 {

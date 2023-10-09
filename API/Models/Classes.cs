@@ -7,6 +7,7 @@ using Exiled.API.Features;
 using FoundationFortune.API.Models.Enums;
 using System;
 using System.Collections.Generic;
+using MEC;
 
 namespace FoundationFortune.API.Models.Classes
 {
@@ -22,6 +23,12 @@ namespace FoundationFortune.API.Models.Classes
             Timestamp = timestamp;
             Reward = reward;
         }
+    }
+
+    public class ExtractionTimerData
+    {
+        public CoroutineHandle CoroutineHandle { get; set; }
+        public float StartTime { get; set; }
     }
 
     public class BuyingBotComponent : MonoBehaviour

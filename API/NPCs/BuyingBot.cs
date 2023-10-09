@@ -23,6 +23,9 @@ namespace FoundationFortune.API.NPCs
     {
         public static readonly IReadOnlyList<string> allowedBuyingBotNameColors;
 
+        public static bool IsSellingBot(ReferenceHub refHub) => FoundationFortune.Singleton.BuyingBotIndexation.Values.Any(botAndIndexation => botAndIndexation.bot == Player.Get(refHub));
+        public static bool IsSellingBot(ScpSubroutineBase targetTrack) => targetTrack.Role.TryGetOwner(out ReferenceHub refHub) && FoundationFortune.Singleton.BuyingBotIndexation.Values.Any(botAndIndexation => botAndIndexation.bot == Player.Get(refHub));
+
         static BuyingBot()
         {
             ServerRoles serverRoles = NetworkManager.singleton.playerPrefab.GetComponent<ServerRoles>();
@@ -75,16 +78,6 @@ namespace FoundationFortune.API.NPCs
             int nextAvailableIndex = 0;
             while (FoundationFortune.Singleton.BuyingBotIndexation.Values.Any(data => data.indexation == nextAvailableIndex)) nextAvailableIndex++;
             return nextAvailableIndex;
-        }
-
-        public static bool IsSellingBot(ReferenceHub refHub)
-        {
-            return FoundationFortune.Singleton.BuyingBotIndexation.Values.Any(botAndIndexation => botAndIndexation.bot == Player.Get(refHub));
-        }
-
-        public static bool IsSellingBot(ScpSubroutineBase targetTrack)
-        {
-            return targetTrack.Role.TryGetOwner(out ReferenceHub refHub) && FoundationFortune.Singleton.BuyingBotIndexation.Values.Any(botAndIndexation => botAndIndexation.bot == Player.Get(refHub));
         }
 
         public static Npc SpawnBuyingBot(string target, string Badge, string Color, RoleTypeId Role, ItemType? HeldItem, Vector3 scale)

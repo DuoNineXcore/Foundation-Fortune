@@ -8,8 +8,6 @@ using System.ComponentModel;
 using FoundationFortune.API.Models.Classes;
 using FoundationFortune.API.Models.Enums;
 using VoiceChatSettings = FoundationFortune.API.Models.Classes.VoiceChatSettings;
-using System;
-using Utf8Json.Resolvers.Internal;
 
 namespace FoundationFortune.Configs
 {
@@ -38,7 +36,7 @@ namespace FoundationFortune.Configs
         public bool RevivalBountyKillRewardTransferAll { get; set; } = false;
 
         [Description("Money Extraction System Settings.")]
-        public bool RandomExtractionSystem { get; set; } = true;
+        public bool MoneyExtractionSystem { get; set; } = true;
         public List<RoomType> ExtractionPointRooms { get; set; } = new List<RoomType>
         {
             RoomType.LczToilets,

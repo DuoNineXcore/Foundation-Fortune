@@ -1,5 +1,4 @@
 ﻿using Exiled.API.Features;
-using FoundationFortune.Events;
 using LiteDB;
 using FoundationFortune.API.Models.Enums;
 using FoundationFortune.API.Models.Classes;

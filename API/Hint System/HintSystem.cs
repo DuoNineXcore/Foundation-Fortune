@@ -11,7 +11,7 @@ using UnityEngine;
 using Exiled.API.Features.Items;
 using Exiled.API.Enums;
 
-namespace FoundationFortune.Events
+namespace FoundationFortune.API.HintSystem
 {
     public partial class ServerEvents
     {
@@ -44,28 +44,10 @@ namespace FoundationFortune.Events
                         hintMessage += $"\n<align={hintAlignment}>{moneySavedString}{moneyHoldString}<align=left>\n";
                     }
 
-                    try
-                    {
-                        UpdateExtractionEventHint(ply, ref hintMessage);
-                    }
-                    catch (Exception ex)
-                    {
-                        Log.Error(ex);
-                    }
-
+                    HandleExtractionSystemMessages(ply, ref hintMessage);
                     HandleWorkstationMessages(ply, ref hintMessage);
                     HandleBuyingBotMessages(ply, ref hintMessage);
-
-                    Bounty bounty = BountiedPlayers.FirstOrDefault(b => b.Player == ply);
-                    if (bounty != null)
-                    {
-                        TimeSpan timeLeft = bounty.ExpirationTime - DateTime.Now;
-                        string bountyMessage = ply.UserId == bounty.Player.UserId
-                            ? FoundationFortune.Singleton.Translation.SelfBounty.Replace("%duration%", timeLeft.ToString(@"hh\:mm\:ss"))
-                            : FoundationFortune.Singleton.Translation.OtherBounty.Replace("%player%", bounty.Player.Nickname).Replace("%duration%", timeLeft.ToString(@"hh\:mm\:ss"));
-
-                        hintMessage += $"<align={hintAlignment}>\n{bountyMessage}</align>";
-                    }
+                    HandleBountySystemMessages(ply, ref hintMessage);
 
                     string recentHintsText = GetRecentHints(ply.UserId);
                     if (!string.IsNullOrEmpty(recentHintsText))

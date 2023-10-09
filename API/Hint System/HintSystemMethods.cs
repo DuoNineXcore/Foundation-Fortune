@@ -10,7 +10,7 @@ using Random = UnityEngine.Random;
 using Exiled.API.Features.Doors;
 using FoundationFortune.API.Models.Classes;
 
-namespace FoundationFortune.Events
+namespace FoundationFortune.API.HintSystem
 {
     public partial class ServerEvents
     {

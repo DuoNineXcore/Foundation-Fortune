@@ -14,7 +14,7 @@ using FoundationFortune.API.Models.Enums;
 using PlayerRoles;
 using System.Collections.Generic;
 
-namespace FoundationFortune.Events
+namespace FoundationFortune.API.HintSystem
 {
 	public partial class ServerEvents
 	{
@@ -28,12 +28,13 @@ namespace FoundationFortune.Events
 			FoundationFortune.Singleton.BuyingBotIndexation.Clear();
 			buyingBotPositions.Clear();
 
-			if (FoundationFortune.Singleton.Config.RandomExtractionSystem)
+			if (FoundationFortune.Singleton.Config.MoneyExtractionSystem)
 			{
                 int nextExtractionTime = Random.Range(FoundationFortune.Singleton.Config.MinExtractionPointGenerationTime, FoundationFortune.Singleton.Config.MaxExtractionPointGenerationTime + 1);
                 Timing.CallDelayed(nextExtractionTime, () => StartExtractionEvent());
                 Log.Info($"Round Started. The first extraction will commence at T-{nextExtractionTime} Seconds.");
             }
+
             InitializeWorkstationPositions();
 			InitializeBuyingBots();
 		}

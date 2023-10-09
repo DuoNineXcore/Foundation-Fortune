@@ -2,7 +2,6 @@
 using Exiled.API.Features;
 using FoundationFortune.API.Models;
 using FoundationFortune.API.Database;
-using FoundationFortune.API.Perks;
 using InventorySystem;
 using System;
 using System.Collections.Generic;
@@ -10,7 +9,7 @@ using System.Linq;
 using Utils.NonAllocLINQ;
 using FoundationFortune.API.Models.Enums;
 using FoundationFortune.API.Models.Classes;
-using FoundationFortune.Events;
+using FoundationFortune.API.HintSystem;
 
 namespace FoundationFortune.Commands.BuyCommand
 {

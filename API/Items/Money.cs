@@ -5,12 +5,8 @@ using Exiled.API.Features.Spawn;
 using Exiled.CustomItems.API.Features;
 using Exiled.Events.EventArgs.Player;
 using FoundationFortune.API.Database;
-using FoundationFortune.Events;
 using Exiled.API.Features.Items;
 using System.Collections.Generic;
-using System.Linq;
-using InventorySystem;
-using Exiled.CustomItems;
 
 namespace FoundationFortune.API.Items
 {
@@ -22,7 +18,7 @@ namespace FoundationFortune.API.Items
         public override string Description { get; set; } = "It's just money.";
         public override float Weight { get; set; } = 0f;
         public override SpawnProperties SpawnProperties { get; set; }
-        private Dictionary<int, (int coinValue, Player player)> droppedCoins = new Dictionary<int, (int coinValue, Player player)>();
+        private Dictionary<int, (int coinValue, Player player)> droppedCoins = new();
 
         protected override void SubscribeEvents()
         {
