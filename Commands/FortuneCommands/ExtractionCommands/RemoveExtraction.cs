@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FoundationFortune.Commands.Fortune_Commands.ExtractionCommands
+namespace FoundationFortune.Commands.FortuneCommands.ExtractionCommands
 {
     [CommandHandler(typeof(ClientCommandHandler))]
     [CommandHandler(typeof(RemoteAdminCommandHandler))]

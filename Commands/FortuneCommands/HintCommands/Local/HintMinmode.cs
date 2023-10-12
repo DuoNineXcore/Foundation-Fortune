@@ -4,7 +4,7 @@ using RemoteAdmin;
 using System;
 using Exiled.API.Features;
 
-namespace FoundationFortune.Commands.FortuneCommands.HintCommands
+namespace FoundationFortune.Commands.FortuneCommands.HintCommands.Local
 {
     [CommandHandler(typeof(ClientCommandHandler))]
     [CommandHandler(typeof(RemoteAdminCommandHandler))]

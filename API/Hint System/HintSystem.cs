@@ -7,6 +7,8 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Exiled.API.Features.Items;
+using System.Text;
+
 namespace FoundationFortune.API.HintSystem
 {
 	public partial class ServerEvents
@@ -16,73 +18,69 @@ namespace FoundationFortune.API.HintSystem
 		private Dictionary<string, float> dropTimestamp = new();
 		private Dictionary<string, (Item item, int price)> itemsBeingSold = new();
 
-		private IEnumerator<float> UpdateMoneyAndHints()
-		{
-			while (true)
-			{
-				float updateRate = recentHints.Any(entry => entry.Value.Any(hint => hint.IsAnimated)) ?
-							    FoundationFortune.Singleton.Config.AnimatedHintUpdateRate :
-							    FoundationFortune.Singleton.Config.HintSystemUpdateRate;
+        private IEnumerator<float> UpdateMoneyAndHints()
+        {
+            while (true)
+            {
+                float updateRate = recentHints.Any(entry => entry.Value.Any(hint => hint.IsAnimated)) ?
+                                    FoundationFortune.Singleton.Config.AnimatedHintUpdateRate :
+                                    FoundationFortune.Singleton.Config.HintSystemUpdateRate;
 
-				foreach (Player ply in Player.List.Where(p => !p.IsDead && !p.IsNPC))
-				{
-					if (!PlayerDataRepository.GetHintDisable(ply.UserId)) continue;
+                foreach (Player ply in Player.List.Where(p => !p.IsDead && !p.IsNPC))
+                {
+                    if (!PlayerDataRepository.GetHintDisable(ply.UserId)) continue;
 
-					Log.Debug($"Updating money and hints for player {ply.UserId}");
+                    int moneyOnHold = PlayerDataRepository.GetMoneyOnHold(ply.UserId);
+                    int moneySaved = PlayerDataRepository.GetMoneySaved(ply.UserId);
 
-					int moneyOnHold = PlayerDataRepository.GetMoneyOnHold(ply.UserId);
-					int moneySaved = PlayerDataRepository.GetMoneySaved(ply.UserId);
+                    HintAlign? hintAlignment = PlayerDataRepository.GetUserHintAlign(ply.UserId);
+                    int hintAlpha = PlayerDataRepository.GetHintAlpha(ply.UserId);
+                    int hintSize = PlayerDataRepository.GetHintSize(ply.UserId);
 
-					HintAlign? hintAlignment = PlayerDataRepository.GetUserHintAlign(ply.UserId);
-					int hintAlpha = PlayerDataRepository.GetHintAlpha(ply.UserId);
-					int hintSize = PlayerDataRepository.GetHintSize(ply.UserId);
-
+                    StringBuilder hintMessageBuilder = new();
 					string hintMessage = "";
 
-					if (!PlayerDataRepository.GetHintMinmode(ply.UserId))
-					{
-						string moneySavedString = FoundationFortune.Singleton.Translation.MoneyCounterSaved
-						    .Replace("%rolecolor%", ply.Role.Color.ToHex())
-						    .Replace("%moneySaved%", moneySaved.ToString());
-						string moneyHoldString = FoundationFortune.Singleton.Translation.MoneyCounterOnHold
-						    .Replace("%rolecolor%", ply.Role.Color.ToHex())
-						    .Replace("%moneyOnHold%", moneyOnHold.ToString());
+                    if (!PlayerDataRepository.GetHintMinmode(ply.UserId))
+                    {
+                        string moneySavedString = FoundationFortune.Singleton.Translation.MoneyCounterSaved
+                            .Replace("%rolecolor%", ply.Role.Color.ToHex())
+                            .Replace("%moneySaved%", moneySaved.ToString());
+                        string moneyHoldString = FoundationFortune.Singleton.Translation.MoneyCounterOnHold
+                            .Replace("%rolecolor%", ply.Role.Color.ToHex())
+                            .Replace("%moneyOnHold%", moneyOnHold.ToString());
 
-						hintMessage += $"\n{IntToHexAlpha(hintAlpha)}<size={hintSize}><align={hintAlignment}>{moneySavedString}{moneyHoldString}</align></size>\n";
-					}
+                        hintMessageBuilder.Append($"{moneySavedString}{moneyHoldString}");
+                    }
 
-					HandleExtractionSystemMessages(ply, ref hintMessage);
-					HandleWorkstationMessages(ply, ref hintMessage);
-					HandleBuyingBotMessages(ply, ref hintMessage);
-					HandleBountySystemMessages(ply, ref hintMessage);
+                    HandleExtractionSystemMessages(ply, ref hintMessage);
+                    HandleWorkstationMessages(ply, ref hintMessage);
+                    HandleBuyingBotMessages(ply, ref hintMessage);
+                    HandleBountySystemMessages(ply, ref hintMessage);
 
-					string recentHintsText = GetRecentHints(ply.UserId);
-					//if (!string.IsNullOrEmpty(recentHintsText)) hintMessage += $"<align={hintAlignment}>\n{recentHintsText}</align>";
-					//if (!string.IsNullOrEmpty(recentHintsText)) hintMessage += $"\n<alpha={IntToHexAlpha(hintAlpha)}><size={hintSize}><align={hintAlignment}>{recentHintsText}</align></size>\n";
-					if (!string.IsNullOrEmpty(recentHintsText)) hintMessage += $"\n<size={hintSize}><align={hintAlignment}>{recentHintsText}</align></size>\n";
+                    string recentHintsText = GetRecentHints(ply.UserId);
+                    if (!string.IsNullOrEmpty(recentHintsText)) hintMessageBuilder.Append(recentHintsText);
+
+                    string recentAnimatedHintsText = GetAnimatedHints(ply.UserId);
+                    if (!string.IsNullOrEmpty(recentAnimatedHintsText)) hintMessageBuilder.Append(recentAnimatedHintsText);
+
+					hintMessage = hintMessageBuilder.ToString();
+
+                    ply.ShowHint($"{IntToHexAlpha(hintAlpha)}<size={hintSize}><align={hintAlignment}>{hintMessage}</align>", 2);
+
+                    if (confirmSell.ContainsKey(ply.UserId) && Time.time - dropTimestamp[ply.UserId] >= FoundationFortune.Singleton.Config.SellingConfirmationTime)
+                    {
+                        confirmSell.Remove(ply.UserId);
+                        dropTimestamp.Remove(ply.UserId);
+                    }
+                }
+
+                yield return Timing.WaitForSeconds(updateRate);
+            }
+        }
 
 
-					string recentAnimatedHintsText = GetAnimatedHints(ply.UserId);
-					//if (!string.IsNullOrEmpty(recentAnimatedHintsText)) hintMessage += $"<align={hintAlignment}>\n{recentAnimatedHintsText}</align>";
-					if (!string.IsNullOrEmpty(recentAnimatedHintsText)) hintMessage += $"\n<alpha={IntToHexAlpha(hintAlpha)}><size={hintSize}><align={hintAlignment}>\n{recentAnimatedHintsText}</align></size>\n";
-
-					ply.ShowHint(hintMessage, 2);
-
-					if (confirmSell.ContainsKey(ply.UserId) && Time.time - dropTimestamp[ply.UserId] >= FoundationFortune.Singleton.Config.SellingConfirmationTime)
-					{
-						confirmSell.Remove(ply.UserId);
-						dropTimestamp.Remove(ply.UserId);
-					}
-				}
-
-				yield return Timing.WaitForSeconds(updateRate);
-			}
-		}
-
-		public string GetRecentHints(string userId)
+        public string GetRecentHints(string userId)
 		{
-			Log.Debug($"Getting recent hints for user {userId}");
-
 			if (recentHints.ContainsKey(userId))
 			{
 				var currentHints = recentHints[userId]
@@ -97,8 +95,6 @@ namespace FoundationFortune.API.HintSystem
 
 		public string GetAnimatedHints(string userId)
 		{
-			Log.Debug($"Getting animated hints for user {userId}");
-
 			if (recentHints.ContainsKey(userId))
 			{
 				var currentHints = recentHints[userId]

@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using FoundationFortune.API.Database;
 using FoundationFortune.API.Models.Enums;
 using FoundationFortune.API.Models.Classes;
+using System.Text;
 
 namespace FoundationFortune.API.HintSystem
 {
@@ -77,58 +78,56 @@ namespace FoundationFortune.API.HintSystem
 			}
 		}
 
-		private void HandleExtractionSystemMessages(Player ply, ref string hintMessage)
-		{
-			HintAlign? hintAlignment = PlayerDataRepository.GetUserHintAlign(ply.UserId);
-			int hintAlpha = PlayerDataRepository.GetHintAlpha(ply.UserId);
-			int hintSize = PlayerDataRepository.GetHintSize(ply.UserId);
+        private void HandleExtractionSystemMessages(Player ply, ref string hintMessage)
+        {
+            StringBuilder hintMessageBuilder = new();
 
-			if (isExtractionPointActive)
-			{
-				if (IsPlayerInExtractionRoom(ply, activeExtractionRoom))
-				{
-					int totalMoneyOnHold = PlayerDataRepository.GetMoneyOnHold(ply.UserId);
+            if (isExtractionPointActive)
+            {
+                if (IsPlayerInExtractionRoom(ply, activeExtractionRoom))
+                {
+                    int totalMoneyOnHold = PlayerDataRepository.GetMoneyOnHold(ply.UserId);
 
-					if (totalMoneyOnHold <= 0)
-					{
-						//hintMessage += $"<align={hintAlignment}>{FoundationFortune.Singleton.Translation.ExtractionNoMoney}</align>";
-						hintMessage += $"\n{IntToHexAlpha(hintAlpha)}<size={hintSize}><align={hintAlignment}>{FoundationFortune.Singleton.Translation.ExtractionNoMoney}</align></size>";
-						return;
-					}
+                    if (totalMoneyOnHold <= 0)
+                    {
+                        hintMessageBuilder.Append($"{FoundationFortune.Singleton.Translation.ExtractionNoMoney}");
+                    }
+                    else
+                    {
+                        if (!extractionTimers.ContainsKey(ply)) StartExtractionTimer(ply, TimeSpan.FromSeconds(10));
 
-					if (!extractionTimers.ContainsKey(ply)) StartExtractionTimer(ply, TimeSpan.FromSeconds(10));
+                        ExtractionTimerData timerData = extractionTimers[ply];
+                        float elapsedTime = Time.time - timerData.StartTime;
+                        TimeSpan timeLeft = TimeSpan.FromSeconds(10 - elapsedTime);
 
-					ExtractionTimerData timerData = extractionTimers[ply];
-					float elapsedTime = Time.time - timerData.StartTime;
-					TimeSpan timeLeft = TimeSpan.FromSeconds(10 - elapsedTime);
+                        string waitTimerHint = FoundationFortune.Singleton.Translation.ExtractionTimer
+                            .Replace("%time%", timeLeft.ToString(@"ss"));
+                        hintMessageBuilder.Append(waitTimerHint);
 
-					string waitTimerHint = FoundationFortune.Singleton.Translation.ExtractionTimer
-					    .Replace("%time%", timeLeft.ToString(@"ss"));
-					hintMessage += $"\n{IntToHexAlpha(hintAlpha)}<size={hintSize}><align={hintAlignment}>{waitTimerHint}</align></size>\n"; 
-					//hintMessage += $"<align={hintAlignment}>{waitTimerHint}</align>";
+                        if (IsExtractionTimerFinished(ply) && totalMoneyOnHold > 0)
+                        {
+                            CancelExtractionTimer(ply);
+                            StartMoneyExtractionTimer(ply);
+                            hintMessageBuilder.Append($"{FoundationFortune.Singleton.Translation.ExtractionStart}");
+                        }
+                    }
+                }
+                else
+                {
+                    CancelExtractionTimer(ply);
 
-					if (IsExtractionTimerFinished(ply) && totalMoneyOnHold > 0)
-					{
-						CancelExtractionTimer(ply);
-						StartMoneyExtractionTimer(ply);
-						hintMessage += $"\n{IntToHexAlpha(hintAlpha)}<size={hintSize}><align={hintAlignment}>{FoundationFortune.Singleton.Translation.ExtractionStart}</align></size>"; 
-						//hintMessage += $"<align={hintAlignment}>{FoundationFortune.Singleton.Translation.ExtractionStart}</align>";
-					}
-				}
-				else
-				{
-					CancelExtractionTimer(ply);
+                    string extractionHint = FoundationFortune.Singleton.Translation.ExtractionEvent
+                        .Replace("%room%", activeExtractionRoom.ToString())
+                        .Replace("%time%", TimeSpan.FromSeconds(FoundationFortune.Singleton.Config.ExtractionPointDuration - (Time.time - extractionStartTime)).ToString(@"hh\:mm\:ss"));
+                    hintMessageBuilder.Append(extractionHint);
+                }
+            }
 
-					string extractionHint = FoundationFortune.Singleton.Translation.ExtractionEvent
-					    .Replace("%room%", activeExtractionRoom.ToString())
-					    .Replace("%time%", TimeSpan.FromSeconds(FoundationFortune.Singleton.Config.ExtractionPointDuration - (Time.time - extractionStartTime)).ToString(@"hh\:mm\:ss"));
-					//hintMessage += $"<align={hintAlignment}>{extractionHint}</align>";
-					hintMessage += $"\n{IntToHexAlpha(hintAlpha)}<size={hintSize}><align={hintAlignment}>{extractionHint}</align></size>\n"; 
-				}
-			}
-		}
+            hintMessage = hintMessageBuilder.ToString();
+        }
 
-		private IEnumerator<float> ExtractMoneyCoroutine(Player player)
+
+        private IEnumerator<float> ExtractMoneyCoroutine(Player player)
 		{
 			Log.Debug($"Extraction coroutine started for player {player.UserId}");
 

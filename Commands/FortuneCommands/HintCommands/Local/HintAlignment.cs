@@ -4,9 +4,8 @@ using FoundationFortune.API.Models.Enums;
 using RemoteAdmin;
 using System;
 using Exiled.API.Features;
-using CustomPlayerEffects;
 
-namespace FoundationFortune.Commands.FortuneCommands.HintCommands
+namespace FoundationFortune.Commands.FortuneCommands.HintCommands.Local
 {
     [CommandHandler(typeof(ClientCommandHandler))]
     [CommandHandler(typeof(RemoteAdminCommandHandler))]
@@ -25,27 +24,17 @@ namespace FoundationFortune.Commands.FortuneCommands.HintCommands
                 return false;
             }
 
+            if (args.Count < 1 || !Enum.TryParse(args.At(0), true, out HintAlign align))
+            {
+                response = "Invalid usage. Correct usage: ff_hintalign <right/left/center>";
+                return false;
+            }
+
             Player player = Player.Get(playerSender);
 
-            if (args.Count < 2)
-            {
-                response = $"Not enough arguments. [{args.Count}] Usage: align <center/left/right>";
-                return false;
-            }
-
-            string alignmentStr = args.At(1).ToLower();
-
-            if (Enum.TryParse(alignmentStr, true, out HintAlign alignment))
-            {
-                PlayerDataRepository.SetUserHintAlign(player.UserId, alignment);
-                response = $"Hint alignment set to {alignment}.";
-                return true;
-            }
-            else
-            {
-                response = "Invalid alignment. Use 'center', 'left', or 'right'.";
-                return false;
-            }
+            PlayerDataRepository.SetUserHintAlign(player.UserId, align);
+            response = $"Your hint animation has been set to {align}.";
+            return true;
         }
     }
 }

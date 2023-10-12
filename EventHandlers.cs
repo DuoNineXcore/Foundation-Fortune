@@ -172,7 +172,11 @@ namespace FoundationFortune.API.HintSystem
 							{
 								VoiceChatSettings buyVoiceChatSettings = FoundationFortune.Singleton.Config.VoiceChatSettings.FirstOrDefault(settings => settings.VoiceChatUsageType == VoiceChatUsageType.Buying);
 								BuyingBot.PlayAudio(buyingbot, buyVoiceChatSettings.AudioFile, buyVoiceChatSettings.Volume, buyVoiceChatSettings.Loop, buyVoiceChatSettings.VoiceChat);
-								EnqueueHint(ev.Player, FoundationFortune.Singleton.Translation.SellSuccess.Replace("%price%", price.ToString()).Replace("%itemName%", FoundationFortune.Singleton.Config.SellableItems.Find(x => x.ItemType == ev.Item.Type).DisplayName), 3f);
+								string str = FoundationFortune.Singleton.Translation.SellSuccess
+									.Replace("%price%", price.ToString())
+									.Replace("%itemName%", FoundationFortune.Singleton.Config.SellableItems.Find(x => x.ItemType == ev.Item.Type).DisplayName);
+
+                                EnqueueHint(ev.Player, str, 3f);
 								ev.Player.RemoveItem(ev.Item);
 							}
                             else EnqueueHint(ev.Player, translation.SaleCancelled, 3f);

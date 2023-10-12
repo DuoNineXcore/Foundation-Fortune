@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FoundationFortune.Commands.FortuneCommands.HintCommands
+namespace FoundationFortune.Commands.FortuneCommands.HintCommands.Global
 {
     [CommandHandler(typeof(ClientCommandHandler))]
     [CommandHandler(typeof(RemoteAdminCommandHandler))]

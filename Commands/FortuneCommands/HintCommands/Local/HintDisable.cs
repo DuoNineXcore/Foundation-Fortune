@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FoundationFortune.Commands.Fortune_Commands.HintCommands
+namespace FoundationFortune.Commands.FortuneCommands.HintCommands.Local
 {
     [CommandHandler(typeof(ClientCommandHandler))]
     [CommandHandler(typeof(RemoteAdminCommandHandler))]
@@ -16,7 +16,7 @@ namespace FoundationFortune.Commands.Fortune_Commands.HintCommands
     {
         public string Command { get; } = "ff_togglehintsystem";
         public string Description { get; } = "Enable or disable the hint system, this only applies to you.";
-        public string[] Aliases { get; } = new string[] { string.Empty };
+        public string[] Aliases { get; } = new string[] {};
 
         public bool Execute(ArraySegment<string> args, ICommandSender sender, out string response)
         {

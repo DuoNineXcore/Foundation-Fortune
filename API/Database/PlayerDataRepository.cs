@@ -16,7 +16,7 @@ namespace FoundationFortune.API.Database
         //player settings
         public static bool GetHintMinmode(string userId) => PlayersCollection.FindOne(p => p.UserId == userId)?.HintMinmode ?? false;
         public static bool GetHintDisable(string userId) => PlayersCollection.FindOne(p => p.UserId == userId)?.DisabledHintSystem ?? false;
-        public static int GetHintAlpha(string userId) => PlayersCollection.FindOne(p => p.UserId == userId)?.HintOpacity ?? 5;
+        public static int GetHintAlpha(string userId) => PlayersCollection.FindOne(p => p.UserId == userId)?.HintOpacity ?? 50;
         public static int GetHintSize(string userId) => PlayersCollection.FindOne(p => p.UserId == userId)?.HintSize ?? 25;
         public static HintAnim GetHintAnim(string userId) => PlayersCollection.FindOne(p => p.UserId == userId)?.HintAnim ?? HintAnim.None;
 
@@ -31,6 +31,44 @@ namespace FoundationFortune.API.Database
             {
                 player.HintMinmode = enable;
                 return PlayersCollection.Update(player);
+            }
+            return false;
+        }
+
+        public static void SetHintOpacity(string userId, int hintAlpha)
+        {
+            var playerData = GetPlayerById(userId);
+            if (playerData != null)
+            {
+                playerData.HintOpacity = hintAlpha;
+                PlayersCollection.Update(playerData);
+            }
+        }
+
+        public static void SetHintSize(string userId, int hintSize)
+        {
+            var playerData = GetPlayerById(userId);
+            if (playerData != null)
+            {
+                playerData.HintSize = hintSize;
+                PlayersCollection.Update(playerData);
+            }
+        }
+
+        public static bool SetHintAnim(string userId, HintAnim hintAnim)
+        {
+            try
+            {
+                var playerData = GetPlayerById(userId);
+                if (playerData != null)
+                {
+                    playerData.HintAnim = hintAnim;
+                    PlayersCollection.Update(playerData);
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"Error retrieving hint animation for user {userId}: {ex.Message}");
             }
             return false;
         }
@@ -96,7 +134,6 @@ namespace FoundationFortune.API.Database
             }
         }
 
-
         public static void EmptyMoney(string userId, bool onHold = false, bool saved = false)
         {
             var player = GetPlayerById(userId);
@@ -123,7 +160,6 @@ namespace FoundationFortune.API.Database
                     player.MoneyOnHold += player.MoneySaved;
                     player.MoneySaved = 0;
                 }
-
                 PlayersCollection.Update(player);
             }
         }

@@ -2,7 +2,7 @@
 {
     public enum HintAlign
     {
-        Center, Right, Left       
+        Center, Right, Left    
     }
 
     public enum HintAnim
