@@ -25,7 +25,7 @@ namespace FoundationFortune.Commands.FortuneCommands.DatabaseCommands
                 return false;
             }
 
-            if (args.Count < 1)
+            if (args.Count < 2)
             {
                 response = "Usage: foundationfortune database addmoney <self/steamid/all> [amount]";
                 return false;
@@ -52,7 +52,7 @@ namespace FoundationFortune.Commands.FortuneCommands.DatabaseCommands
 
                     string SelfAddMoney = pluginTranslations.AllAddMoney.Replace("%amount%", amount.ToString());
                     FoundationFortune.Singleton.serverEvents.EnqueueHint(ply, $"{SelfAddMoney}", 5f);
-                    PlayerDataRepository.ModifyMoney(ply.UserId, amount, true, true, false);
+                    PlayerDataRepository.ModifyMoney(ply.UserId, amount, false, true, false);
                     response = $"Gave {amount} money to player '{ply}'.";
                     return true;
 

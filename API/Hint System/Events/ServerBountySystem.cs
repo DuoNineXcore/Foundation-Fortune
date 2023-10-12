@@ -9,38 +9,41 @@ using FoundationFortune.API.Models.Enums;
 
 namespace FoundationFortune.API.HintSystem
 {
-    public partial class ServerEvents
-    {
-        public List<Bounty> BountiedPlayers { get; } = new List<Bounty>();
+	public partial class ServerEvents
+	{
+		public List<Bounty> BountiedPlayers { get; } = new List<Bounty>();
 
-        public void AddBounty(Player player, int bountyPrice, TimeSpan duration)
-        {
-            DateTime expirationTime = DateTime.Now.Add(duration);
-            BountiedPlayers.Add(new Bounty(player, true, bountyPrice, expirationTime));
+		public void AddBounty(Player player, int bountyPrice, TimeSpan duration)
+		{
+			DateTime expirationTime = DateTime.Now.Add(duration);
+			BountiedPlayers.Add(new Bounty(player, true, bountyPrice, expirationTime));
 
-            Timing.CallDelayed((float)duration.TotalSeconds, () => StopBounty(player));
-        }
+			Timing.CallDelayed((float)duration.TotalSeconds, () => StopBounty(player));
+		}
 
-        public void StopBounty(Player player)
-        {
-            Bounty bounty = BountiedPlayers.FirstOrDefault(b => b.Player == player);
-            if (bounty != null) BountiedPlayers.Remove(bounty);
-        }
+		public void StopBounty(Player player)
+		{
+			Bounty bounty = BountiedPlayers.FirstOrDefault(b => b.Player == player);
+			if (bounty != null) BountiedPlayers.Remove(bounty);
+		}
 
-        private void HandleBountySystemMessages(Player ply, ref string hintMessage)
-        {
-            HintAlign? hintAlignment = PlayerDataRepository.GetUserHintAlign(ply.UserId);
+		private void HandleBountySystemMessages(Player ply, ref string hintMessage)
+		{
+			HintAlign? hintAlignment = PlayerDataRepository.GetUserHintAlign(ply.UserId);
+			int hintAlpha = PlayerDataRepository.GetHintAlpha(ply.UserId);
+			int hintSize = PlayerDataRepository.GetHintSize(ply.UserId);
 
-            Bounty bounty = BountiedPlayers.FirstOrDefault(b => b.Player == ply);
-            if (bounty != null)
-            {
-                TimeSpan timeLeft = bounty.ExpirationTime - DateTime.Now;
-                string bountyMessage = ply.UserId == bounty.Player.UserId
-                    ? FoundationFortune.Singleton.Translation.SelfBounty.Replace("%duration%", timeLeft.ToString(@"hh\:mm\:ss"))
-                    : FoundationFortune.Singleton.Translation.OtherBounty.Replace("%player%", bounty.Player.Nickname).Replace("%duration%", timeLeft.ToString(@"hh\:mm\:ss"));
+			Bounty bounty = BountiedPlayers.FirstOrDefault(b => b.Player == ply);
+			if (bounty != null)
+			{
+				TimeSpan timeLeft = bounty.ExpirationTime - DateTime.Now;
+				string bountyMessage = ply.UserId == bounty.Player.UserId
+				    ? FoundationFortune.Singleton.Translation.SelfBounty.Replace("%duration%", timeLeft.ToString(@"hh\:mm\:ss"))
+				    : FoundationFortune.Singleton.Translation.OtherBounty.Replace("%player%", bounty.Player.Nickname).Replace("%duration%", timeLeft.ToString(@"hh\:mm\:ss"));
 
-                hintMessage += $"<align={hintAlignment}>{bountyMessage}</align>";
-            }
-        }
-    }
+				//hintMessage += $"<align={hintAlignment}>{bountyMessage}</align>";
+				hintMessage += $"{IntToHexAlpha(hintAlpha)}<size={hintSize}><align={hintAlignment}>{bountyMessage}</align></size>"; 
+			}
+		}
+	}
 }
