@@ -37,7 +37,7 @@ namespace FoundationFortune.API.Items
             int moneyBeforeDeath = PlayerDataRepository.GetMoneyOnHold(ev.Player.UserId);
             if (moneyBeforeDeath > 0)
             {
-                FoundationFortune.Singleton.serverEvents.EnqueueHint(ev.Player, FoundationFortune.Singleton.Translation.Death.Replace("%moneyBeforeDeath%", moneyBeforeDeath.ToString()), 0, 5f, false, false);
+                FoundationFortune.Singleton.serverEvents.EnqueueHint(ev.Player, FoundationFortune.Singleton.Translation.Death.Replace("%moneyBeforeDeath%", moneyBeforeDeath.ToString()), 5f);
 
                 PlayerDataRepository.EmptyMoney(ev.Player.UserId, true, false);
 
@@ -62,7 +62,8 @@ namespace FoundationFortune.API.Items
                 if (droppedCoins.TryGetValue(item.Serial, out var coinData))
                 {
                     int coinValue = coinData.coinValue;
-                    FoundationFortune.Singleton.serverEvents.EnqueueHint(player, FoundationFortune.Singleton.Translation.DeathCoinPickup.Replace("%coinValue%", coinValue.ToString()), coinValue, 3, false, false);
+                    FoundationFortune.Singleton.serverEvents.EnqueueHint(player, FoundationFortune.Singleton.Translation.DeathCoinPickup.Replace("%coinValue%", coinValue.ToString()), 3f);
+                    PlayerDataRepository.ModifyMoney(player.UserId, coinValue, true, true, false);
                     droppedCoins.Remove(item.Serial);
                 }
                 item.Destroy();

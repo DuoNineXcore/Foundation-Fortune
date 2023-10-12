@@ -13,17 +13,18 @@ namespace FoundationFortune.API.Models.Classes
 {
     public class HintEntry
     {
-        public string Text { get; }
-        public float Timestamp { get; }
-        public int Reward { get; }
+        public string Text { get; set; }
+        public float Timestamp { get; set; }
+        public bool IsAnimated { get; set; }
 
-        public HintEntry(string text, float timestamp, int reward)
+        public HintEntry(string text, float timestamp, bool isAnimated)
         {
             Text = text;
             Timestamp = timestamp;
-            Reward = reward;
+            IsAnimated = isAnimated;
         }
     }
+
 
     public class ExtractionTimerData
     {
@@ -123,7 +124,11 @@ namespace FoundationFortune.API.Models.Classes
         public string UserId { get; set; }
         public int MoneyOnHold { get; set; }
         public int MoneySaved { get; set; }
+        public int HintOpacity { get; set; }
+        public int HintSize { get; set; }
         public bool HintMinmode { get; set; }
+        public bool DisabledHintSystem { get; set; }
         public HintAlign HintAlign { get; set; }
+        public HintAnim HintAnim { get; set; }
     }
 }

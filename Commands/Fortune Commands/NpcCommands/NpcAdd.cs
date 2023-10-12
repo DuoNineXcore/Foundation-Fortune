@@ -14,11 +14,14 @@ using UnityEngine;
 
 namespace FoundationFortune.Commands.FortuneCommands.NpcCommands
 {
-    internal class NpcAdd : ICommand
+    [CommandHandler(typeof(ClientCommandHandler))]
+    [CommandHandler(typeof(RemoteAdminCommandHandler))]
+    internal class NpcAdd : ICommand, IUsageProvider
     {
-        public string Command { get; } = "add";
+        public string Command { get; } = "ff_addnpc";
         public string Description { get; } = "Add an NPC to the game.";
-        public string[] Aliases { get; } = new string[] { "npcadd" , "addnpc" };
+        public string[] Aliases { get; } = new string[] {};
+        public string[] Usage { get; } = new string[] { "<Name> <Badge> <Color> <RoleTypeId> <HeldItemId> <ScaleX> <ScaleY> <ScaleZ>" };
 
         public bool Execute(ArraySegment<string> args, ICommandSender sender, out string response)
         {
@@ -30,7 +33,7 @@ namespace FoundationFortune.Commands.FortuneCommands.NpcCommands
 
             if (args.Count < 9)
             {
-                response = "Usage: foundationfortune npc add <Name> <Badge> <Color> <Role> <HeldItem> <ScaleX> <ScaleY> <ScaleZ>";
+                response = "Usage: <Name> <Badge> <Color> <Role> <HeldItem> <ScaleX> <ScaleY> <ScaleZ>";
                 return false;
             }
 

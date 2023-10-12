@@ -9,6 +9,8 @@ using Exiled.API.Enums;
 using Random = UnityEngine.Random;
 using Exiled.API.Features.Doors;
 using FoundationFortune.API.Models.Classes;
+using FoundationFortune.API.Database;
+using FoundationFortune.API.Models.Enums;
 
 namespace FoundationFortune.API.HintSystem
 {
@@ -125,6 +127,58 @@ namespace FoundationFortune.API.HintSystem
             }
         }
 
+        private void HandleWorkstationMessages(Player ply, ref string hintMessage)
+        {
+            HintAlign? hintAlignment = PlayerDataRepository.GetUserHintAlign(ply.UserId);
+
+            if (IsPlayerOnSellingWorkstation(ply))
+            {
+                if (!confirmSell.ContainsKey(ply.UserId)) hintMessage += $"<align={hintAlignment}>{FoundationFortune.Singleton.Translation.SellingWorkstation}</align>";
+                else if (confirmSell[ply.UserId])
+                {
+                    hintMessage += $"<align={hintAlignment}>{FoundationFortune.Singleton.Translation.SellingWorkstation}</align>";
+
+                    if (itemsBeingSold.TryGetValue(ply.UserId, out var soldItemData))
+                    {
+                        int price = soldItemData.price;
+                        hintMessage += $"<align={hintAlignment}>\n{FoundationFortune.Singleton.Translation.ItemConfirmation.Replace("%price%", price.ToString()).Replace("%time%", GetConfirmationTimeLeft(ply).ToString())}</align>";
+                    }
+                }
+            }
+        }
+
+        private void HandleBuyingBotMessages(Player ply, ref string hintMessage)
+        {
+            HintAlign? hintAlignment = PlayerDataRepository.GetUserHintAlign(ply.UserId);
+            Npc npc = GetBuyingBotNearPlayer(ply);
+
+            if (IsPlayerNearBuyingBot(ply, npc))
+            {
+                BuyingBot.LookAt(npc, ply.Position);
+                hintMessage += $"<align={hintAlignment}>{FoundationFortune.Singleton.Translation.BuyingBot}</align>";
+            }
+            else if (IsPlayerNearSellingBot(ply))
+            {
+                BuyingBot.LookAt(npc, ply.Position);
+                if (!confirmSell.ContainsKey(ply.UserId)) hintMessage += $"<align={hintAlignment}>{FoundationFortune.Singleton.Translation.SellingBot}</align>";
+
+                else if (confirmSell[ply.UserId])
+                {
+                    hintMessage += $"<align={hintAlignment}>{FoundationFortune.Singleton.Translation.SellingBot}</align>";
+
+                    if (itemsBeingSold.TryGetValue(ply.UserId, out var soldItemData))
+                    {
+                        int price = soldItemData.price;
+                        string confirmationHint = FoundationFortune.Singleton.Translation.ItemConfirmation
+                            .Replace("%price%", price.ToString())
+                            .Replace("%time%", GetConfirmationTimeLeft(ply));
+
+                        hintMessage += $"<align={hintAlignment}>\n{confirmationHint}</align>";
+                    }
+                }
+            }
+        }
+
         public bool IsPlayerInSafeZone(Player player)
         {
             float distanceSqr = (player.Position - WorldPos).sqrMagnitude;
@@ -229,6 +283,17 @@ namespace FoundationFortune.API.HintSystem
             bool isSellingBot = FoundationFortune.Singleton.Config.BuyingBotSpawnSettings.Any(c => c.Name == npc.Nickname && c.IsSellingBot);
             return isSellingBot;
         }
+
+        public static string IntToHexAlpha(int value)
+        {
+            int clampedValue = Mathf.Clamp(value, 0, 100);
+            int alphaValue = Mathf.RoundToInt(clampedValue * 255 / 100);
+            string hexValue = alphaValue.ToString("X2");
+            string alphaTag = $"<alpha=#{hexValue}>";
+
+            return alphaTag;
+        }
+
 
         public static void AddToPlayerLimits(Player player, PerkItem perkItem)
         {

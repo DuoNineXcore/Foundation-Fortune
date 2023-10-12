@@ -9,11 +9,13 @@ using System.Threading.Tasks;
 
 namespace FoundationFortune.Commands.FortuneCommands.NpcCommands
 {
+    [CommandHandler(typeof(ClientCommandHandler))]
+    [CommandHandler(typeof(RemoteAdminCommandHandler))]
     internal class NpcFlush : ICommand
     {
-        public string Command { get; } = "flush";
+        public string Command { get; } = "ff_flushnpcs";
         public string Description { get; } = "Flush all NPCs from the game.";
-        public string[] Aliases { get; } = new string[] { "flushnpcs", "removenpcs" };
+        public string[] Aliases { get; } = new string[] {};
 
         public bool Execute(ArraySegment<string> args, ICommandSender sender, out string response)
         {
@@ -24,11 +26,7 @@ namespace FoundationFortune.Commands.FortuneCommands.NpcCommands
             }
 
             var buyingBots = FoundationFortune.Singleton.BuyingBotIndexation.Values.ToList();
-
-            foreach (var botInfo in buyingBots)
-            {
-                BuyingBot.RemoveBuyingBot(botInfo.indexation);
-            }
+            foreach (var botInfo in buyingBots) BuyingBot.RemoveBuyingBot(botInfo.indexation);
 
             response = $"Flushed {buyingBots.Count} BuyingBots from the server.";
             return true;

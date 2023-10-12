@@ -6,11 +6,14 @@ using Exiled.API.Features;
 
 namespace FoundationFortune.Commands.FortuneCommands.BountyCommands
 {
+    [CommandHandler(typeof(ClientCommandHandler))]
+    [CommandHandler(typeof(RemoteAdminCommandHandler))]
     internal class RemoveBounty : ICommand
     {
-        public string Command { get; } = "removebounty";
+        public string Command { get; } = "ff_removebounty";
         public string Description { get; } = "Remove a bounty from a player.";
-        public string[] Aliases { get; } = new string[] { "clearbounty", "bountyclear" };
+        public string[] Aliases { get; } = new string[] {};
+        public string[] Usage { get; } = new string[] { "<playerName>" };
 
         public bool Execute(ArraySegment<string> args, ICommandSender sender, out string response)
         {

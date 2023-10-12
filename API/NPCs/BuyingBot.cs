@@ -124,9 +124,7 @@ namespace FoundationFortune.API.NPCs
             {
                 npc.ReferenceHub.roleManager.InitializeNewRole(RoleTypeId.None, RoleChangeReason.None, RoleSpawnFlags.None);
             }
-            catch (Exception arg)
-            {
-            }
+            catch (Exception ex) { }
 
             if (RecyclablePlayerId.FreeIds.Contains(id)) RecyclablePlayerId.FreeIds.RemoveFromQueue(id);
             else if (RecyclablePlayerId._autoIncrement >= id) id = ++RecyclablePlayerId._autoIncrement;
@@ -136,10 +134,7 @@ namespace FoundationFortune.API.NPCs
             {
                 npc.ReferenceHub.characterClassManager.InstanceMode = ClientInstanceMode.DedicatedServer;
             }
-            catch (Exception e)
-            {
-                Log.Debug($"2 Ignore: {e}");
-            }
+            catch (Exception ex) { }
 
             npc.ReferenceHub.nicknameSync.Network_myNickSync = name;
             Player.Dictionary.Add(gameObject, npc);

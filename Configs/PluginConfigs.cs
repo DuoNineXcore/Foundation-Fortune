@@ -22,9 +22,10 @@ namespace FoundationFortune.Configs
 
         [Description("Killing player event.")]
         public int KillReward { get; set; } = 300;
-        public bool KillRewardTransfer { get; set; } = false;
-        public bool KillRewardTransferAll { get; set; } = false;
         public bool KillRewardScpOnly { get; set; } = false;
+
+        [Description("Escaping player event.")]
+        public int EscapeReward { get; set; } = 300;
 
         [Description("Revival Settings.")]
         public bool HuntReviver { get; set; } = true;
@@ -49,10 +50,9 @@ namespace FoundationFortune.Configs
         public int MaxExtractionPointGenerationTime { get; set; } = 30;
         public int ExtractionPointDuration { get; set; } = 120;
 
-        [Description("Escaping player event.")]
-        public int EscapeReward { get; set; } = 300;
-        public bool EscapeRewardTransfer { get; set; } = true;
-        public bool EscapeRewardTransferAll { get; set; } = false;
+        [Description("Update Rate Settings")]
+        public float HintSystemUpdateRate { get; set; } = 0.5f;
+        public float AnimatedHintUpdateRate { get; set; } = 0.5f;
 
         [Description("Amount of Death Coins to drop. NOTE: the value of the coins will be divided by the amount of coins. so if there's 10 coins a coin will be worth a tenth of the player's on hold money account.")]
         public int DeathCoinsToDrop { get; set; } = 10;

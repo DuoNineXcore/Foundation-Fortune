@@ -13,7 +13,8 @@ namespace FoundationFortune.API.HintSystem
 {
 	public partial class ServerEvents
 	{
-		private bool isExtractionPointActive = false;
+        private bool isExtractionPointActive = false;
+        public bool limitReached = false;
 		private RoomType activeExtractionRoom;
 		private int extractionCount = 0;
 		private int nextExtractionTime = 0;
@@ -26,13 +27,14 @@ namespace FoundationFortune.API.HintSystem
 			else return false;
 		}
 
-		private void StartExtractionEvent()
+		public void StartExtractionEvent()
 		{
-			if (extractionCount >= FoundationFortune.Singleton.Config.ExtractionLimit)
-			{
-				Log.Debug("Extraction limit reached. No more extractions will occur.");
-				return;
-			}
+            if (!FoundationFortune.Singleton.Config.MoneyExtractionSystem) return;
+            if (extractionCount >= FoundationFortune.Singleton.Config.ExtractionLimit)
+            {
+                limitReached = true;
+                return;
+            }
 
 			extractionStartTime = Time.time;
 			activeExtractionRoom = FoundationFortune.Singleton.Config.ExtractionPointRooms[UnityEngine.Random.Range(0, FoundationFortune.Singleton.Config.ExtractionPointRooms.Count)];
@@ -41,21 +43,39 @@ namespace FoundationFortune.API.HintSystem
 			Log.Debug($"Extraction point activated in room: {activeExtractionRoom}. It will be active for {FoundationFortune.Singleton.Config.ExtractionPointDuration} seconds.");
 
 			extractionCount++;
-			Timing.CallDelayed(FoundationFortune.Singleton.Config.ExtractionPointDuration, () => DeactivateExtractionPoint());
+			Timing.CallDelayed(FoundationFortune.Singleton.Config.ExtractionPointDuration, () => DeactivateExtractionPoint(true));
 		}
 
-		private void DeactivateExtractionPoint()
+        public void StartExtractionEvent(RoomType room, float duration)
+        {
+            extractionStartTime = Time.time;
+            activeExtractionRoom = room;
+
+            isExtractionPointActive = true;
+            Log.Debug($"Extraction point activated in room: {activeExtractionRoom}. It will be active for T-{duration} seconds.");
+
+            Timing.CallDelayed(duration, () => DeactivateExtractionPoint(false));
+        }
+
+        public void DeactivateExtractionPoint(bool restart)
 		{
 			if (!isExtractionPointActive) return;
 
-			isExtractionPointActive = false;
-			if (extractionCount < FoundationFortune.Singleton.Config.ExtractionLimit)
-			{
-				nextExtractionTime = UnityEngine.Random.Range(FoundationFortune.Singleton.Config.MinExtractionPointGenerationTime, FoundationFortune.Singleton.Config.MaxExtractionPointGenerationTime + 1);
-				Log.Debug($"Extraction point in room {activeExtractionRoom} deactivated. Next extraction in T-{nextExtractionTime} Seconds.");
-				Timing.CallDelayed(nextExtractionTime, () => StartExtractionEvent());
-			}
-		}
+            if (restart)
+            {
+                isExtractionPointActive = false;
+                if (extractionCount < FoundationFortune.Singleton.Config.ExtractionLimit)
+                {
+                    nextExtractionTime = UnityEngine.Random.Range(FoundationFortune.Singleton.Config.MinExtractionPointGenerationTime, FoundationFortune.Singleton.Config.MaxExtractionPointGenerationTime + 1);
+                    Log.Debug($"Extraction point in room {activeExtractionRoom} deactivated. Next extraction in T-{nextExtractionTime} Seconds.");
+                    Timing.CallDelayed(nextExtractionTime, () => StartExtractionEvent());
+                }
+            }
+            else
+            {
+                isExtractionPointActive = false;
+            }
+        }
 
         private void HandleExtractionSystemMessages(Player ply, ref string hintMessage)
         {
@@ -137,7 +157,7 @@ namespace FoundationFortune.API.HintSystem
             return false;
         }
 
-        private void StartExtractionTimer(Player player, TimeSpan duration)
+        public void StartExtractionTimer(Player player, TimeSpan duration)
         {
             CoroutineHandle timerHandle = Timing.RunCoroutine(ExtractionTimerCoroutine(player, duration));
             ExtractionTimerData timerData = new()
@@ -148,7 +168,7 @@ namespace FoundationFortune.API.HintSystem
             extractionTimers[player] = timerData;
         }
 
-        private void CancelExtractionTimer(Player player)
+        public void CancelExtractionTimer(Player player)
         {
             if (extractionTimers.ContainsKey(player))
             {

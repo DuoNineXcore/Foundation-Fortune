@@ -6,11 +6,13 @@ using Exiled.API.Features;
 
 namespace FoundationFortune.Commands.FortuneCommands.HintCommands
 {
+    [CommandHandler(typeof(ClientCommandHandler))]
+    [CommandHandler(typeof(RemoteAdminCommandHandler))]
     internal class HintMinmode : ICommand
     {
-        public string Command { get; } = "hintminmode";
+        public string Command { get; } = "ff_hintminmode";
         public string Description { get; } = "Toggle hint minmode.";
-        public string[] Aliases { get; } = new string[] { "toggleminmode" };
+        public string[] Aliases { get; } = new string[] {};
 
         public bool Execute(ArraySegment<string> args, ICommandSender sender, out string response)
         {
@@ -25,27 +27,14 @@ namespace FoundationFortune.Commands.FortuneCommands.HintCommands
 
             if (isMinmodeEnabled)
             {
-                if (PlayerDataRepository.SetHintMinmode(playersender.UserId, false))
-                {
-                    response = "Hint Minmode is now disabled.";
-                }
-                else
-                {
-                    response = "Failed to disable Hint Minmode.";
-                }
+                if (PlayerDataRepository.ToggleHintMinmode(playersender.UserId, false)) response = "Hint Minmode is now disabled.";
+                else response = "Failed to disable Hint Minmode.";
             }
             else
             {
-                if (PlayerDataRepository.SetHintMinmode(playersender.UserId, true))
-                {
-                    response = "Hint Minmode is now enabled.";
-                }
-                else
-                {
-                    response = "Failed to enable Hint Minmode.";
-                }
+                if (PlayerDataRepository.ToggleHintMinmode(playersender.UserId, true)) response = "Hint Minmode is now enabled.";
+                else response = "Failed to enable Hint Minmode.";
             }
-
             return true;
         }
     }

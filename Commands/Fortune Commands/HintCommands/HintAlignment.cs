@@ -8,11 +8,14 @@ using CustomPlayerEffects;
 
 namespace FoundationFortune.Commands.FortuneCommands.HintCommands
 {
-    internal class HintAlignment : ICommand
+    [CommandHandler(typeof(ClientCommandHandler))]
+    [CommandHandler(typeof(RemoteAdminCommandHandler))]
+    internal class HintAlignment : ICommand,IUsageProvider
     {
-        public string Command { get; } = "hintalign";
-        public string Description { get; } = "Set the hint alignment.";
-        public string[] Aliases { get; } = new string[] { "sethintalign" };
+        public string Command { get; } = "ff_hintalign";
+        public string Description { get; } = "Set the hint system's alignment, this only applies to you.";
+        public string[] Aliases { get; } = new string[] {};
+        public string[] Usage { get; } = new string[] { "<center/left/right>" };
 
         public bool Execute(ArraySegment<string> args, ICommandSender sender, out string response)
         {
@@ -26,7 +29,7 @@ namespace FoundationFortune.Commands.FortuneCommands.HintCommands
 
             if (args.Count < 2)
             {
-                response = $"Not enough args. [{args.Count}] Usage: align <center/left/right>";
+                response = $"Not enough arguments. [{args.Count}] Usage: align <center/left/right>";
                 return false;
             }
 

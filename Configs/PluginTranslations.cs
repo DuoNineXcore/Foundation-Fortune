@@ -11,8 +11,8 @@ namespace FoundationFortune.Configs
 	public class PluginTranslations : ITranslation
 	{
 		[Description("Server Events")]
-		public string Kill { get; set; } = "<b><size=24><color=green>+$300</color>%victim%'s Termination.</b></size>";
-		public string Escape { get; set; } = "<b><size=24><color=green>+$300</color>Successfully Escaped.</b></size>";
+		public string Kill { get; set; } = "<b><size=24><color=green>+$300</color> %victim%'s Termination.</b></size>";
+		public string Escape { get; set; } = "<b><size=24><color=green>+$300</color> Successfully Escaped.</b></size>";
         public string Death { get; set; } = "<b><size=24><color=red>$-%moneyBeforeDeath%.</color> You died.</b></size>";
 
         [Description("Bot Proximity Hints")]

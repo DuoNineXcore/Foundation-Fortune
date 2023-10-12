@@ -80,7 +80,12 @@
     <Compile Include="Commands\Fortune Commands\DatabaseCommands\AddMoney.cs" />
     <Compile Include="Commands\Fortune Commands\DatabaseCommands\FlushDatabase.cs" />
     <Compile Include="Commands\Fortune Commands\DatabaseCommands\RemoveMoney.cs" />
+    <Compile Include="Commands\Fortune Commands\ExtractionCommands\AddExtraction.cs" />
+    <Compile Include="Commands\Fortune Commands\ExtractionCommands\RemoveExtraction.cs" />
     <Compile Include="Commands\Fortune Commands\HintCommands\HintAlignment.cs" />
+    <Compile Include="Commands\Fortune Commands\HintCommands\HintAnimation.cs" />
+    <Compile Include="Commands\Fortune Commands\HintCommands\HintDisable.cs" />
+    <Compile Include="Commands\Fortune Commands\HintCommands\HintEnqueue.cs" />
     <Compile Include="Commands\Fortune Commands\HintCommands\HintMinmode.cs" />
     <Compile Include="Commands\Fortune Commands\NpcCommands\NpcAdd.cs" />
     <Compile Include="Commands\Fortune Commands\NpcCommands\NpcFlush.cs" />
@@ -88,10 +93,6 @@
     <Compile Include="Commands\Fortune Commands\NpcCommands\NpcRemove.cs" />
     <Compile Include="API\Buying System\Perks.cs" />
     <Compile Include="Commands\Buying System\BuyCommand.cs" />
-    <Compile Include="Commands\Fortune Commands\ParentCommands\ParentBountyCommand.cs" />
-    <Compile Include="Commands\Fortune Commands\ParentCommands\ParentDatabaseCommand.cs" />
-    <Compile Include="Commands\Fortune Commands\ParentCommands\ParentHintCommand.cs" />
-    <Compile Include="Commands\Fortune Commands\ParentCommands\ParentNpcCommand.cs" />
     <Compile Include="Configs\PluginConfigs.cs" />
     <Compile Include="API\Hint System\HintSystem.cs" />
     <Compile Include="API\Hint System\Events\ServerExtractionSystem.cs" />

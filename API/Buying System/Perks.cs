@@ -49,7 +49,7 @@ namespace FoundationFortune.Commands.BuyCommand
             }
             else
             {
-                FoundationFortune.Singleton.serverEvents.EnqueueHint(reviver, FoundationFortune.Singleton.Translation.RevivalNoDeadPlayer.Replace("%targetName%", targetName), 0, 3, false, false);
+                FoundationFortune.Singleton.serverEvents.EnqueueHint(reviver, FoundationFortune.Singleton.Translation.RevivalNoDeadPlayer.Replace("%targetName%", targetName), 3f);
                 return false;
             }
         }
@@ -73,7 +73,7 @@ namespace FoundationFortune.Commands.BuyCommand
             if (Config.HuntReviver) ServerEvents.AddBounty(reviver, Config.RevivalBountyKillReward, TimeSpan.FromSeconds(Config.RevivalBountyTimeSeconds));
 
             foreach (var ply in Player.List.Where(p => !p.IsNPC))
-                ServerEvents.EnqueueHint(ply, Translations.RevivalSuccess.Replace("%rolecolor%", reviver.Role.Color.ToHex()).Replace("%nickname%", reviver.Nickname).Replace("%target%", targetToRevive.Nickname), 0, 3, false, false);
+                ServerEvents.EnqueueHint(ply, Translations.RevivalSuccess.Replace("%rolecolor%", reviver.Role.Color.ToHex()).Replace("%nickname%", reviver.Nickname).Replace("%target%", targetToRevive.Nickname), 3f);
         }
     }
 }

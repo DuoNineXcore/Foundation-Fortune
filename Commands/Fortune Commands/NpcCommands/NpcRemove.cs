@@ -9,11 +9,12 @@ using System.Threading.Tasks;
 
 namespace FoundationFortune.Commands.FortuneCommands.NpcCommands
 {
-    internal class NpcRemove : ICommand
+    internal class NpcRemove : ICommand,IUsageProvider
     {
-        public string Command { get; } = "remove";
+        public string Command { get; } = "ff_removenpc";
         public string Description { get; } = "Remove an NPC from the game.";
-        public string[] Aliases { get; } = new string[] { "npcremove", "removenpc" };
+        public string[] Aliases { get; } = new string[] {};
+        public string[] Usage { get; } = new string[] {"<IndexationNumber>"};
 
         public bool Execute(ArraySegment<string> args, ICommandSender sender, out string response)
         {
@@ -25,25 +26,25 @@ namespace FoundationFortune.Commands.FortuneCommands.NpcCommands
 
             if (args.Count < 2)
             {
-                response = "Usage: foundationfortune npc remove <IndexationNumber>";
+                response = "Usage: ff_removenpc <IndexationNumber>";
                 return false;
             }
 
             if (!int.TryParse(args.At(1), out int indexationNumber))
             {
-                response = "Invalid IndexationNumber. Please provide a valid number.";
+                response = "Invalid Indexation Number. Please provide a valid number.";
                 return false;
             }
 
             if (BuyingBot.RemoveBuyingBot(indexationNumber))
             {
                 BuyingBot.RemoveBuyingBot(indexationNumber);
-                response = $"Removed BuyingBot with IndexationNumber {indexationNumber}.";
+                response = $"Removed BuyingBot with Indexation Number {indexationNumber}.";
                 return true;
             }
             else
             {
-                response = $"No BuyingBot found with IndexationNumber {indexationNumber}.";
+                response = $"No BuyingBot found with Indexation Number {indexationNumber}.";
                 return false;
             }
         }

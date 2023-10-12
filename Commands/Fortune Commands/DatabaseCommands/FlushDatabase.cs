@@ -7,11 +7,13 @@ using FoundationFortune.API.Database;
 
 namespace FoundationFortune.Commands.FortuneCommands.DatabaseCommands
 {
+    [CommandHandler(typeof(ClientCommandHandler))]
+    [CommandHandler(typeof(RemoteAdminCommandHandler))]
     internal class FlushDatabase : ICommand
     {
-        public string Command { get; } = "flush";
+        public string Command { get; } = "ff_flushdatabase";
         public string Description { get; } = "Flush the database, removing all stored data.";
-        public string[] Aliases { get; } = new string[] { "flushdatabase", "cleardata", "resetdata" };
+        public string[] Aliases { get; } = new string[] {};
 
         public bool Execute(ArraySegment<string> args, ICommandSender sender, out string response)
         {
@@ -30,7 +32,7 @@ namespace FoundationFortune.Commands.FortuneCommands.DatabaseCommands
                 string FlushedDatabase = pluginTranslations.FlushedDatabase
                     .Replace("%moneyOnHold%", moneyOnHold.ToString())
                     .Replace("%moneySaved%", moneySaved.ToString());
-                FoundationFortune.Singleton.serverEvents.EnqueueHint(player, $"{FlushedDatabase}", 0, 5f, false, false);
+                FoundationFortune.Singleton.serverEvents.EnqueueHint(player, $"{FlushedDatabase}", 5f);
                 PlayerDataRepository.EmptyMoney(player.UserId, true, true);
             }
 

@@ -97,7 +97,7 @@ namespace FoundationFortune.Commands.BuyCommand
 					.Replace("%perkItem%", perkItem.Alias)
 					.Replace("%perkPrice%", perkItem.Price.ToString());
 
-				FoundationFortune.Singleton.serverEvents.EnqueueHint(player, $"{BoughtHint}", 0, 3, false, false);
+				FoundationFortune.Singleton.serverEvents.EnqueueHint(player, $"{BoughtHint}", 3f);
                 PlayerDataRepository.ModifyMoney(player.UserId, perkItem.Price, true, false, true);
 				ServerEvents.AddToPlayerLimits(player, perkItem);
 
@@ -126,7 +126,7 @@ namespace FoundationFortune.Commands.BuyCommand
                 string BoughtHint = FoundationFortune.Singleton.Translation.BuyItemSuccess
                     .Replace("%perkItem%", buyItem.Alias)
                     .Replace("%perkPrice%", buyItem.Price.ToString());
-                FoundationFortune.Singleton.serverEvents.EnqueueHint(player, $"{BoughtHint}", 0, 3, false, false);
+                FoundationFortune.Singleton.serverEvents.EnqueueHint(player, $"{BoughtHint}", 3f);
                 PlayerDataRepository.ModifyMoney(player.UserId, buyItem.Price, true, false, true);
                 player.AddItem(buyItem.ItemType);
                 ServerEvents.AddToPlayerLimits(player, buyItem);

@@ -17,7 +17,7 @@ namespace FoundationFortune
 	{
 		public override string Author => "DuoNineXcore & Misfiy";
 		public override string Name => "Foundation Fortune";
-		public override string Prefix => "ff";
+		public override string Prefix => "this plugin is a performance issue";
 		public override Version Version => new(1, 0, 0);
 
 		private Harmony _harmony;
@@ -50,7 +50,11 @@ namespace FoundationFortune
 			UnregisterEvents();
 			Singleton = null;
 			CustomItem.UnregisterItems();
-		}
+            if (_harmony != null)
+            {
+				_harmony.UnpatchAll(_harmony.Id);
+            }
+        }
 
 		private void RegisterEvents()
 		{
@@ -63,7 +67,7 @@ namespace FoundationFortune
 			Exiled.Events.Handlers.Scp0492.TriggeringBloodlust += serverEvents.FuckYourOtherAbility;
 			Exiled.Events.Handlers.Player.Spawning += serverEvents.SpawningNpc;
 			Exiled.Events.Handlers.Server.EndingRound += serverEvents.RoundEnding;
-			Exiled.Events.Handlers.Server.RoundEnded += serverEvents.RoundEnded;
+			Exiled.Events.Handlers.Server.RestartingRound += serverEvents.RoundRestart;
 		}
 
 		private void UnregisterEvents()
@@ -77,7 +81,7 @@ namespace FoundationFortune
 			Exiled.Events.Handlers.Scp0492.TriggeringBloodlust -= serverEvents.FuckYourOtherAbility;
 			Exiled.Events.Handlers.Player.Spawning -= serverEvents.SpawningNpc;
 			Exiled.Events.Handlers.Server.EndingRound -= serverEvents.RoundEnding;
-			Exiled.Events.Handlers.Server.RoundEnded -= serverEvents.RoundEnded;
+			Exiled.Events.Handlers.Server.RestartingRound -= serverEvents.RoundRestart;
 
 			serverEvents = null;
 		}

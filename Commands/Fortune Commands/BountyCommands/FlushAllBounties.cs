@@ -4,11 +4,13 @@ using System;
 
 namespace FoundationFortune.Commands.FortuneCommands.BountyCommands
 {
+    [CommandHandler(typeof(ClientCommandHandler))]
+    [CommandHandler(typeof(RemoteAdminCommandHandler))]
     internal class FlushAllBounties : ICommand
     {
-        public string Command { get; } = "flush";
+        public string Command { get; } = "ff_flushbounties";
         public string Description { get; } = "Flush all bounties from the server.";
-        public string[] Aliases { get; } = new string[] { "flushallbounties", "clearallbounties", "bountiesclearall" };
+        public string[] Aliases { get; } = new string[] {};
 
         public bool Execute(ArraySegment<string> args, ICommandSender sender, out string response)
         {

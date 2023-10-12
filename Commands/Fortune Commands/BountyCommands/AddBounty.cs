@@ -9,7 +9,7 @@ namespace FoundationFortune.Commands.FortuneCommands.BountyCommands
     [CommandHandler(typeof(RemoteAdminCommandHandler))]
     internal class AddBounty : ICommand
     {
-        public string Command { get; } = "addbounty";
+        public string Command { get; } = "ff_addbounty";
         public string Description { get; } = "Add a bounty to a player.";
         public string[] Aliases { get; } = new string[] { "placebounty", "bountyadd" };
         public string[] Usage { get; } = new string[] { "<playerName> <amount> <durationInSeconds>" };

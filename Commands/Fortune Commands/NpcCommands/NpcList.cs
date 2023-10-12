@@ -8,11 +8,13 @@ using System.Threading.Tasks;
 
 namespace FoundationFortune.Commands.FortuneCommands.NpcCommands
 {
+    [CommandHandler(typeof(ClientCommandHandler))]
+    [CommandHandler(typeof(RemoteAdminCommandHandler))]
     internal class NpcList : ICommand
     {
-        public string Command { get; } = "list";
+        public string Command { get; } = "ff_npclist";
         public string Description { get; } = "List all NPCs in the game.";
-        public string[] Aliases { get; } = new string[] { "npclist", "listnpcs" };
+        public string[] Aliases { get; } = new string[] {};
 
         public bool Execute(ArraySegment<string> args, ICommandSender sender, out string response)
         {
@@ -38,12 +40,9 @@ namespace FoundationFortune.Commands.FortuneCommands.NpcCommands
 
             if (buyingBots.Any())
             {
-                response = "List of BuyingBots in the server:\n";
+                response = "\tList of BuyingBots in the server:\n";
 
-                foreach (var botInfo in buyingBots)
-                {
-                    response += $"Indexation Number: {botInfo.indexation}, Name: {(botInfo.bot != null ? botInfo.bot.Nickname : "null")}\n";
-                }
+                foreach (var botInfo in buyingBots) response += $"Indexation Number: {botInfo.indexation}, Name: {(botInfo.bot != null ? botInfo.bot.Nickname : "Null Nickname  ")}\n";
             }
             else
             {

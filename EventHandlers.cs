@@ -66,6 +66,10 @@ namespace FoundationFortune.API.HintSystem
 					MoneyOnHold = 0,
 					MoneySaved = 0,
 					HintMinmode = false,
+					DisabledHintSystem = false,
+					HintSize = 100,
+					HintOpacity = 100,
+					HintAnim = HintAnim.None,
 					HintAlign = HintAlign.Center
 				};
 				PlayerDataRepository.InsertPlayer(newPlayer);
@@ -87,7 +91,7 @@ namespace FoundationFortune.API.HintSystem
 						.Replace("%victimcolor%", ev.Player.Role.Color.ToHex() ?? "#FFFFFF")
 						.Replace("%attackercolor%", ev.Attacker.Role.Color.ToHex() ?? "#FFFFFF")
 						.Replace("%bountyPrice%", bountiedPlayer.Value.ToString());
-					EnqueueHint(ply, globalKillHint, 0, config.MaxHintAge, false, false);
+					EnqueueHint(ply, globalKillHint, config.MaxHintAge);
 				}
 
 				if (ev.Attacker != null && ev.Attacker != ev.Player)
@@ -96,7 +100,7 @@ namespace FoundationFortune.API.HintSystem
 						.Replace("%victim%", ev.Player?.Nickname)
 						.Replace("%bountyPrice%", bountiedPlayer?.Value.ToString());
 
-					EnqueueHint(ev.Attacker, killHint, bountiedPlayer.Value, config.MaxHintAge, config.KillRewardTransfer, config.KillRewardTransferAll);
+					EnqueueHint(ev.Attacker, killHint, config.MaxHintAge);
 				}
 				StopBounty(ev.Player);
 			}
@@ -105,14 +109,14 @@ namespace FoundationFortune.API.HintSystem
 				var killHint = FoundationFortune.Singleton.Translation.BountyPlayerDied
 					.Replace("%victim%", ev.Player?.Nickname);
 
-				foreach (Player ply in Player.List.Where(p => !p.IsNPC)) EnqueueHint(ply, killHint, 0, config.MaxHintAge, false, false);
+				foreach (Player ply in Player.List.Where(p => !p.IsNPC)) EnqueueHint(ply, killHint, config.MaxHintAge);
 				StopBounty(ev.Player);
 			}
 
 			if (ev.Attacker != null && ev.Attacker != ev.Player && config.KillRewardScpOnly)
 			{
 				var killHint = FoundationFortune.Singleton.Translation.Kill.Replace("%victim%", ev.Player?.Nickname);
-				EnqueueHint(ev.Attacker, killHint, config.KillReward, config.MaxHintAge, config.KillRewardTransfer, config.KillRewardTransferAll);
+				EnqueueHint(ev.Attacker, killHint, config.MaxHintAge);
 			}
 
 			if (ev.Player?.IsNPC == true) RoundSummary.singleton.Network_chaosTargetCount += 2;
@@ -122,7 +126,8 @@ namespace FoundationFortune.API.HintSystem
 		{
 			if (!ev.IsAllowed) return;
 			var config = FoundationFortune.Singleton.Config;
-			EnqueueHint(ev.Player, $"{FoundationFortune.Singleton.Translation.Escape}", config.EscapeReward, config.MaxHintAge, config.EscapeRewardTransfer, config.EscapeRewardTransferAll);
+			EnqueueHint(ev.Player, $"{FoundationFortune.Singleton.Translation.Escape}", config.MaxHintAge, HintAnim.Right);
+			PlayerDataRepository.ModifyMoney(ev.Player.UserId, config.EscapeReward, false, false, true);
 		}
 
 		public void SellingItem(DroppingItemEventArgs ev)
@@ -167,10 +172,10 @@ namespace FoundationFortune.API.HintSystem
 							{
 								VoiceChatSettings buyVoiceChatSettings = FoundationFortune.Singleton.Config.VoiceChatSettings.FirstOrDefault(settings => settings.VoiceChatUsageType == VoiceChatUsageType.Buying);
 								BuyingBot.PlayAudio(buyingbot, buyVoiceChatSettings.AudioFile, buyVoiceChatSettings.Volume, buyVoiceChatSettings.Loop, buyVoiceChatSettings.VoiceChat);
-								EnqueueHint(ev.Player, FoundationFortune.Singleton.Translation.SellSuccess.Replace("%price%", price.ToString()).Replace("%itemName%", FoundationFortune.Singleton.Config.SellableItems.Find(x => x.ItemType == ev.Item.Type).DisplayName), price, 3, false, false);
+								EnqueueHint(ev.Player, FoundationFortune.Singleton.Translation.SellSuccess.Replace("%price%", price.ToString()).Replace("%itemName%", FoundationFortune.Singleton.Config.SellableItems.Find(x => x.ItemType == ev.Item.Type).DisplayName), 3f);
 								ev.Player.RemoveItem(ev.Item);
 							}
-                            else EnqueueHint(ev.Player, translation.SaleCancelled, 0, 3, false, false);
+                            else EnqueueHint(ev.Player, translation.SaleCancelled, 3f);
 
                             itemsBeingSold.Remove(ev.Player.UserId);
 							ev.IsAllowed = true;
@@ -184,14 +189,27 @@ namespace FoundationFortune.API.HintSystem
 				ev.IsAllowed = true;
 				VoiceChatSettings wrongBotSettings = FoundationFortune.Singleton.Config.VoiceChatSettings.FirstOrDefault(settings => settings.VoiceChatUsageType == VoiceChatUsageType.WrongBuyingBot);
 				BuyingBot.PlayAudio(buyingbot, wrongBotSettings.AudioFile, wrongBotSettings.Volume, wrongBotSettings.Loop, wrongBotSettings.VoiceChat);
-				EnqueueHint(ev.Player, FoundationFortune.Singleton.Translation.WrongBot, 0, 3, false, false);
+				EnqueueHint(ev.Player, FoundationFortune.Singleton.Translation.WrongBot, 3f);
 			}
 			ev.IsAllowed = true;
 		}
 
-		public void SpawningNpc(SpawningEventArgs ev) { if (ev.Player.IsNPC) RoundSummary.singleton.Network_chaosTargetCount -= 1; }
-		public void RoundEnded(RoundEndedEventArgs ev) { if (moneyHintCoroutine.IsRunning) Timing.KillCoroutines(moneyHintCoroutine); }
-		public void FuckYourAbility(ActivatingSenseEventArgs ev) { if (ev.Target != null && ev.Target.IsNPC) ev.IsAllowed = false; }
-		public void FuckYourOtherAbility(TriggeringBloodlustEventArgs ev) { if (ev.Target != null && ev.Target.IsNPC) ev.IsAllowed = false; }
+        public string GetConfirmationTimeLeft(Player ply)
+        {
+            if (dropTimestamp.ContainsKey(ply.UserId))
+            {
+                float timeLeft = FoundationFortune.Singleton.Config.SellingConfirmationTime - (Time.time - dropTimestamp[ply.UserId]);
+                if (timeLeft > 0)
+                {
+                    return timeLeft.ToString("F0");
+                }
+            }
+            return "0";
+        }
+
+        public void SpawningNpc(SpawningEventArgs ev) {if (ev.Player.IsNPC) RoundSummary.singleton.Network_chaosTargetCount -= 1;}
+		public void RoundRestart() {if (moneyHintCoroutine.IsRunning) Timing.KillCoroutines(moneyHintCoroutine);}
+		public void FuckYourAbility(ActivatingSenseEventArgs ev) {if (ev.Target != null && ev.Target.IsNPC) ev.IsAllowed = false;}
+		public void FuckYourOtherAbility(TriggeringBloodlustEventArgs ev) {if (ev.Target != null && ev.Target.IsNPC) ev.IsAllowed = false;}
 	}
 }
