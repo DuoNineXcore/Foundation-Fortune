@@ -1,10 +1,7 @@
 ﻿using CommandSystem;
 using Exiled.API.Features;
-using FoundationFortune.API.Models;
 using FoundationFortune.API.Database;
-using InventorySystem;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using Utils.NonAllocLINQ;
 using FoundationFortune.API.Models.Enums;
@@ -98,8 +95,10 @@ namespace FoundationFortune.Commands.BuyCommand
 					.Replace("%perkItem%", perkItem.Alias)
 					.Replace("%perkPrice%", perkItem.Price.ToString());
 
-				PerkBottle perkBottle = new();
-				perkBottle.GivePerkBottle(player, perkItem.PerkType);
+				Log.Info("Perk");
+				//PerkBottle perkBottle = new();
+				//perkBottle.GivePerkBottle(player, perkItem.PerkType);
+				PerkBottle.GivePerkBottle(player, perkItem.PerkType);
 				FoundationFortune.Singleton.serverEvents.EnqueueHint(player, $"{BoughtHint}", 3f);
                 PlayerDataRepository.ModifyMoney(player.UserId, perkItem.Price, true, false, true);
 				ServerEvents.AddToPlayerLimits(player, perkItem);
