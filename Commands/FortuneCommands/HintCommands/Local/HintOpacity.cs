@@ -18,7 +18,7 @@ namespace FoundationFortune.Commands.FortuneCommands.HintCommands.Local
         public string Command { get; } = "ff_hintopacity";
         public string Description { get; } = "Change your hint opacity.";
         public string[] Aliases { get; } = new string[] {};
-        public string[] Usage { get; } = new string[] { "<opacity>" };
+        public string[] Usage { get; } = new string[] { "<opacity (0 - 100)>" };
 
         public bool Execute(ArraySegment<string> args, ICommandSender sender, out string response)
         {

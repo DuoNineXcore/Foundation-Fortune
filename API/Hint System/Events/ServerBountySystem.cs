@@ -28,12 +28,8 @@ namespace FoundationFortune.API.HintSystem
 			if (bounty != null) BountiedPlayers.Remove(bounty);
 		}
 
-        private void HandleBountySystemMessages(Player ply, ref string hintMessage)
+        private void HandleBountySystemMessages(Player ply, ref StringBuilder hintMessage)
         {
-            HintAlign? hintAlignment = PlayerDataRepository.GetUserHintAlign(ply.UserId);
-            int hintAlpha = PlayerDataRepository.GetHintAlpha(ply.UserId);
-            int hintSize = PlayerDataRepository.GetHintSize(ply.UserId);
-            StringBuilder hintMessageBuilder = new(hintMessage);
             Bounty bounty = BountiedPlayers.FirstOrDefault(b => b.Player == ply);
 
             if (bounty != null)
@@ -42,9 +38,8 @@ namespace FoundationFortune.API.HintSystem
                 string bountyMessage = ply.UserId == bounty.Player.UserId
                     ? FoundationFortune.Singleton.Translation.SelfBounty.Replace("%duration%", timeLeft.ToString(@"hh\:mm\:ss"))
                     : FoundationFortune.Singleton.Translation.OtherBounty.Replace("%player%", bounty.Player.Nickname).Replace("%duration%", timeLeft.ToString(@"hh\:mm\:ss"));
-                hintMessageBuilder.Append($"{IntToHexAlpha(hintAlpha)}<size={hintSize}><align={hintAlignment}>{bountyMessage}</align>");
+                hintMessage.Append($"{bountyMessage}");
             }
-            hintMessage = hintMessageBuilder.ToString();
         }
     }
 }

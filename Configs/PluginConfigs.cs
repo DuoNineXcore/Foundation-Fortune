@@ -33,8 +33,6 @@ namespace FoundationFortune.Configs
         public bool ResetRevivedInventory { get; set; } = false;
         public int RevivalBountyKillReward { get; set; } = 5000;
         public int RevivalBountyTimeSeconds { get; set; } = 300;
-        public bool RevivalBountyKillRewardTransfer { get; set; } = false;
-        public bool RevivalBountyKillRewardTransferAll { get; set; } = false;
 
         [Description("Money Extraction System Settings.")]
         public bool MoneyExtractionSystem { get; set; } = true;

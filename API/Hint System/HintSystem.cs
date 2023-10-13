@@ -8,6 +8,7 @@ using System.Linq;
 using UnityEngine;
 using Exiled.API.Features.Items;
 using System.Text;
+using FoundationFortune.API.Items;
 
 namespace FoundationFortune.API.HintSystem
 {
@@ -17,6 +18,7 @@ namespace FoundationFortune.API.HintSystem
 		private Dictionary<string, bool> confirmSell = new();
 		private Dictionary<string, float> dropTimestamp = new();
 		private Dictionary<string, (Item item, int price)> itemsBeingSold = new();
+		private PerkBottle perk;
 
         private IEnumerator<float> UpdateMoneyAndHints()
         {
@@ -38,7 +40,6 @@ namespace FoundationFortune.API.HintSystem
                     int hintSize = PlayerDataRepository.GetHintSize(ply.UserId);
 
                     StringBuilder hintMessageBuilder = new();
-					string hintMessage = "";
 
                     if (!PlayerDataRepository.GetHintMinmode(ply.UserId))
                     {
@@ -52,10 +53,10 @@ namespace FoundationFortune.API.HintSystem
                         hintMessageBuilder.Append($"{moneySavedString}{moneyHoldString}");
                     }
 
-                    HandleExtractionSystemMessages(ply, ref hintMessage);
-                    HandleWorkstationMessages(ply, ref hintMessage);
-                    HandleBuyingBotMessages(ply, ref hintMessage);
-                    HandleBountySystemMessages(ply, ref hintMessage);
+                    HandleExtractionSystemMessages(ply, ref hintMessageBuilder);
+                    HandleWorkstationMessages(ply, ref hintMessageBuilder);
+                    HandleBuyingBotMessages(ply, ref hintMessageBuilder);
+                    HandleBountySystemMessages(ply, ref hintMessageBuilder);
 
                     string recentHintsText = GetRecentHints(ply.UserId);
                     if (!string.IsNullOrEmpty(recentHintsText)) hintMessageBuilder.Append(recentHintsText);
@@ -63,9 +64,7 @@ namespace FoundationFortune.API.HintSystem
                     string recentAnimatedHintsText = GetAnimatedHints(ply.UserId);
                     if (!string.IsNullOrEmpty(recentAnimatedHintsText)) hintMessageBuilder.Append(recentAnimatedHintsText);
 
-					hintMessage = hintMessageBuilder.ToString();
-
-                    ply.ShowHint($"{IntToHexAlpha(hintAlpha)}<size={hintSize}><align={hintAlignment}>{hintMessage}</align>", 2);
+                    ply.ShowHint($"{IntToHexAlpha(hintAlpha)}<size={hintSize}><align={hintAlignment}>{hintMessageBuilder}</align>", 2);
 
                     if (confirmSell.ContainsKey(ply.UserId) && Time.time - dropTimestamp[ply.UserId] >= FoundationFortune.Singleton.Config.SellingConfirmationTime)
                     {

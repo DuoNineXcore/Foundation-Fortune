@@ -13,7 +13,7 @@ namespace FoundationFortune.Commands.FortuneCommands.HintCommands.Local
         public string Command { get; } = "ff_hintsize";
         public string Description { get; } = "Change your hint size.";
         public string[] Aliases { get; } = new string[] { };
-        public string[] Usage { get; } = new string[] { "<size>" };
+        public string[] Usage { get; } = new string[] { "<size (0 - 100)>" };
 
         public bool Execute(ArraySegment<string> args, ICommandSender sender, out string response)
         {

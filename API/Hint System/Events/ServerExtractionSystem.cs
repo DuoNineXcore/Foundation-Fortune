@@ -72,16 +72,11 @@ namespace FoundationFortune.API.HintSystem
 					Timing.CallDelayed(nextExtractionTime, () => StartExtractionEvent());
 				}
 			}
-			else
-			{
-				isExtractionPointActive = false;
-			}
-		}
+            else isExtractionPointActive = false;
+        }
 
-        private void HandleExtractionSystemMessages(Player ply, ref string hintMessage)
+        private void HandleExtractionSystemMessages(Player ply, ref StringBuilder hintMessage)
         {
-            StringBuilder hintMessageBuilder = new();
-
             if (isExtractionPointActive)
             {
                 if (IsPlayerInExtractionRoom(ply, activeExtractionRoom))
@@ -90,7 +85,7 @@ namespace FoundationFortune.API.HintSystem
 
                     if (totalMoneyOnHold <= 0)
                     {
-                        hintMessageBuilder.Append($"{FoundationFortune.Singleton.Translation.ExtractionNoMoney}");
+                        hintMessage.Append($"{FoundationFortune.Singleton.Translation.ExtractionNoMoney}");
                     }
                     else
                     {
@@ -102,13 +97,13 @@ namespace FoundationFortune.API.HintSystem
 
                         string waitTimerHint = FoundationFortune.Singleton.Translation.ExtractionTimer
                             .Replace("%time%", timeLeft.ToString(@"ss"));
-                        hintMessageBuilder.Append(waitTimerHint);
+                        hintMessage.Append(waitTimerHint);
 
                         if (IsExtractionTimerFinished(ply) && totalMoneyOnHold > 0)
                         {
                             CancelExtractionTimer(ply);
                             StartMoneyExtractionTimer(ply);
-                            hintMessageBuilder.Append($"{FoundationFortune.Singleton.Translation.ExtractionStart}");
+                            hintMessage.Append($"{FoundationFortune.Singleton.Translation.ExtractionStart}");
                         }
                     }
                 }
@@ -119,11 +114,9 @@ namespace FoundationFortune.API.HintSystem
                     string extractionHint = FoundationFortune.Singleton.Translation.ExtractionEvent
                         .Replace("%room%", activeExtractionRoom.ToString())
                         .Replace("%time%", TimeSpan.FromSeconds(FoundationFortune.Singleton.Config.ExtractionPointDuration - (Time.time - extractionStartTime)).ToString(@"hh\:mm\:ss"));
-                    hintMessageBuilder.Append(extractionHint);
+                    hintMessage.Append(extractionHint);
                 }
             }
-
-            hintMessage = hintMessageBuilder.ToString();
         }
 
 

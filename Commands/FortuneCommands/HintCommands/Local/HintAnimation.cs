@@ -13,7 +13,7 @@ namespace FoundationFortune.Commands.FortuneCommands.HintCommands.Local
     {
         public string Command { get; } = "ff_hintanim";
         public string Description { get; } = "Change your hint animation.";
-        public string[] Aliases { get; } = new string[] { };
+        public string[] Aliases { get; } = new string[] {};
         public string[] Usage { get; } = new string[] { "<right/left/center>" };
 
         public bool Execute(ArraySegment<string> args, ICommandSender sender, out string response)

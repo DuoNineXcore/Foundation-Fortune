@@ -25,7 +25,6 @@ namespace FoundationFortune.API.Models.Classes
         }
     }
 
-
     public class ExtractionTimerData
     {
         public CoroutineHandle CoroutineHandle { get; set; }

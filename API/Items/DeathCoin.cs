@@ -11,11 +11,11 @@ using System.Collections.Generic;
 namespace FoundationFortune.API.Items
 {
     [CustomItem(ItemType.Coin)]
-    public class Money : CustomItem
+    public class DeathCoin : CustomItem
     {
         public override uint Id { get; set; } = 132;
-        public override string Name { get; set; } = "Money";
-        public override string Description { get; set; } = "It's just money.";
+        public override string Name { get; set; } = "Death Coin";
+        public override string Description { get; set; } = "A dead man's wealth.";
         public override float Weight { get; set; } = 0f;
         public override SpawnProperties SpawnProperties { get; set; }
         private Dictionary<int, (int coinValue, Player player)> droppedCoins = new();

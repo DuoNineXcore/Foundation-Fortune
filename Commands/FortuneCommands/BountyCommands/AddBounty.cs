@@ -7,7 +7,7 @@ namespace FoundationFortune.Commands.FortuneCommands.BountyCommands
 {
     [CommandHandler(typeof(ClientCommandHandler))]
     [CommandHandler(typeof(RemoteAdminCommandHandler))]
-    internal class AddBounty : ICommand
+    internal class AddBounty : ICommand, IUsageProvider
     {
         public string Command { get; } = "ff_addbounty";
         public string Description { get; } = "Add a bounty to a player.";
@@ -22,9 +22,9 @@ namespace FoundationFortune.Commands.FortuneCommands.BountyCommands
                 return false;
             }
 
-            if (args.Count < 4)
+            if (args.Count < 3)
             {
-                response = "Usage: bounty addbounty <playerName> <amount> <durationInSeconds>";
+                response = "Usage: ff_addbounty <playerName> <amount> <durationInSeconds>";
                 return false;
             }
 

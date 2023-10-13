@@ -37,9 +37,7 @@ namespace FoundationFortune.API.HintSystem
 			HashSet<WorkstationController> selectedWorkstations = new();
 
 			foreach (var workstation in allWorkstations.OrderBy(x => Random.value).Take(numWorkstationsToConsider))
-			{
-				selectedWorkstations.Add(workstation);
-			}
+			selectedWorkstations.Add(workstation);
 
 			workstationPositions = selectedWorkstations.ToDictionary(workstation => workstation, workstation => workstation.transform.position);
 		}
@@ -128,56 +126,42 @@ namespace FoundationFortune.API.HintSystem
 			}
 		}
 
-        private void HandleWorkstationMessages(Player ply, ref string hintMessage)
+        private void HandleWorkstationMessages(Player ply, ref StringBuilder hintMessage)
         {
-            HintAlign? hintAlignment = PlayerDataRepository.GetUserHintAlign(ply.UserId);
-            int hintAlpha = PlayerDataRepository.GetHintAlpha(ply.UserId);
-            int hintSize = PlayerDataRepository.GetHintSize(ply.UserId);
-
-            StringBuilder hintMessageBuilder = new(hintMessage);
-
             if (IsPlayerOnSellingWorkstation(ply))
             {
                 if (!confirmSell.ContainsKey(ply.UserId))
-                {
-                    hintMessageBuilder.Append($"{FoundationFortune.Singleton.Translation.SellingWorkstation}");
-                }
+                hintMessage.Append($"{FoundationFortune.Singleton.Translation.SellingWorkstation}");
                 else if (confirmSell[ply.UserId])
                 {
-                    hintMessageBuilder.Append($"{FoundationFortune.Singleton.Translation.SellingWorkstation}");
+                    hintMessage.Append($"{FoundationFortune.Singleton.Translation.SellingWorkstation}");
 
                     if (itemsBeingSold.TryGetValue(ply.UserId, out var soldItemData))
                     {
                         int price = soldItemData.price;
-                        hintMessageBuilder.Append($"{FoundationFortune.Singleton.Translation.ItemConfirmation.Replace("%price%", price.ToString()).Replace("%time%", GetConfirmationTimeLeft(ply).ToString())}");
+                        hintMessage.Append($"{FoundationFortune.Singleton.Translation.ItemConfirmation.Replace("%price%", price.ToString()).Replace("%time%", GetConfirmationTimeLeft(ply).ToString())}");
                     }
                 }
             }
-
-            hintMessage = hintMessageBuilder.ToString();
         }
 
-
-        private void HandleBuyingBotMessages(Player ply, ref string hintMessage)
+        private void HandleBuyingBotMessages(Player ply, ref StringBuilder hintMessage)
         {
             Npc npc = GetBuyingBotNearPlayer(ply);
-            StringBuilder hintBuilder = new();
 
             if (IsPlayerNearBuyingBot(ply, npc))
             {
                 BuyingBot.LookAt(npc, ply.Position);
-                hintBuilder.Append($"{FoundationFortune.Singleton.Translation.BuyingBot}");
+                hintMessage.Append($"{FoundationFortune.Singleton.Translation.BuyingBot}");
             }
             else if (IsPlayerNearSellingBot(ply))
             {
                 BuyingBot.LookAt(npc, ply.Position);
                 if (!confirmSell.ContainsKey(ply.UserId))
-                {
-                    hintBuilder.Append($"{FoundationFortune.Singleton.Translation.SellingBot}");
-                }
+                hintMessage.Append($"{FoundationFortune.Singleton.Translation.SellingBot}");
                 else if (confirmSell[ply.UserId])
                 {
-                    hintBuilder.Append($"{FoundationFortune.Singleton.Translation.SellingBot}");
+                    hintMessage.Append($"{FoundationFortune.Singleton.Translation.SellingBot}");
 
                     if (itemsBeingSold.TryGetValue(ply.UserId, out var soldItemData))
                     {
@@ -186,11 +170,10 @@ namespace FoundationFortune.API.HintSystem
                             .Replace("%price%", price.ToString())
                             .Replace("%time%", GetConfirmationTimeLeft(ply));
 
-                        hintBuilder.Append($"{confirmationHint}");
+                        hintMessage.Append($"{confirmationHint}");
                     }
                 }
             }
-            hintMessage = hintBuilder.ToString();
         }
 
 
@@ -305,10 +288,8 @@ namespace FoundationFortune.API.HintSystem
             int alphaValue = Mathf.RoundToInt(clampedValue * 255 / 100);
             string hexValue = alphaValue.ToString("X2");
             string alphaTag = $"<alpha=#{hexValue}>";
-
             return alphaTag;
         }
-
 
         public static void AddToPlayerLimits(Player player, PerkItem perkItem)
 		{
@@ -319,14 +300,8 @@ namespace FoundationFortune.API.HintSystem
 				FoundationFortune.PlayerLimits.Add(playerLimit);
 			}
 
-			if (playerLimit.BoughtPerks.ContainsKey(perkItem))
-			{
-				playerLimit.BoughtPerks[perkItem]++;
-			}
-			else
-			{
-				playerLimit.BoughtPerks[perkItem] = 1;
-			}
+			if (playerLimit.BoughtPerks.ContainsKey(perkItem)) playerLimit.BoughtPerks[perkItem]++;
+			else playerLimit.BoughtPerks[perkItem] = 1;
 		}
 
 		public static void AddToPlayerLimits(Player player, BuyableItem buyItem)
@@ -338,17 +313,11 @@ namespace FoundationFortune.API.HintSystem
 				FoundationFortune.PlayerLimits.Add(playerLimit);
 			}
 
-			if (playerLimit.BoughtItems.ContainsKey(buyItem))
-			{
-				playerLimit.BoughtItems[buyItem]++;
-			}
-			else
-			{
-				playerLimit.BoughtItems[buyItem] = 1;
-			}
-		}
+			if (playerLimit.BoughtItems.ContainsKey(buyItem)) playerLimit.BoughtItems[buyItem]++;
+            else playerLimit.BoughtItems[buyItem] = 1;
+        }
 
-		public static void AddToPlayerLimits(Player player, SellableItem sellItem)
+        public static void AddToPlayerLimits(Player player, SellableItem sellItem)
 		{
 			var playerLimit = FoundationFortune.PlayerLimits.FirstOrDefault(p => p.Player.UserId == player.UserId);
 			if (playerLimit == null)
@@ -357,14 +326,8 @@ namespace FoundationFortune.API.HintSystem
 				FoundationFortune.PlayerLimits.Add(playerLimit);
 			}
 
-			if (playerLimit.SoldItems.ContainsKey(sellItem))
-			{
-				playerLimit.SoldItems[sellItem]++;
-			}
-			else
-			{
-				playerLimit.SoldItems[sellItem] = 1;
-			}
+			if (playerLimit.SoldItems.ContainsKey(sellItem)) playerLimit.SoldItems[sellItem]++;
+			else playerLimit.SoldItems[sellItem] = 1;
 		}
 	}
 }

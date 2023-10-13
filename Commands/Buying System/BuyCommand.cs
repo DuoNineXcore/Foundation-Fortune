@@ -10,6 +10,7 @@ using Utils.NonAllocLINQ;
 using FoundationFortune.API.Models.Enums;
 using FoundationFortune.API.Models.Classes;
 using FoundationFortune.API.HintSystem;
+using FoundationFortune.API.Items;
 
 namespace FoundationFortune.Commands.BuyCommand
 {
@@ -97,11 +98,12 @@ namespace FoundationFortune.Commands.BuyCommand
 					.Replace("%perkItem%", perkItem.Alias)
 					.Replace("%perkPrice%", perkItem.Price.ToString());
 
+				PerkBottle perkBottle = new();
+				perkBottle.GivePerkBottle(player, perkItem.PerkType);
 				FoundationFortune.Singleton.serverEvents.EnqueueHint(player, $"{BoughtHint}", 3f);
                 PlayerDataRepository.ModifyMoney(player.UserId, perkItem.Price, true, false, true);
 				ServerEvents.AddToPlayerLimits(player, perkItem);
 
-				perks.GrantPerk(player, perkItem.PerkType);
 				response = $"You have successfully bought {perkItem.DisplayName} for ${perkItem.Price}";
 				return true;
 			}
@@ -157,7 +159,7 @@ namespace FoundationFortune.Commands.BuyCommand
 								.Select(buyableItem => $"{buyableItem.ItemType} - {buyableItem.DisplayName} ({buyableItem.Alias}) - {buyableItem.Price}$")) +
 							"\n";
 
-			string perksToBuy = "<color=cyan>Available Perks:</color>\n" +
+			string perksToBuy = "<color=green>Available Perks:</color>\n" +
 							string.Join("\n", FoundationFortune.Singleton.Config.PerkItems
 								.Select(perkItem => $"{perkItem.DisplayName} ({perkItem.Alias}) - {perkItem.Price}$ - {perkItem.Description}")) +
 							"\n";

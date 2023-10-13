@@ -23,8 +23,10 @@ namespace FoundationFortune
 		private Harmony _harmony;
 
 		public static FoundationFortune Singleton;
+		#nullable enable
 		public Dictionary<string, (Npc? bot, int indexation)> BuyingBotIndexation { get; private set; } = new Dictionary<string, (Npc? bot, int indexation)>();
-        public static List<ObjectInteractions> PlayerLimits = new();
+		#nullable disable
+		public static List<ObjectInteractions> PlayerLimits = new();
         public ServerEvents serverEvents = new();
 		public LiteDatabase db;
 
@@ -50,10 +52,7 @@ namespace FoundationFortune
 			UnregisterEvents();
 			Singleton = null;
 			CustomItem.UnregisterItems();
-            if (_harmony != null)
-            {
-				_harmony.UnpatchAll(_harmony.Id);
-            }
+            _harmony?.UnpatchAll(_harmony.Id);
         }
 
 		private void RegisterEvents()

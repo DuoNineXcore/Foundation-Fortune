@@ -69,9 +69,10 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="API\Items\PerkBottle.cs" />
     <Compile Include="API\Models\Classes.cs" />
     <Compile Include="API\Models\Enums.cs" />
-    <Compile Include="API\Items\Money.cs" />
+    <Compile Include="API\Items\DeathCoin.cs" />
     <Compile Include="API\NPCs\BuyingBot.cs" />
     <Compile Include="API\Database\PlayerDataRepository.cs" />
     <Compile Include="Commands\FortuneCommands\BountyCommands\AddBounty.cs" />

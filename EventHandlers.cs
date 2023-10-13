@@ -67,7 +67,7 @@ namespace FoundationFortune.API.HintSystem
 					MoneySaved = 0,
 					HintMinmode = false,
 					DisabledHintSystem = false,
-					HintSize = 100,
+					HintSize = 25,
 					HintOpacity = 100,
 					HintAnim = HintAnim.None,
 					HintAlign = HintAlign.Center
