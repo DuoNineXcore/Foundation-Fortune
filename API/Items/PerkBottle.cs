@@ -10,6 +10,7 @@ using Exiled.Events.EventArgs.Player;
 using FoundationFortune.API.Models.Enums;
 using FoundationFortune.Commands.BuyCommand;
 using System.Collections.Generic;
+using System.Text;
 
 namespace FoundationFortune.API.Items
 {
@@ -63,6 +64,15 @@ namespace FoundationFortune.API.Items
 		protected override void OnAcquired(Player player, Item item, bool displayMessage)
 		{
 			base.OnAcquired(player, item, false);
+		}
+
+		public static void GetHeldBottle(Player player, ref StringBuilder stringbuilder)
+		{
+			if (player.CurrentItem == null) return;
+			if (DroppedPerkBottles.TryGetValue(player.CurrentItem.Serial, out var perkBottleData))
+			{
+				stringbuilder.AppendLine($"You are holding a {perkBottleData.perkType} bottle!");
+			}
 		}
 	}
 }
