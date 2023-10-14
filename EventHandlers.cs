@@ -13,6 +13,11 @@ using FoundationFortune.API.Models.Classes;
 using FoundationFortune.API.Models.Enums;
 using PlayerRoles;
 using System.Collections.Generic;
+using FoundationFortune.API.Perks;
+using Utf8Json.Resolvers.Internal;
+using Exiled.API.Extensions;
+using InventorySystem;
+using Exiled.API.Enums;
 
 namespace FoundationFortune.API.HintSystem
 {
@@ -75,6 +80,35 @@ namespace FoundationFortune.API.HintSystem
 				};
 				PlayerDataRepository.InsertPlayer(newPlayer);
 			}
+		}
+
+		public void EthernalInterventionHandler(DyingEventArgs ev)
+		{
+			if(!PerkSystem.EthernalInterventionPlayers.Contains(ev.Player)) return;
+			PerkSystem.EthernalInterventionPlayers.Remove(ev.Player);
+
+			RoleTypeId role = ev.Player.Role.Type;
+			Room room = Room.List.Where(r => r.Zone == ev.Player.Zone & !FoundationFortune.Singleton.Config.ForbiddenRooms.Contains(r.Type)).GetRandomValue();
+			List<Item> items = new();
+			Dictionary<AmmoType, ushort> ammos = new();
+			
+			foreach(Item item in ev.Player.Items) items.Add(item);
+			foreach(var kvp in ev.Player.Ammo) ammos.Add(kvp.Key.GetAmmoType(), kvp.Value);
+
+			Timing.CallDelayed(0.15f, delegate
+			{
+				ev.Player.Role.Set(role);
+				ev.Player.Teleport(room);
+
+				foreach(Item item in items)
+				{
+					ev.Player.AddItem(item.Type);
+				}
+				foreach(var kvp in ammos)
+				{
+					ev.Player.AddAmmo(kvp.Key, kvp.Value);
+				}
+			});
 		}
 
 		public void KillingReward(DiedEventArgs ev)

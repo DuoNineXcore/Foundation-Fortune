@@ -107,8 +107,8 @@ namespace FoundationFortune.Configs
 		public List<PlayerVoiceChatSettings> PlayerVoiceChatSettings { get; set; } = new List<PlayerVoiceChatSettings>()
 		{
 			new PlayerVoiceChatSettings { VoiceChatUsageType = PlayerVoiceChatUsageType.EtherealIntervention, VoiceChat = VoiceChatChannel.Mimicry, Loop = false, AudioFile = "BuySuccess.ogg", Volume = 50},
-            new PlayerVoiceChatSettings { VoiceChatUsageType = PlayerVoiceChatUsageType.BlissfulUnawareness, VoiceChat = VoiceChatChannel.Mimicry, Loop = false, AudioFile = "urgoingtodie.ogg", Volume = 50},
-            new PlayerVoiceChatSettings { VoiceChatUsageType = PlayerVoiceChatUsageType.ResurgenceBeacon, VoiceChat = VoiceChatChannel.Mimicry, Loop = false, AudioFile = "BuySuccess.ogg", Volume = 50},
+		  new PlayerVoiceChatSettings { VoiceChatUsageType = PlayerVoiceChatUsageType.BlissfulUnawareness, VoiceChat = VoiceChatChannel.Mimicry, Loop = false, AudioFile = "urgoingtodie.ogg", Volume = 50},
+		  new PlayerVoiceChatSettings { VoiceChatUsageType = PlayerVoiceChatUsageType.ResurgenceBeacon, VoiceChat = VoiceChatChannel.Mimicry, Loop = false, AudioFile = "BuySuccess.ogg", Volume = 50},
 			new PlayerVoiceChatSettings { VoiceChatUsageType = PlayerVoiceChatUsageType.ResurgenceBeacon, VoiceChat = VoiceChatChannel.Mimicry, Loop = false, AudioFile = "BuySuccess.ogg", Volume = 50},
 			new PlayerVoiceChatSettings { VoiceChatUsageType = PlayerVoiceChatUsageType.Hunted, VoiceChat = VoiceChatChannel.Mimicry, Loop = false, AudioFile = "BuySuccess.ogg", Volume = 50},
 			new PlayerVoiceChatSettings { VoiceChatUsageType = PlayerVoiceChatUsageType.Hunter, VoiceChat = VoiceChatChannel.Mimicry, Loop = false, AudioFile = "BuySuccess.ogg", Volume = 50},
@@ -123,7 +123,7 @@ namespace FoundationFortune.Configs
 		};
 
 		[Description("List of items that can be bought.")]
-		public List<BuyableItem>BuyableItems { get; set; } = new List<BuyableItem>
+		public List<BuyableItem> BuyableItems { get; set; } = new List<BuyableItem>
 		{
 			new BuyableItem { Limit = 1, Alias = "Micro", ItemType = ItemType.MicroHID, Price = 500, DisplayName = "Micro HID" },
 			new BuyableItem { Limit = 1, Alias = "500", ItemType = ItemType.SCP500, Price = 1000, DisplayName = "SCP-500" },
@@ -131,7 +131,7 @@ namespace FoundationFortune.Configs
 
 		[Description("List of perks that can be bought.")]
 		public List<PerkItem> PerkItems { get; set; } = new List<PerkItem>
-        {
+	   {
 			new PerkItem { Limit = 1, Alias = "OSP", PerkType = PerkType.OvershieldedProtection, Price = 2500, DisplayName = "Overshielded Protection", Description = ""},
 			new PerkItem { Limit = 1, Alias = "BRS", PerkType = PerkType.BoostedResilience, Price = 1800, DisplayName = "Boosted Resilience", Description = ""},
 			new PerkItem { Limit = 1, Alias = "CPR", PerkType = PerkType.ConcealedPresence, Price = 2000, DisplayName = "Concealed Presence", Description = ""},
@@ -142,5 +142,15 @@ namespace FoundationFortune.Configs
 			new PerkItem { Limit = 1, Alias = "RBC", PerkType = PerkType.ResurgenceBeacon, Price = 3000, DisplayName = "Resurgence Beacon", Description = ""},
 			new PerkItem { Limit = 1, Alias = "EIN", PerkType = PerkType.EtherealIntervention, Price = 4200, DisplayName = "Ethereal Intervention", Description = ""},
 		};
-    }
+
+		[Description("A list of rooms that you cannot be teleported to")]
+		public List<RoomType> ForbiddenRooms { get; set; } = new()
+		{
+			RoomType.EzCollapsedTunnel,
+			RoomType.HczTestRoom,
+			RoomType.Hcz049,
+			RoomType.Lcz173,
+			RoomType.HczTesla
+		};
+	}
 }

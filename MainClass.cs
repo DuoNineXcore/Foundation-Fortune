@@ -59,6 +59,7 @@ namespace FoundationFortune
 		{
 			Exiled.Events.Handlers.Server.RoundStarted += serverEvents.RoundStart;
 			Exiled.Events.Handlers.Player.Verified += serverEvents.RegisterInDatabase;
+			Exiled.Events.Handlers.Player.Dying += serverEvents.EthernalInterventionHandler;
 			Exiled.Events.Handlers.Player.Died += serverEvents.KillingReward;
 			Exiled.Events.Handlers.Player.Escaping += serverEvents.EscapingReward;
 			Exiled.Events.Handlers.Player.DroppingItem += serverEvents.SellingItem;
@@ -73,6 +74,7 @@ namespace FoundationFortune
 		{
 			Exiled.Events.Handlers.Server.RoundStarted -= serverEvents.RoundStart;
 			Exiled.Events.Handlers.Player.Verified -= serverEvents.RegisterInDatabase;
+			Exiled.Events.Handlers.Player.Dying -= serverEvents.EthernalInterventionHandler;
 			Exiled.Events.Handlers.Player.Died -= serverEvents.KillingReward;
 			Exiled.Events.Handlers.Player.Escaping -= serverEvents.EscapingReward;
 			Exiled.Events.Handlers.Player.DroppingItem -= serverEvents.SellingItem;
