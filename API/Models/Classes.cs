@@ -87,7 +87,6 @@ namespace FoundationFortune.API.Models.Classes
         public string DisplayName { get; set; }
     }
 
-
     public class NPCVoiceChatSettings
     {
         public VoiceChatChannel VoiceChat { get; set; }

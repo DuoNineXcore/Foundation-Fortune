@@ -35,7 +35,7 @@ namespace FoundationFortune.API.Items
 
 		private void OnDeath(DyingEventArgs ev)
 		{
-			if (PerkSystem.EthernalInterventionPlayers.Contains(ev.Player)) return;
+			if (PerkSystem.EtherealInterventionPlayers.Contains(ev.Player)) return;
 
 			int moneyBeforeDeath = PlayerDataRepository.GetMoneyOnHold(ev.Player.UserId);
 			if (moneyBeforeDeath > 0 && !PlayerDataRepository.GetPluginAdmin(ev.Player.UserId))

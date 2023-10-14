@@ -33,6 +33,11 @@ namespace FoundationFortune.API.Items
             Exiled.Events.Handlers.Player.UsingRadioBattery -= RevivePlayer;
         }
 
+        protected override void OnChanging(ChangingItemEventArgs ev)
+        {
+            base.OnChanging(ev);
+        }
+
         private void RevivePlayer(UsingRadioBatteryEventArgs ev)
         {
             if (RevivalData.TryGetValue(ev.Item.Serial, out var revivalInfo) && ev.Radio.IsEnabled)

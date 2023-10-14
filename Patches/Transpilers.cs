@@ -14,6 +14,7 @@ using PlayerRoles;
 using System.Reflection;
 using VoiceChat.Networking;
 using VoiceChat;
+using PlayerRoles.PlayableScps.Scp939.Mimicry;
 
 namespace FoundationFortune.Patches
 {
@@ -73,12 +74,13 @@ namespace FoundationFortune.Patches
         }
     }
 
-    [HarmonyPatch(typeof(VoiceTransceiver), nameof(VoiceTransceiver.ServerReceiveMessage))]
+    /*
+    [HarmonyPatch(typeof(MimicryRecordingIcon), nameof(VoiceTransceiver.ServerReceiveMessage))]
     public static class HearSelfTranspiler
     {
         private static VoiceChatChannel No(VoiceChatChannel channel, ReferenceHub speaker, ReferenceHub listener)
         {
-            if (listener == speaker && channel == VoiceChatChannel.Mimicry) return VoiceChatChannel.RoundSummary; else return channel;
+            if (speaker == listener && speaker.IsHuman() && channel == VoiceChatChannel.Mimicry) return VoiceChatChannel.RoundSummary; else return channel;
         }
 
         private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
@@ -103,6 +105,7 @@ namespace FoundationFortune.Patches
             ListPool<CodeInstruction>.Shared.Return(newInstructions);
         }
     }
+    */
 
     [HarmonyPatch(typeof(Scp173ObserversTracker), nameof(Scp173ObserversTracker.UpdateObservers))]
     internal static class UpdateObservers

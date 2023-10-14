@@ -3,6 +3,9 @@ using Exiled.API.Features;
 using PlayerRoles.PlayableScps.Scp079;
 using InventorySystem.Items.Usables;
 using FoundationFortune.API.Items;
+using FoundationFortune.API.Models.Interfaces;
+using PlayerRoles.PlayableScps.Scp939.Ripples;
+using UnityEngine;
 
 namespace FoundationFortune.Patches
 {
@@ -27,7 +30,7 @@ namespace FoundationFortune.Patches
 		}
 	}
 
-	[HarmonyPatch(typeof(Scp079Recontainer), nameof(Scp079Recontainer.OnServerRoleChanged))]
+    [HarmonyPatch(typeof(Scp079Recontainer), nameof(Scp079Recontainer.OnServerRoleChanged))]
 	internal static class Scp079RecontainPatch
 	{
 		private static bool Prefix(Scp079Recontainer __instance, ReferenceHub hub)

@@ -37,7 +37,7 @@ namespace FoundationFortune.API.Items
 			base.UnsubscribeEvents();
 		}
 
-		private void UsedPerkBottle(UsedItemEventArgs ev)
+        private void UsedPerkBottle(UsedItemEventArgs ev)
 		{
 			if (DroppedPerkBottles.TryGetValue(ev.Item.Serial, out var perkBottleData))
 			{

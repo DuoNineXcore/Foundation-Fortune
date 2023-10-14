@@ -18,6 +18,8 @@ using Utf8Json.Resolvers.Internal;
 using Exiled.API.Extensions;
 using InventorySystem;
 using Exiled.API.Enums;
+using PluginAPI.Roles;
+using Exiled.API.Features.Roles;
 
 namespace FoundationFortune.API.HintSystem
 {
@@ -82,36 +84,53 @@ namespace FoundationFortune.API.HintSystem
 			}
 		}
 
-		public void EthernalInterventionHandler(DyingEventArgs ev)
+		public void EtherealInterventionHandler(DyingEventArgs ev)
 		{
-			if(!PerkSystem.EthernalInterventionPlayers.Contains(ev.Player)) return;
-			PerkSystem.EthernalInterventionPlayers.Remove(ev.Player);
-
-			RoleTypeId role = ev.Player.Role.Type;
-			Room room = Room.List.Where(r => r.Zone == ev.Player.Zone & !FoundationFortune.Singleton.Config.ForbiddenRooms.Contains(r.Type)).GetRandomValue();
-			List<Item> items = new();
-			Dictionary<AmmoType, ushort> ammos = new();
-			
-			foreach(Item item in ev.Player.Items) items.Add(item);
-			foreach(var kvp in ev.Player.Ammo) ammos.Add(kvp.Key.GetAmmoType(), kvp.Value);
-
-			Timing.CallDelayed(0.15f, delegate
+            if (!PerkSystem.EtherealInterventionPlayers.Contains(ev.Player)) return;
+			else
 			{
-				ev.Player.Role.Set(role);
-				ev.Player.Teleport(room);
+                RoleTypeId role = ev.Player.Role.Type;
+                Room room = Room.List.Where(r => r.Zone == ev.Player.Zone & !FoundationFortune.Singleton.Config.ForbiddenRooms.Contains(r.Type)).GetRandomValue();
+                List<Item> items = new();
+                Dictionary<AmmoType, ushort> ammos = new();
+                ev.ItemsToDrop = new List<Item>();
 
-				foreach(Item item in items)
-				{
-					ev.Player.AddItem(item.Type);
-				}
-				foreach(var kvp in ammos)
-				{
-					ev.Player.AddAmmo(kvp.Key, kvp.Value);
-				}
-			});
+                foreach (Item item in ev.Player.Items) items.Add(item);
+                foreach (var kvp in ev.Player.Ammo) ammos.Add(kvp.Key.GetAmmoType(), kvp.Value);
+
+                Timing.CallDelayed(0.15f, delegate
+                {
+                    ev.Player.Role.Set(role, RoleSpawnFlags.None);
+                    ev.Player.Teleport(room);
+
+                    foreach (Item item in items)
+                    {
+                        ev.Player.AddItem(item.Type);
+                    }
+                    foreach (var kvp in ammos)
+                    {
+                        ev.Player.AddAmmo(kvp.Key, kvp.Value);
+                    }
+                });
+            }
 		}
 
-		public void KillingReward(DiedEventArgs ev)
+		public void EtherealInterventionSpawn(SpawnedEventArgs ev)
+		{
+            if (!PerkSystem.EtherealInterventionPlayers.Contains(ev.Player)) return;
+			else
+			{
+                Timing.CallDelayed(0.15f, delegate
+                {
+                    PlayerVoiceChatSettings EtherealInterventionAudio = FoundationFortune.Singleton.Config.PlayerVoiceChatSettings
+								.FirstOrDefault(settings => settings.VoiceChatUsageType == PlayerVoiceChatUsageType.EtherealIntervention);
+                    AudioPlayer.PlayAudio(ev.Player, EtherealInterventionAudio.AudioFile, EtherealInterventionAudio.Volume, EtherealInterventionAudio.Loop, EtherealInterventionAudio.VoiceChat);
+                });
+                PerkSystem.EtherealInterventionPlayers.Remove(ev.Player);
+            }
+        }
+
+        public void KillingReward(DiedEventArgs ev)
 		{
 			var config = FoundationFortune.Singleton.Config;
 			var bountiedPlayer = BountiedPlayers.FirstOrDefault(bounty => bounty.Player == ev.Player && bounty.IsBountied);
@@ -121,10 +140,10 @@ namespace FoundationFortune.API.HintSystem
 				foreach (Player ply in Player.List.Where(p => p != ev.Attacker && !p.IsDead))
 				{
 					var globalKillHint = FoundationFortune.Singleton.Translation.BountyFinished
-						.Replace("%victim%", ev.Player.Nickname ?? "Null Hunted Player")
+						.Replace("%victim%", ev.Player.Nickname)
 						.Replace("%attacker%", ev.Attacker.Nickname)
-						.Replace("%victimcolor%", ev.Player.Role.Color.ToHex() ?? "#FFFFFF")
-						.Replace("%attackercolor%", ev.Attacker.Role.Color.ToHex() ?? "#FFFFFF")
+						.Replace("%victimcolor%", ev.Player.Role.Color.ToHex())
+						.Replace("%attackercolor%", ev.Attacker.Role.Color.ToHex())
 						.Replace("%bountyPrice%", bountiedPlayer.Value.ToString());
 					EnqueueHint(ply, globalKillHint, config.MaxHintAge);
 				}
@@ -132,7 +151,7 @@ namespace FoundationFortune.API.HintSystem
 				if (ev.Attacker != null && ev.Attacker != ev.Player)
 				{
 					var killHint = FoundationFortune.Singleton.Translation.BountyKill
-						.Replace("%victim%", ev.Player?.Nickname)
+						.Replace("%victim%", ev.Player.Nickname)
 						.Replace("%bountyPrice%", bountiedPlayer?.Value.ToString());
 
 					EnqueueHint(ev.Attacker, killHint, config.MaxHintAge);
@@ -142,15 +161,15 @@ namespace FoundationFortune.API.HintSystem
 			else if (bountiedPlayer != null && ev.Attacker == null)
 			{
 				var killHint = FoundationFortune.Singleton.Translation.BountyPlayerDied
-					.Replace("%victim%", ev.Player?.Nickname);
+					.Replace("%victim%", ev.Player.Nickname);
 
 				foreach (Player ply in Player.List.Where(p => !p.IsNPC)) EnqueueHint(ply, killHint, config.MaxHintAge);
 				StopBounty(ev.Player);
 			}
 
-			if (ev.Attacker != null && ev.Attacker != ev.Player && config.KillRewardScpOnly)
+			if (ev.Attacker != null && ev.Attacker != ev.Player)
 			{
-				var killHint = FoundationFortune.Singleton.Translation.Kill.Replace("%victim%", ev.Player?.Nickname);
+				var killHint = FoundationFortune.Singleton.Translation.Kill.Replace("%victim%", ev.Player.Nickname);
 				EnqueueHint(ev.Attacker, killHint, config.MaxHintAge);
 			}
 

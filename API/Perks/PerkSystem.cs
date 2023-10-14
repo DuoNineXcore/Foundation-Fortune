@@ -17,7 +17,7 @@ namespace FoundationFortune.API.Perks
 	/// </summary>
 	public static class PerkSystem
 	{
-		public static List<Player> EthernalInterventionPlayers = new();
+		public static List<Player> EtherealInterventionPlayers = new();
 		public static void GrantPerk(Player ply, PerkType perk)
 		{
 			switch (perk)
@@ -46,8 +46,8 @@ namespace FoundationFortune.API.Perks
 					//coming soon:tm:
 					break;
 				case PerkType.EtherealIntervention:
-					if (!EthernalInterventionPlayers.Contains(ply))
-						EthernalInterventionPlayers.Add(ply);
+					if (!EtherealInterventionPlayers.Contains(ply))
+						EtherealInterventionPlayers.Add(ply);
 					break;
 			}
 		}
@@ -66,7 +66,7 @@ namespace FoundationFortune.API.Perks
 			    .FirstOrDefault(settings => settings.VoiceChatUsageType == PlayerVoiceChatUsageType.BlissfulUnawareness);
 			AudioPlayer.PlayAudio(ply, BlissfulAwarenessSettings.AudioFile, BlissfulAwarenessSettings.Volume, BlissfulAwarenessSettings.Loop, BlissfulAwarenessSettings.VoiceChat);
 
-			yield return Timing.WaitForSeconds(42f);
+			yield return Timing.WaitForSeconds(41f);
 
 			Log.Debug("Blissful Unawareness 2nd coroutine finished.");
 			Map.Explode(ply.Position, Exiled.API.Enums.ProjectileType.Scp2176, ply);
