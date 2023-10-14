@@ -16,7 +16,6 @@ namespace FoundationFortune.Patches
 		}
 	}
 
-
 	[HarmonyPatch(typeof(Scp079ScannerTracker), nameof(Scp079ScannerTracker.AddTarget))]
 	internal static class Scp079TargetAddPatch
 	{

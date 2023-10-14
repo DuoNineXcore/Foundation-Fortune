@@ -28,7 +28,7 @@ namespace FoundationFortune.API.HintSystem
 			if (bounty != null) BountiedPlayers.Remove(bounty);
 		}
 
-        private void HandleBountySystemMessages(Player ply, ref StringBuilder hintMessage)
+        private void UpdateBountyMessages(Player ply, ref StringBuilder hintMessage)
         {
             Bounty bounty = BountiedPlayers.FirstOrDefault(b => b.Player == ply);
 

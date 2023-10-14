@@ -13,7 +13,7 @@ namespace FoundationFortune.API.Items
     [CustomItem(ItemType.Coin)]
     public class DeathCoin : CustomItem
     {
-        public override uint Id { get; set; } = 132;
+        public override uint Id { get; set; } = 330;
         public override string Name { get; set; } = "Death Coin";
         public override string Description { get; set; } = "A dead man's wealth.";
         public override float Weight { get; set; } = 0f;
@@ -35,14 +35,11 @@ namespace FoundationFortune.API.Items
         private void OnDeath(DyingEventArgs ev)
         {
             int moneyBeforeDeath = PlayerDataRepository.GetMoneyOnHold(ev.Player.UserId);
-            if (moneyBeforeDeath > 0)
+            if (moneyBeforeDeath > 0 && !PlayerDataRepository.GetPluginAdmin(ev.Player.UserId))
             {
                 FoundationFortune.Singleton.serverEvents.EnqueueHint(ev.Player, FoundationFortune.Singleton.Translation.Death.Replace("%moneyBeforeDeath%", moneyBeforeDeath.ToString()), 5f);
-
                 PlayerDataRepository.EmptyMoney(ev.Player.UserId, true, false);
-
                 int coinValue = moneyBeforeDeath / FoundationFortune.Singleton.Config.DeathCoinsToDrop;
-
                 for (int i = 0; i < FoundationFortune.Singleton.Config.DeathCoinsToDrop; i++)
                 {
                     if (TrySpawn(Id, ev.Player.Position, out Pickup coin))
@@ -63,7 +60,7 @@ namespace FoundationFortune.API.Items
                 {
                     int coinValue = coinData.coinValue;
                     FoundationFortune.Singleton.serverEvents.EnqueueHint(player, FoundationFortune.Singleton.Translation.DeathCoinPickup.Replace("%coinValue%", coinValue.ToString()), 3f);
-                    PlayerDataRepository.ModifyMoney(player.UserId, coinValue, true, true, false);
+                    PlayerDataRepository.ModifyMoney(player.UserId, coinValue, false, true, false);
                     droppedCoins.Remove(item.Serial);
                 }
                 item.Destroy();

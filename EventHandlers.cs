@@ -65,8 +65,9 @@ namespace FoundationFortune.API.HintSystem
 					UserId = ev.Player.UserId,
 					MoneyOnHold = 0,
 					MoneySaved = 0,
-					HintMinmode = false,
+					HintMinmode = true,
 					DisabledHintSystem = false,
+					IsAdmin = false,
 					HintSize = 25,
 					HintOpacity = 100,
 					HintAnim = HintAnim.None,
@@ -170,8 +171,8 @@ namespace FoundationFortune.API.HintSystem
 
 							if (soldItem == ev.Item)
 							{
-								VoiceChatSettings buyVoiceChatSettings = FoundationFortune.Singleton.Config.VoiceChatSettings.FirstOrDefault(settings => settings.VoiceChatUsageType == VoiceChatUsageType.Buying);
-								BuyingBot.PlayAudio(buyingbot, buyVoiceChatSettings.AudioFile, buyVoiceChatSettings.Volume, buyVoiceChatSettings.Loop, buyVoiceChatSettings.VoiceChat);
+								NPCVoiceChatSettings buyVoiceChatSettings = FoundationFortune.Singleton.Config.NPCVoiceChatSettings.FirstOrDefault(settings => settings.VoiceChatUsageType == NPCVoiceChatUsageType.Buying);
+								AudioPlayer.PlayAudio(buyingbot, buyVoiceChatSettings.AudioFile, buyVoiceChatSettings.Volume, buyVoiceChatSettings.Loop, buyVoiceChatSettings.VoiceChat);
 								string str = FoundationFortune.Singleton.Translation.SellSuccess
 									.Replace("%price%", price.ToString())
 									.Replace("%itemName%", FoundationFortune.Singleton.Config.SellableItems.Find(x => x.ItemType == ev.Item.Type).DisplayName);
@@ -191,8 +192,8 @@ namespace FoundationFortune.API.HintSystem
 			else
 			{
 				ev.IsAllowed = true;
-				VoiceChatSettings wrongBotSettings = FoundationFortune.Singleton.Config.VoiceChatSettings.FirstOrDefault(settings => settings.VoiceChatUsageType == VoiceChatUsageType.WrongBuyingBot);
-				BuyingBot.PlayAudio(buyingbot, wrongBotSettings.AudioFile, wrongBotSettings.Volume, wrongBotSettings.Loop, wrongBotSettings.VoiceChat);
+				NPCVoiceChatSettings wrongBotSettings = FoundationFortune.Singleton.Config.NPCVoiceChatSettings.FirstOrDefault(settings => settings.VoiceChatUsageType == NPCVoiceChatUsageType.WrongBuyingBot);
+				AudioPlayer.PlayAudio(buyingbot, wrongBotSettings.AudioFile, wrongBotSettings.Volume, wrongBotSettings.Loop, wrongBotSettings.VoiceChat);
 				EnqueueHint(ev.Player, FoundationFortune.Singleton.Translation.WrongBot, 3f);
 			}
 			ev.IsAllowed = true;

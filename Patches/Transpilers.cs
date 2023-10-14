@@ -9,6 +9,11 @@ using System.Reflection.Emit;
 using FoundationFortune.API.NPCs;
 using PlayerRoles.PlayableScps.Scp939;
 using Exiled.API.Enums;
+using PlayerRoles.Voice;
+using PlayerRoles;
+using System.Reflection;
+using VoiceChat.Networking;
+using VoiceChat;
 
 namespace FoundationFortune.Patches
 {
@@ -59,6 +64,37 @@ namespace FoundationFortune.Patches
                 new CodeInstruction(OpCodes.Callvirt, AccessTools.Method(typeof(BuyingBot), nameof(BuyingBot.IsSellingBot), new[] { typeof(ReferenceHub) })),
                 new CodeInstruction(OpCodes.Brfalse_S, skip),
                 new CodeInstruction(OpCodes.Ret)
+            });
+
+            foreach (CodeInstruction instruction in newInstructions)
+                yield return instruction;
+
+            ListPool<CodeInstruction>.Shared.Return(newInstructions);
+        }
+    }
+
+    [HarmonyPatch(typeof(VoiceTransceiver), nameof(VoiceTransceiver.ServerReceiveMessage))]
+    public static class HearSelfTranspiler
+    {
+        private static VoiceChatChannel No(VoiceChatChannel channel, ReferenceHub speaker, ReferenceHub listener)
+        {
+            if (listener == speaker && channel == VoiceChatChannel.Mimicry) return VoiceChatChannel.RoundSummary; else return channel;
+        }
+
+        private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+        {
+            List<CodeInstruction> newInstructions = ListPool<CodeInstruction>.Shared.Rent(instructions);
+            int index = newInstructions.FindIndex(instruction =>
+                instruction.opcode == OpCodes.Callvirt
+                && (MethodInfo)instruction.operand == AccessTools.Method(typeof(VoiceModuleBase), nameof(VoiceModuleBase.ValidateReceive)));
+            index += 1;
+
+            newInstructions.InsertRange(index, new[]
+            {
+                new CodeInstruction(OpCodes.Ldarg_1),
+                new CodeInstruction(OpCodes.Ldfld, AccessTools.Field(typeof(VoiceMessage), nameof(VoiceMessage.Speaker))),
+                new CodeInstruction(OpCodes.Ldloc_3),
+                new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(HearSelfTranspiler), nameof(No)))
             });
 
             foreach (CodeInstruction instruction in newInstructions)

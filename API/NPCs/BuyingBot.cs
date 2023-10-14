@@ -154,30 +154,6 @@ namespace FoundationFortune.API.NPCs
             return npc;
         }
 
-        public static void PlayAudio(Npc npc, string audioFile, byte volume, bool loop, VoiceChatChannel channel)
-        {
-            var path = Path.Combine(Path.Combine(Paths.Configs, "Foundation Fortune"), audioFile);
-            var audioPlayer = AudioPlayerBase.Get(npc.ReferenceHub);
-            audioPlayer.Enqueue(path, -1);
-            audioPlayer.LogDebug = false;
-            audioPlayer.BroadcastChannel = channel;
-            audioPlayer.Volume = volume;
-            audioPlayer.Loop = loop;
-            audioPlayer.Continue = true;
-            audioPlayer.Play(0);
-        }
-
-        public static void StopAudio(Npc npc)
-        {
-            var audioPlayer = AudioPlayerBase.Get(npc.ReferenceHub);
-
-            if (audioPlayer.CurrentPlay != null)
-            {
-                audioPlayer.Stoptrack(true);
-                audioPlayer.OnDestroy();
-            }
-        }
-
         public static (ushort horizontal, ushort vertical) ToClientUShorts(Quaternion rotation)
         {
             if (rotation.eulerAngles.z != 0f) rotation = Quaternion.LookRotation(rotation * Vector3.forward, Vector3.up);

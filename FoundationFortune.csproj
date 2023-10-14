@@ -69,12 +69,16 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="API\AudioPlayer.cs" />
     <Compile Include="API\Items\PerkBottle.cs" />
+    <Compile Include="API\Items\ResurgenceBeacon.cs" />
     <Compile Include="API\Models\Classes.cs" />
     <Compile Include="API\Models\Enums.cs" />
     <Compile Include="API\Items\DeathCoin.cs" />
     <Compile Include="API\NPCs\BuyingBot.cs" />
     <Compile Include="API\Database\PlayerDataRepository.cs" />
+    <Compile Include="Commands\FortuneCommands\AdminCommands\AddAdmin.cs" />
+    <Compile Include="Commands\FortuneCommands\AdminCommands\RemoveAdmin.cs" />
     <Compile Include="Commands\FortuneCommands\BountyCommands\AddBounty.cs" />
     <Compile Include="Commands\FortuneCommands\BountyCommands\FlushAllBounties.cs" />
     <Compile Include="Commands\FortuneCommands\BountyCommands\RemoveBounty.cs" />
@@ -94,20 +98,20 @@
     <Compile Include="Commands\FortuneCommands\NpcCommands\NpcFlush.cs" />
     <Compile Include="Commands\FortuneCommands\NpcCommands\NpcList.cs" />
     <Compile Include="Commands\FortuneCommands\NpcCommands\NpcRemove.cs" />
-    <Compile Include="API\Buying System\Perks.cs" />
+    <Compile Include="API\Perks\PerkSystem.cs" />
     <Compile Include="Commands\Buying System\BuyCommand.cs" />
     <Compile Include="Configs\PluginConfigs.cs" />
-    <Compile Include="API\Hint System\HintSystem.cs" />
-    <Compile Include="API\Hint System\Events\ServerExtractionSystem.cs" />
+    <Compile Include="API\Hints\HintSystem.cs" />
+    <Compile Include="API\Hints\Events\ServerExtractionSystem.cs" />
     <Compile Include="Patches\Transpilers.cs" />
-    <Compile Include="API\Hint System\HintSystemMethods.cs" />
+    <Compile Include="API\Hints\HintSystemMethods.cs" />
     <Compile Include="EventHandlers.cs" />
     <Compile Include="MainClass.cs" />
     <Compile Include="Configs\PluginTranslations.cs" />
     <Compile Include="Patches\Postfixes.cs" />
     <Compile Include="Patches\Prefixes.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="API\Hint System\Events\ServerBountySystem.cs" />
+    <Compile Include="API\Hints\Events\ServerBountySystem.cs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="EXILED">

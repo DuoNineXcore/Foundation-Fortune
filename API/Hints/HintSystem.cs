@@ -18,7 +18,6 @@ namespace FoundationFortune.API.HintSystem
 		private Dictionary<string, bool> confirmSell = new();
 		private Dictionary<string, float> dropTimestamp = new();
 		private Dictionary<string, (Item item, int price)> itemsBeingSold = new();
-		private PerkBottle perk;
 
         private IEnumerator<float> UpdateMoneyAndHints()
         {
@@ -43,20 +42,37 @@ namespace FoundationFortune.API.HintSystem
 
                     if (!PlayerDataRepository.GetHintMinmode(ply.UserId))
                     {
-                        string moneySavedString = FoundationFortune.Singleton.Translation.MoneyCounterSaved
-                            .Replace("%rolecolor%", ply.Role.Color.ToHex())
-                            .Replace("%moneySaved%", moneySaved.ToString());
-                        string moneyHoldString = FoundationFortune.Singleton.Translation.MoneyCounterOnHold
-                            .Replace("%rolecolor%", ply.Role.Color.ToHex())
-                            .Replace("%moneyOnHold%", moneyOnHold.ToString());
+                        string moneySavedString;
+                        string moneyHoldString;
 
+                        if (PlayerDataRepository.GetPluginAdmin(ply.UserId))
+                        {
+                            moneySavedString = FoundationFortune.Singleton.Translation.MoneyCounterSaved
+                                .Replace("%rolecolor%", ply.Role.Color.ToHex())
+                                .Replace("%moneySaved%", "inf");
+
+                            moneyHoldString = FoundationFortune.Singleton.Translation.MoneyCounterOnHold
+                                .Replace("%rolecolor%", ply.Role.Color.ToHex())
+                                .Replace("%moneyOnHold%", "inf");
+                        }
+                        else
+                        {
+                            moneySavedString = FoundationFortune.Singleton.Translation.MoneyCounterSaved
+                                .Replace("%rolecolor%", ply.Role.Color.ToHex())
+                                .Replace("%moneySaved%", moneySaved.ToString());
+
+                            moneyHoldString = FoundationFortune.Singleton.Translation.MoneyCounterOnHold
+                                .Replace("%rolecolor%", ply.Role.Color.ToHex())
+                                .Replace("%moneyOnHold%", moneyOnHold.ToString());
+                        }
                         hintMessageBuilder.Append($"{moneySavedString}{moneyHoldString}");
                     }
 
-                    HandleExtractionSystemMessages(ply, ref hintMessageBuilder);
-                    HandleWorkstationMessages(ply, ref hintMessageBuilder);
-                    HandleBuyingBotMessages(ply, ref hintMessageBuilder);
-                    HandleBountySystemMessages(ply, ref hintMessageBuilder);
+                    UpdateExtractionMessages(ply, ref hintMessageBuilder);
+                    UpdateBuyingBotMessages(ply, ref hintMessageBuilder);
+                    UpdateWorkstationMessages(ply, ref hintMessageBuilder);
+                    UpdateBountyMessages(ply, ref hintMessageBuilder);
+					PerkBottle.GetHeldBottle(ply, ref hintMessageBuilder);
 
                     string recentHintsText = GetRecentHints(ply.UserId);
                     if (!string.IsNullOrEmpty(recentHintsText)) hintMessageBuilder.Append(recentHintsText);

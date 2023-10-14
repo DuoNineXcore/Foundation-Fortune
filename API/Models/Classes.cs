@@ -88,12 +88,21 @@ namespace FoundationFortune.API.Models.Classes
     }
 
 
-    public class VoiceChatSettings
+    public class NPCVoiceChatSettings
     {
         public VoiceChatChannel VoiceChat { get; set; }
         public byte Volume { get; set; }
         public string AudioFile { get; set; }
-        public VoiceChatUsageType VoiceChatUsageType { get; set; }
+        public NPCVoiceChatUsageType VoiceChatUsageType { get; set; }
+        public bool Loop { get; set; }
+    }
+
+    public class PlayerVoiceChatSettings
+    {
+        public VoiceChatChannel VoiceChat { get; set; }
+        public byte Volume { get; set; }
+        public string AudioFile { get; set; }
+        public PlayerVoiceChatUsageType VoiceChatUsageType { get; set; }
         public bool Loop { get; set; }
     }
 
@@ -127,6 +136,7 @@ namespace FoundationFortune.API.Models.Classes
         public int HintSize { get; set; }
         public bool HintMinmode { get; set; }
         public bool DisabledHintSystem { get; set; }
+        public bool IsAdmin { get; set; }
         public HintAlign HintAlign { get; set; }
         public HintAnim HintAnim { get; set; }
     }

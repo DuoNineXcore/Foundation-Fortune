@@ -75,7 +75,7 @@ namespace FoundationFortune.API.HintSystem
             else isExtractionPointActive = false;
         }
 
-        private void HandleExtractionSystemMessages(Player ply, ref StringBuilder hintMessage)
+        private void UpdateExtractionMessages(Player ply, ref StringBuilder hintMessage)
         {
             if (isExtractionPointActive)
             {

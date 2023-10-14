@@ -18,7 +18,6 @@ namespace FoundationFortune.Commands.BuyCommand
 		public string Command { get; } = "buy";
 		public string[] Aliases { get; } = new string[] { "b" };
 		public string Description { get; } = "Buy items, wow.";
-		private Perks perks = new();
 
 		public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
 		{
@@ -38,7 +37,7 @@ namespace FoundationFortune.Commands.BuyCommand
 
 			Log.Debug($"Input argument: {arguments.At(0)}");
 
-			if (Enum.TryParse(arguments.At(0), ignoreCase: true, out PerkType perkType) && perkType == PerkType.Revival || FoundationFortune.Singleton.Config.PerkItems.Any(p => p.PerkType == PerkType.Revival && arguments.At(0).ToLower() == p.Alias.ToLower()))
+			if (Enum.TryParse(arguments.At(0), ignoreCase: true, out PerkType perkType) && perkType == PerkType.ResurgenceBeacon || FoundationFortune.Singleton.Config.PerkItems.Any(p => p.PerkType == PerkType.ResurgenceBeacon && arguments.At(0).ToLower() == p.Alias.ToLower()))
 			{
 				if (arguments.Count < 2)
 				{
@@ -61,15 +60,15 @@ namespace FoundationFortune.Commands.BuyCommand
 		private bool TryPurchaseRevivalPerk(Player player, string targetName, out string response)
 		{
 			int revivalPerkPrice = FoundationFortune.Singleton.Config.PerkItems
-				.Where(perk => perk.PerkType == PerkType.Revival)
+				.Where(perk => perk.PerkType == PerkType.ResurgenceBeacon)
 				.Select(perk => perk.Price)
 				.FirstOrDefault();
 
 			if (CanPurchase(player, revivalPerkPrice))
 			{
-				if (perks.GrantRevivalPerk(player, targetName))
+				if (ResurgenceBeacon.SpawnResurgenceBeacon(player, targetName))
 				{
-					response = $"You have successfully bought Revival Perk for ${revivalPerkPrice} to revive '{targetName}'.";
+					response = $"You have successfully bought a Resurgence Beacon for ${revivalPerkPrice} to revive '{targetName}'.";
 					return true;
 				}
 				else
@@ -78,8 +77,7 @@ namespace FoundationFortune.Commands.BuyCommand
 					return false;
 				}
 			}
-
-			response = $"You don't have enough money to purchase the Revival Perk to revive '{targetName}'.";
+			response = $"You don't have enough money to purchase the Resurgence Beacon to revive '{targetName}'.";
 			return false;
 		}
 
@@ -91,17 +89,13 @@ namespace FoundationFortune.Commands.BuyCommand
 
 			if (perkItem != null && CanPurchase(player, perkItem.Price) && !ExceedsPerkLimit(player, perkItem))
 			{
-				string BoughtHint = FoundationFortune.Singleton.Translation.BuyItemSuccess
-					.Replace("%perkItem%", perkItem.Alias)
-					.Replace("%perkPrice%", perkItem.Price.ToString());
-
-				Log.Info("Perk");
-				//PerkBottle perkBottle = new();
-				//perkBottle.GivePerkBottle(player, perkItem.PerkType);
-				PerkBottle.GivePerkBottle(player, perkItem.PerkType);
-				FoundationFortune.Singleton.serverEvents.EnqueueHint(player, $"{BoughtHint}", 3f);
+                string BoughtHint = FoundationFortune.Singleton.Translation.BuyItemSuccess
+						.Replace("%itemAlias%", perkItem.Alias)
+						.Replace("%itemPrice%", perkItem.Price.ToString());
+                FoundationFortune.Singleton.serverEvents.EnqueueHint(player, $"{BoughtHint}", 3f);
                 PlayerDataRepository.ModifyMoney(player.UserId, perkItem.Price, true, false, true);
-				ServerEvents.AddToPlayerLimits(player, perkItem);
+                PerkBottle.GivePerkBottle(player, perkItem.PerkType);
+                ServerEvents.AddToPlayerLimits(player, perkItem);
 
 				response = $"You have successfully bought {perkItem.DisplayName} for ${perkItem.Price}";
 				return true;
@@ -112,7 +106,7 @@ namespace FoundationFortune.Commands.BuyCommand
                 return true;
             }
 
-			response = "That is not a purchasable perk, you don't have enough money";
+			response = "That is not a purchasable perk, you don't\t\t\tnew PlayerVoiceChatSettings { VoiceChatUsageType = PlayerVoiceChatUsageType.EtherealIntervention, VoiceChat = VoiceChatChannel.Mimicry, Loop = false, AudioFile = \"BuySuccess.ogg\", Volume = 50},\r\n have enough money";
 			return false;
 		}
 
@@ -125,8 +119,8 @@ namespace FoundationFortune.Commands.BuyCommand
             if (buyItem != null && CanPurchase(player, buyItem.Price) && !ExceedsItemLimit(player, buyItem))
             {
                 string BoughtHint = FoundationFortune.Singleton.Translation.BuyItemSuccess
-                    .Replace("%perkItem%", buyItem.Alias)
-                    .Replace("%perkPrice%", buyItem.Price.ToString());
+                    .Replace("%itemAlias%", buyItem.Alias)
+                    .Replace("%itemPrice%", buyItem.Price.ToString());
                 FoundationFortune.Singleton.serverEvents.EnqueueHint(player, $"{BoughtHint}", 3f);
                 PlayerDataRepository.ModifyMoney(player.UserId, buyItem.Price, true, false, true);
                 player.AddItem(buyItem.ItemType);
@@ -146,10 +140,11 @@ namespace FoundationFortune.Commands.BuyCommand
 
         private bool CanPurchase(Player player, int price)
 		{
-			int money = PlayerDataRepository.GetMoneySaved(player.UserId);
-			if (money < price) return false;
-			return true;
-		}
+            if (PlayerDataRepository.GetPluginAdmin(player.UserId)) return true;
+            int money = PlayerDataRepository.GetMoneySaved(player.UserId);
+            if (money < price) return false;
+            return true;
+        }
 
 		private string GetList()
 		{
@@ -167,6 +162,7 @@ namespace FoundationFortune.Commands.BuyCommand
 
         private bool ExceedsPerkLimit(Player player, PerkItem perkItem)
         {
+			if (PlayerDataRepository.GetPluginAdmin(player.UserId)) return false;
             var playerLimit = FoundationFortune.PlayerLimits.FirstOrDefault(p => p.Player.UserId == player.UserId);
             if (playerLimit != null)
             {
@@ -178,6 +174,7 @@ namespace FoundationFortune.Commands.BuyCommand
 
         private bool ExceedsItemLimit(Player player, BuyableItem buyItem)
         {
+            if (PlayerDataRepository.GetPluginAdmin(player.UserId)) return false;
             var playerLimit = FoundationFortune.PlayerLimits.FirstOrDefault(p => p.Player.UserId == player.UserId);
             if (playerLimit != null)
             {

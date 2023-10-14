@@ -10,13 +10,26 @@
         Center, Right, Left, None
     }
 
-    public enum VoiceChatUsageType
+    public enum NPCVoiceChatUsageType
     { 
-        Selling, Buying, Revival, NotEnoughMoney, WrongBuyingBot, BuyingBotInRange, SellingBotInRange
+        Selling, Buying, NotEnoughMoney, WrongBuyingBot, BuyingBotInRange, SellingBotInRange
+    }
+
+    public enum PlayerVoiceChatUsageType
+    {
+        Hunted, Hunter, BlissfulUnawareness, ResurgenceBeacon, EtherealIntervention,
     }
 
     public enum PerkType
     {
-        ExtraHP, AHPBoost, Invisibility, Regeneration, MovementBoost, Revival, Ultrasensitive
+        OvershieldedProtection,
+        BoostedResilience,
+        ConcealedPresence,
+        EthericVitality,
+        Hyperactivity,
+        BlissfulUnawareness,
+        ExtrasensoryPerception,
+        ResurgenceBeacon,
+        EtherealIntervention
     }
 }

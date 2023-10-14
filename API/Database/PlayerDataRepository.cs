@@ -16,6 +16,7 @@ namespace FoundationFortune.API.Database
         //player settings
         public static bool GetHintMinmode(string userId) => PlayersCollection.FindOne(p => p.UserId == userId)?.HintMinmode ?? false;
         public static bool GetHintDisable(string userId) => PlayersCollection.FindOne(p => p.UserId == userId)?.DisabledHintSystem ?? false;
+        public static bool GetPluginAdmin(string userId) => PlayersCollection.FindOne(p => p.UserId == userId)?.IsAdmin ?? false;
         public static int GetHintAlpha(string userId) => PlayersCollection.FindOne(p => p.UserId == userId)?.HintOpacity ?? 50;
         public static int GetHintSize(string userId) => PlayersCollection.FindOne(p => p.UserId == userId)?.HintSize ?? 25;
         public static HintAnim GetHintAnim(string userId) => PlayersCollection.FindOne(p => p.UserId == userId)?.HintAnim ?? HintAnim.None;
@@ -79,6 +80,17 @@ namespace FoundationFortune.API.Database
             if (player != null)
             {
                 player.DisabledHintSystem = enable;
+                return PlayersCollection.Update(player);
+            }
+            return false;
+        }
+
+        public static bool TogglePluginAdmin(string userId, bool enable)
+        {
+            var player = GetPlayerById(userId);
+            if (player != null)
+            {
+                player.IsAdmin = enable;
                 return PlayersCollection.Update(player);
             }
             return false;

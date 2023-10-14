@@ -126,7 +126,7 @@ namespace FoundationFortune.API.HintSystem
 			}
 		}
 
-        private void HandleWorkstationMessages(Player ply, ref StringBuilder hintMessage)
+        private void UpdateWorkstationMessages(Player ply, ref StringBuilder hintMessage)
         {
             if (IsPlayerOnSellingWorkstation(ply))
             {
@@ -145,7 +145,7 @@ namespace FoundationFortune.API.HintSystem
             }
         }
 
-        private void HandleBuyingBotMessages(Player ply, ref StringBuilder hintMessage)
+        private void UpdateBuyingBotMessages(Player ply, ref StringBuilder hintMessage)
         {
             Npc npc = GetBuyingBotNearPlayer(ply);
 
