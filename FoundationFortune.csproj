@@ -2,7 +2,7 @@
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
-    <LangVersion>9.0</LangVersion>
+    <LangVersion>10.0</LangVersion>
   </PropertyGroup>
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -75,8 +75,11 @@
     <Compile Include="API\Models\Classes.cs" />
     <Compile Include="API\Models\Enums.cs" />
     <Compile Include="API\Items\DeathCoin.cs" />
-    <Compile Include="API\NPCs\BuyingBot.cs" />
+    <Compile Include="API\NPCs\NPCHelperMethods.cs" />
     <Compile Include="API\Database\PlayerDataRepository.cs" />
+    <Compile Include="API\NPCs\BuyingBot.cs" />
+    <Compile Include="API\NPCs\MusicBot.cs" />
+    <Compile Include="API\NPCs\SellingBot.cs" />
     <Compile Include="Commands\FortuneCommands\AdminCommands\AddAdmin.cs" />
     <Compile Include="Commands\FortuneCommands\AdminCommands\RemoveAdmin.cs" />
     <Compile Include="Commands\FortuneCommands\BountyCommands\AddBounty.cs" />
@@ -103,6 +106,7 @@
     <Compile Include="Configs\PluginConfigs.cs" />
     <Compile Include="API\Hints\HintSystem.cs" />
     <Compile Include="API\Hints\Events\ServerExtractionSystem.cs" />
+    <Compile Include="API\NPCs\NPCInitialization.cs" />
     <Compile Include="Patches\Transpilers.cs" />
     <Compile Include="API\Hints\HintSystemMethods.cs" />
     <Compile Include="EventHandlers.cs" />

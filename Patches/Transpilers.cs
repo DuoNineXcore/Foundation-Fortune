@@ -7,14 +7,13 @@ using PlayerRoles.PlayableScps.Scp939.Ripples;
 using System.Collections.Generic;
 using System.Reflection.Emit;
 using FoundationFortune.API.NPCs;
-using PlayerRoles.PlayableScps.Scp939;
-using Exiled.API.Enums;
+using PlayerRoles.PlayableScps.Scp939.Mimicry;
 using PlayerRoles.Voice;
 using PlayerRoles;
 using System.Reflection;
 using VoiceChat.Networking;
 using VoiceChat;
-using PlayerRoles.PlayableScps.Scp939.Mimicry;
+using Exiled.API.Features;
 
 namespace FoundationFortune.Patches
 {
@@ -32,12 +31,12 @@ namespace FoundationFortune.Patches
 
             newInstructions.InsertRange(0, new List<CodeInstruction>()
                {
-               new CodeInstruction(OpCodes.Ldarg_1),
-               new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(BuyingBot), nameof(BuyingBot.IsSellingBot), new[] { typeof(ReferenceHub) })),
-               new CodeInstruction(OpCodes.Brtrue_S, skip),
-               new CodeInstruction(OpCodes.Ldarg_0),
-               new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(BuyingBot), nameof(BuyingBot.IsSellingBot), new[] { typeof(Scp096TargetsTracker) })),
-               new CodeInstruction(OpCodes.Brtrue_S, skip),
+                new CodeInstruction(OpCodes.Ldarg_1),
+                new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(NPCHelperMethods), nameof(NPCHelperMethods.IsFoundationFortuneNPC), new[] { typeof(ReferenceHub) })),
+                new CodeInstruction(OpCodes.Brtrue_S, skip),
+                new CodeInstruction(OpCodes.Ldarg_0),
+                new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(NPCHelperMethods), nameof(NPCHelperMethods.IsFoundationFortuneNPC), new[] { typeof(Scp096TargetsTracker) })),
+                new CodeInstruction(OpCodes.Brtrue_S, skip),
                });
 
             foreach (CodeInstruction instruction in newInstructions)
@@ -62,7 +61,7 @@ namespace FoundationFortune.Patches
             {
                 new CodeInstruction(OpCodes.Ldarg_1),
                 new CodeInstruction(OpCodes.Callvirt, AccessTools.PropertyGetter(typeof(CharacterModel), nameof(CharacterModel.OwnerHub))),
-                new CodeInstruction(OpCodes.Callvirt, AccessTools.Method(typeof(BuyingBot), nameof(BuyingBot.IsSellingBot), new[] { typeof(ReferenceHub) })),
+                new CodeInstruction(OpCodes.Callvirt, AccessTools.Method(typeof(NPCHelperMethods), nameof(NPCHelperMethods.IsFoundationFortuneNPC), new[] { typeof(ReferenceHub) })),
                 new CodeInstruction(OpCodes.Brfalse_S, skip),
                 new CodeInstruction(OpCodes.Ret)
             });
@@ -73,39 +72,6 @@ namespace FoundationFortune.Patches
             ListPool<CodeInstruction>.Shared.Return(newInstructions);
         }
     }
-
-    /*
-    [HarmonyPatch(typeof(MimicryRecordingIcon), nameof(VoiceTransceiver.ServerReceiveMessage))]
-    public static class HearSelfTranspiler
-    {
-        private static VoiceChatChannel No(VoiceChatChannel channel, ReferenceHub speaker, ReferenceHub listener)
-        {
-            if (speaker == listener && speaker.IsHuman() && channel == VoiceChatChannel.Mimicry) return VoiceChatChannel.RoundSummary; else return channel;
-        }
-
-        private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
-        {
-            List<CodeInstruction> newInstructions = ListPool<CodeInstruction>.Shared.Rent(instructions);
-            int index = newInstructions.FindIndex(instruction =>
-                instruction.opcode == OpCodes.Callvirt
-                && (MethodInfo)instruction.operand == AccessTools.Method(typeof(VoiceModuleBase), nameof(VoiceModuleBase.ValidateReceive)));
-            index += 1;
-
-            newInstructions.InsertRange(index, new[]
-            {
-                new CodeInstruction(OpCodes.Ldarg_1),
-                new CodeInstruction(OpCodes.Ldfld, AccessTools.Field(typeof(VoiceMessage), nameof(VoiceMessage.Speaker))),
-                new CodeInstruction(OpCodes.Ldloc_3),
-                new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(HearSelfTranspiler), nameof(No)))
-            });
-
-            foreach (CodeInstruction instruction in newInstructions)
-                yield return instruction;
-
-            ListPool<CodeInstruction>.Shared.Return(newInstructions);
-        }
-    }
-    */
 
     [HarmonyPatch(typeof(Scp173ObserversTracker), nameof(Scp173ObserversTracker.UpdateObservers))]
     internal static class UpdateObservers
@@ -123,10 +89,10 @@ namespace FoundationFortune.Patches
             newInstructions.InsertRange(index, new List<CodeInstruction>()
             {
                 new CodeInstruction(OpCodes.Ldloc_3),
-                new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(BuyingBot), nameof(BuyingBot.IsSellingBot), new[] { typeof(ReferenceHub) })),
+                new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(NPCHelperMethods), nameof(NPCHelperMethods.IsFoundationFortuneNPC), new[] { typeof(ReferenceHub) })),
                 new CodeInstruction(OpCodes.Brtrue_S, skip),
                 new CodeInstruction(OpCodes.Ldarg_0),
-                new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(BuyingBot), nameof(BuyingBot.IsSellingBot), new[] { typeof(Scp173ObserversTracker) })),
+                new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(NPCHelperMethods), nameof(NPCHelperMethods.IsFoundationFortuneNPC), new[] { typeof(Scp173ObserversTracker) })),
                 new CodeInstruction(OpCodes.Brtrue_S, skip),
             });
 

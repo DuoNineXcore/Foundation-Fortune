@@ -2,11 +2,12 @@
 using SCPSLAudioApi.AudioCore;
 using System.IO;
 using VoiceChat;
+using VoiceChat.Networking;
 
 namespace FoundationFortune.API
 {
     /// <summary>
-    /// This class is just for playing audios from both NPCs and Players. see BuyingBot.cs for actual code related to the bots.
+    /// This class is just for playing audios from both NPCs and Players.
     /// </summary>
     public static class AudioPlayer
     {

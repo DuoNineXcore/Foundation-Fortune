@@ -23,14 +23,15 @@ namespace FoundationFortune
 		private Harmony _harmony;
 
 		public static FoundationFortune Singleton;
-		#nullable enable
-		public Dictionary<string, (Npc? bot, int indexation)> BuyingBotIndexation { get; private set; } = new Dictionary<string, (Npc? bot, int indexation)>();
-		#nullable disable
 		public static List<ObjectInteractions> PlayerLimits = new();
         public ServerEvents serverEvents = new();
 		public LiteDatabase db;
 
-		public override void OnEnabled()
+		public Dictionary<string, (Npc bot, int indexation)> BuyingBots { get; private set; } = new();
+		public Dictionary<string, (Npc bot, int indexation)> SellingBots { get; private set; } = new();
+        public Dictionary<string, (Npc bot, int indexation)> MusicBots { get; private set; } = new();
+
+        public override void OnEnabled()
 		{
 			Singleton = this;
 			CreateDatabase();

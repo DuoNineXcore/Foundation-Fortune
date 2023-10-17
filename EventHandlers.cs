@@ -20,6 +20,7 @@ using InventorySystem;
 using Exiled.API.Enums;
 using PluginAPI.Roles;
 using Exiled.API.Features.Roles;
+using Exiled.API.Features.Doors;
 
 namespace FoundationFortune.API.HintSystem
 {
@@ -32,7 +33,6 @@ namespace FoundationFortune.API.HintSystem
             moneyHintCoroutine = Timing.RunCoroutine(UpdateMoneyAndHints());
 
 			FoundationFortune.PlayerLimits.Clear();
-			FoundationFortune.Singleton.BuyingBotIndexation.Clear();
 			buyingBotPositions.Clear();
 
 			if (FoundationFortune.Singleton.Config.MoneyExtractionSystem)
@@ -42,8 +42,9 @@ namespace FoundationFortune.API.HintSystem
                 Log.Info($"Round Started. The first extraction will commence at T-{nextExtractionTime} Seconds.");
             }
 
+            ClearNPCIndexations();
             InitializeWorkstationPositions();
-			InitializeBuyingBots();
+			InitializeFoundationFortuneNPCs();
 		}
 
         public void RoundEnding(EndingRoundEventArgs ev)
@@ -98,7 +99,7 @@ namespace FoundationFortune.API.HintSystem
                 foreach (Item item in ev.Player.Items) items.Add(item);
                 foreach (var kvp in ev.Player.Ammo) ammos.Add(kvp.Key.GetAmmoType(), kvp.Value);
 
-                Timing.CallDelayed(0.15f, delegate
+                Timing.CallDelayed(0.5f, delegate
                 {
                     ev.Player.Role.Set(role, RoleSpawnFlags.None);
                     ev.Player.Teleport(room);
@@ -187,13 +188,13 @@ namespace FoundationFortune.API.HintSystem
 		public void SellingItem(DroppingItemEventArgs ev)
 		{
 			var translation = FoundationFortune.Singleton.Translation;
-			if (!IsPlayerOnSellingWorkstation(ev.Player) && !IsPlayerOnBuyingBotRadius(ev.Player))
+			if (!IsPlayerOnSellingWorkstation(ev.Player) && !IsPlayerNearSellingBot(ev.Player))
 			{
 				ev.IsAllowed = true;
 				return;
 			}
 
-			Npc buyingbot = GetBuyingBotNearPlayer(ev.Player);
+			Npc buyingbot = GetNearestSellingBot(ev.Player);
 
 			if (IsPlayerNearSellingBot(ev.Player))
 			{
@@ -224,7 +225,7 @@ namespace FoundationFortune.API.HintSystem
 
 							if (soldItem == ev.Item)
 							{
-								NPCVoiceChatSettings buyVoiceChatSettings = FoundationFortune.Singleton.Config.NPCVoiceChatSettings.FirstOrDefault(settings => settings.VoiceChatUsageType == NPCVoiceChatUsageType.Buying);
+								NPCVoiceChatSettings buyVoiceChatSettings = FoundationFortune.Singleton.Config.FFNPCVoiceChatSettings.FirstOrDefault(settings => settings.VoiceChatUsageType == NPCVoiceChatUsageType.Buying);
 								AudioPlayer.PlayAudio(buyingbot, buyVoiceChatSettings.AudioFile, buyVoiceChatSettings.Volume, buyVoiceChatSettings.Loop, buyVoiceChatSettings.VoiceChat);
 								string str = FoundationFortune.Singleton.Translation.SellSuccess
 									.Replace("%price%", price.ToString())
@@ -245,7 +246,7 @@ namespace FoundationFortune.API.HintSystem
 			else
 			{
 				ev.IsAllowed = true;
-				NPCVoiceChatSettings wrongBotSettings = FoundationFortune.Singleton.Config.NPCVoiceChatSettings.FirstOrDefault(settings => settings.VoiceChatUsageType == NPCVoiceChatUsageType.WrongBuyingBot);
+				NPCVoiceChatSettings wrongBotSettings = FoundationFortune.Singleton.Config.FFNPCVoiceChatSettings.FirstOrDefault(settings => settings.VoiceChatUsageType == NPCVoiceChatUsageType.WrongBuyingBot);
 				AudioPlayer.PlayAudio(buyingbot, wrongBotSettings.AudioFile, wrongBotSettings.Volume, wrongBotSettings.Loop, wrongBotSettings.VoiceChat);
 				EnqueueHint(ev.Player, FoundationFortune.Singleton.Translation.WrongBot, 3f);
 			}

@@ -69,7 +69,7 @@ namespace FoundationFortune.API.HintSystem
                     }
 
                     UpdateExtractionMessages(ply, ref hintMessageBuilder);
-                    UpdateBuyingBotMessages(ply, ref hintMessageBuilder);
+                    UpdateNPCProximityMessages(ply, ref hintMessageBuilder);
                     UpdateWorkstationMessages(ply, ref hintMessageBuilder);
                     UpdateBountyMessages(ply, ref hintMessageBuilder);
 					PerkBottle.GetHeldBottle(ply, ref hintMessageBuilder);

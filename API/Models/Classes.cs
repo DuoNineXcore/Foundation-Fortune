@@ -31,12 +31,6 @@ namespace FoundationFortune.API.Models.Classes
         public float StartTime { get; set; }
     }
 
-    public class BuyingBotComponent : MonoBehaviour
-    {
-        internal Npc BuyingBotNPC;
-        internal Player ply;
-    }
-
     public class Bounty
     {
         public Player Player { get; }
@@ -66,12 +60,33 @@ namespace FoundationFortune.API.Models.Classes
         }
     }
 
-    public class NPCSpawn
+    public class BuyingBotSpawn
     {
         public string Name { get; set; }
         public string Badge { get; set; }
         public string BadgeColor { get; set; }
-        public bool IsSellingBot { get; set; }
+        public RoleTypeId Role { get; set; }
+        public ItemType HeldItem { get; set; }
+        public Vector3 Scale { get; set; }
+        public RoomType Room { get; set; }
+    }
+
+    public class SellingBotSpawn
+    {
+        public string Name { get; set; }
+        public string Badge { get; set; }
+        public string BadgeColor { get; set; }
+        public RoleTypeId Role { get; set; }
+        public ItemType HeldItem { get; set; }
+        public Vector3 Scale { get; set; }
+        public RoomType Room { get; set; }
+    }
+    
+    public class MusicBotSpawn
+    {
+        public string Name { get; set; }
+        public string Badge { get; set; }
+        public string BadgeColor { get; set; }
         public RoleTypeId Role { get; set; }
         public ItemType HeldItem { get; set; }
         public Vector3 Scale { get; set; }

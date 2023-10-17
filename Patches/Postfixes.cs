@@ -3,6 +3,8 @@ using Exiled.API.Features;
 using PlayerRoles;
 using System.Linq;
 using PlayerRoles.PlayableScps.Scp939.Ripples;
+using PlayerRoles.Voice;
+using VoiceChat;
 
 namespace FoundationFortune.Patches
 {

@@ -18,6 +18,7 @@ namespace FoundationFortune.Commands.FortuneCommands.DatabaseCommands
         public bool Execute(ArraySegment<string> args, ICommandSender sender, out string response)
         {
             var pluginTranslations = FoundationFortune.Singleton.Translation;
+
             if (!sender.CheckPermission("ff.database.flush"))
             {
                 response = "You do not have permission to use this command.";

@@ -3,9 +3,21 @@ using Exiled.API.Features;
 using PlayerRoles.PlayableScps.Scp079;
 using InventorySystem.Items.Usables;
 using FoundationFortune.API.Items;
-using FoundationFortune.API.Models.Interfaces;
 using PlayerRoles.PlayableScps.Scp939.Ripples;
 using UnityEngine;
+using PlayerRoles.Voice;
+using PlayerRoles;
+using System.Collections.Generic;
+using System.Reflection.Emit;
+using VoiceChat.Networking;
+using VoiceChat;
+using System.Text.RegularExpressions;
+using PlayerRoles.PlayableScps.Subroutines;
+using PlayerRoles.PlayableScps.Scp939;
+using MapGeneration.Distributors;
+using PlayerRoles.Spectating;
+using static HarmonyLib.MethodInvoker;
+using static PlayerList;
 
 namespace FoundationFortune.Patches
 {
@@ -19,7 +31,7 @@ namespace FoundationFortune.Patches
 		}
 	}
 
-	[HarmonyPatch(typeof(Scp079ScannerTracker), nameof(Scp079ScannerTracker.AddTarget))]
+    [HarmonyPatch(typeof(Scp079ScannerTracker), nameof(Scp079ScannerTracker.AddTarget))]
 	internal static class Scp079TargetAddPatch
 	{
 		private static bool Prefix(Scp079ScannerTracker __instance, ReferenceHub hub)
@@ -43,7 +55,7 @@ namespace FoundationFortune.Patches
 		}
 	}
 
-	[HarmonyPatch(typeof(NineTailedFoxAnnouncer), nameof(NineTailedFoxAnnouncer.AnnounceScpTermination))]
+    [HarmonyPatch(typeof(NineTailedFoxAnnouncer), nameof(NineTailedFoxAnnouncer.AnnounceScpTermination))]
 	internal static class TerminationPatch
 	{
 		[HarmonyPrefix]

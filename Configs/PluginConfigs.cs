@@ -63,37 +63,59 @@ namespace FoundationFortune.Configs
 		public bool UseSellingWorkstation { get; set; } = false;
 		public float SellingWorkstationRadius { get; set; } = 3f;
 
-		[Description("Buying/Selling Bot Settings.")]
-		public bool UseBuyingBot { get; set; } = true;
+		[Description("Foundation Fortune NPC Settings.")]
+		public bool FoundationFortuneNPCs { get; set; } = true;
+
+		public bool BuyingBots { get; set; } = true;
+		public bool SellingBots { get; set; } = true;
+		public bool MusicBots { get; set; } = true;
+
 		public float BuyingBotRadius { get; set; } = 3f;
 		public bool BuyingBotFixedLocation { get; set; } = true;
-
-		public List<NPCSpawn> BuyingBotSpawnSettings { get; set; } = new List<NPCSpawn>
+		public List<BuyingBotSpawn> BuyingBotSpawnSettings { get; set; } = new List<BuyingBotSpawn>
 		{
-			new NPCSpawn { Name = "Buying Bot 1", Badge = "Foundation Fortune", BadgeColor = "pumpkin", IsSellingBot = false, Role = RoleTypeId.ClassD, HeldItem = ItemType.KeycardChaosInsurgency, Scale = new Vector3(1, 1, 1), Room = RoomType.HczNuke },
-			new NPCSpawn { Name = "Buying Bot 2", Badge = "Foundation Fortune", BadgeColor = "pumpkin", IsSellingBot = false, Role = RoleTypeId.ClassD, HeldItem = ItemType.KeycardChaosInsurgency, Scale = new Vector3(1, 1, 1), Room = RoomType.Hcz079 },
-			new NPCSpawn { Name = "Selling Bot 3",Badge = "Foundation Fortune", BadgeColor = "yellow", IsSellingBot = true, Role = RoleTypeId.Scientist, HeldItem = ItemType.KeycardChaosInsurgency, Scale = new Vector3(1, 1, 1), Room = RoomType.Hcz096 },
-			new NPCSpawn { Name = "Selling Bot 4",Badge = "Foundation Fortune", BadgeColor = "yellow", IsSellingBot = true, Role = RoleTypeId.Scientist, HeldItem = ItemType.KeycardChaosInsurgency, Scale = new Vector3(1, 1, 1), Room = RoomType.Hcz939 },
-			new NPCSpawn { Name = "Buying Bot 5", Badge = "Foundation Fortune", BadgeColor = "pumpkin", IsSellingBot = false, Role = RoleTypeId.ClassD, HeldItem = ItemType.KeycardChaosInsurgency, Scale = new Vector3(1, 1, 1), Room = RoomType.HczArmory }
+			new BuyingBotSpawn { Name = "Buying Bot 1", Badge = "Foundation Fortune", BadgeColor = "pumpkin", Role = RoleTypeId.ClassD, HeldItem = ItemType.KeycardChaosInsurgency, Scale = new Vector3(1, 1, 1), Room = RoomType.HczNuke },
+			new BuyingBotSpawn { Name = "Buying Bot 2", Badge = "Foundation Fortune", BadgeColor = "pumpkin", Role = RoleTypeId.ClassD, HeldItem = ItemType.KeycardChaosInsurgency, Scale = new Vector3(1, 1, 1), Room = RoomType.Hcz079 },
+			new BuyingBotSpawn { Name = "Buying Bot 3", Badge = "Foundation Fortune", BadgeColor = "pumpkin", Role = RoleTypeId.ClassD, HeldItem = ItemType.KeycardChaosInsurgency, Scale = new Vector3(1, 1, 1), Room = RoomType.HczArmory }
 		};
 
-		public List<RoomType> BuyingBotRandomRooms { get; set; } = new List<RoomType>()
-		{
-			RoomType.EzCafeteria,
-			RoomType.EzCollapsedTunnel,
-			RoomType.HczStraight,
-			RoomType.HczNuke,
-			RoomType.HczTesla,
-			RoomType.LczClassDSpawn,
-			RoomType.EzCheckpointHallway,
-			RoomType.HczServers,
-		};
+        public List<RoomType> BuyingBotRandomRooms { get; set; } = new List<RoomType>()
+        {
+            RoomType.EzCafeteria,
+            RoomType.EzCollapsedTunnel,
+            RoomType.HczStraight,
+            RoomType.HczNuke,
+            RoomType.HczTesla,
+            RoomType.LczClassDSpawn,
+            RoomType.EzCheckpointHallway,
+            RoomType.HczServers,
+        };
 
-		[Description("The time you have to sell an item after asking for confirmation.")]
+        public float SellingBotRadius { get; set; } = 3f;
+        public bool SellingBotFixedLocation { get; set; } = true;
+        public List<SellingBotSpawn> SellingBotSpawnSettings { get; set; } = new List<SellingBotSpawn>
+        {
+            new SellingBotSpawn { Name = "Selling Bot 1",Badge = "Foundation Fortune", BadgeColor = "yellow", Role = RoleTypeId.Scientist, HeldItem = ItemType.KeycardChaosInsurgency, Scale = new Vector3(1, 1, 1), Room = RoomType.Hcz096 },
+            new SellingBotSpawn { Name = "Selling Bot 2",Badge = "Foundation Fortune", BadgeColor = "yellow", Role = RoleTypeId.Scientist, HeldItem = ItemType.KeycardChaosInsurgency, Scale = new Vector3(1, 1, 1), Room = RoomType.Hcz939 },
+        };
+
+        public List<RoomType> SellingBotRandomRooms { get; set; } = new List<RoomType>()
+        {
+            RoomType.EzCafeteria,
+            RoomType.EzCollapsedTunnel,
+            RoomType.HczStraight,
+            RoomType.HczNuke,
+            RoomType.HczTesla,
+            RoomType.LczClassDSpawn,
+            RoomType.EzCheckpointHallway,
+            RoomType.HczServers,
+        };
+
+        [Description("The time you have to sell an item after asking for confirmation.")]
 		public float SellingConfirmationTime { get; set; } = 5f;
 
 		[Description("NPC-Related Event Sound Effects.")]
-		public List<NPCVoiceChatSettings> NPCVoiceChatSettings { get; set; } = new List<NPCVoiceChatSettings>()
+		public List<NPCVoiceChatSettings> FFNPCVoiceChatSettings { get; set; } = new List<NPCVoiceChatSettings>()
 		{
 			new NPCVoiceChatSettings { VoiceChatUsageType = NPCVoiceChatUsageType.Selling, VoiceChat = VoiceChatChannel.Mimicry, Loop = false, AudioFile = "BuySuccess.ogg", Volume = 50},
 			new NPCVoiceChatSettings { VoiceChatUsageType = NPCVoiceChatUsageType.Buying, VoiceChat = VoiceChatChannel.Mimicry, Loop = false, AudioFile = "BuySuccess.ogg", Volume = 50},
@@ -107,13 +129,11 @@ namespace FoundationFortune.Configs
 		public List<PlayerVoiceChatSettings> PlayerVoiceChatSettings { get; set; } = new List<PlayerVoiceChatSettings>()
 		{
 			new PlayerVoiceChatSettings { VoiceChatUsageType = PlayerVoiceChatUsageType.EtherealIntervention, VoiceChat = VoiceChatChannel.Mimicry, Loop = false, AudioFile = "BuySuccess.ogg", Volume = 50},
-		  new PlayerVoiceChatSettings { VoiceChatUsageType = PlayerVoiceChatUsageType.BlissfulUnawareness, VoiceChat = VoiceChatChannel.Mimicry, Loop = false, AudioFile = "urgoingtodie.ogg", Volume = 50},
-		  new PlayerVoiceChatSettings { VoiceChatUsageType = PlayerVoiceChatUsageType.ResurgenceBeacon, VoiceChat = VoiceChatChannel.Mimicry, Loop = false, AudioFile = "BuySuccess.ogg", Volume = 50},
+			new PlayerVoiceChatSettings { VoiceChatUsageType = PlayerVoiceChatUsageType.BlissfulUnawareness, VoiceChat = VoiceChatChannel.Mimicry, Loop = false, AudioFile = "urgoingtodie.ogg", Volume = 50},
 			new PlayerVoiceChatSettings { VoiceChatUsageType = PlayerVoiceChatUsageType.ResurgenceBeacon, VoiceChat = VoiceChatChannel.Mimicry, Loop = false, AudioFile = "BuySuccess.ogg", Volume = 50},
 			new PlayerVoiceChatSettings { VoiceChatUsageType = PlayerVoiceChatUsageType.Hunted, VoiceChat = VoiceChatChannel.Mimicry, Loop = false, AudioFile = "BuySuccess.ogg", Volume = 50},
 			new PlayerVoiceChatSettings { VoiceChatUsageType = PlayerVoiceChatUsageType.Hunter, VoiceChat = VoiceChatChannel.Mimicry, Loop = false, AudioFile = "BuySuccess.ogg", Volume = 50},
 		};
-
 
 		[Description("List of items that can be sold.")]
 		public List<SellableItem> SellableItems { get; set; } = new List<SellableItem>
@@ -131,19 +151,18 @@ namespace FoundationFortune.Configs
 
 		[Description("List of perks that can be bought.")]
 		public List<PerkItem> PerkItems { get; set; } = new List<PerkItem>
-	   {
-			new PerkItem { Limit = 1, Alias = "OSP", PerkType = PerkType.OvershieldedProtection, Price = 2500, DisplayName = "Overshielded Protection", Description = ""},
-			new PerkItem { Limit = 1, Alias = "BRS", PerkType = PerkType.BoostedResilience, Price = 1800, DisplayName = "Boosted Resilience", Description = ""},
-			new PerkItem { Limit = 1, Alias = "CPR", PerkType = PerkType.ConcealedPresence, Price = 2000, DisplayName = "Concealed Presence", Description = ""},
-			new PerkItem { Limit = 1, Alias = "EVT", PerkType = PerkType.EthericVitality, Price = 2800, DisplayName = "Etheric Vitality", Description = ""},
-			new PerkItem { Limit = 1, Alias = "HAC", PerkType = PerkType.Hyperactivity, Price = 3200, DisplayName = "Hyperactivity", Description = ""},
-			new PerkItem { Limit = 1, Alias = "BUA", PerkType = PerkType.BlissfulUnawareness, Price = 3500, DisplayName = "Blissful Unawareness", Description = ""},
-			new PerkItem { Limit = 1, Alias = "ESP", PerkType = PerkType.ExtrasensoryPerception, Price = 4000, DisplayName = "Extrasensory Perception", Description = ""},
-			new PerkItem { Limit = 1, Alias = "RBC", PerkType = PerkType.ResurgenceBeacon, Price = 3000, DisplayName = "Resurgence Beacon", Description = ""},
-			new PerkItem { Limit = 1, Alias = "EIN", PerkType = PerkType.EtherealIntervention, Price = 4200, DisplayName = "Ethereal Intervention", Description = ""},
+	    {
+			new PerkItem { Limit = 1, Alias = "extrahp", PerkType = PerkType.BoostedResilience, Price = 1800, DisplayName = "Boosted Resilience", Description = ""},
+			new PerkItem { Limit = 1, Alias = "invis", PerkType = PerkType.ConcealedPresence, Price = 2000, DisplayName = "Concealed Presence", Description = ""},
+            new PerkItem { Limit = 1, Alias = "ahp", PerkType = PerkType.OvershieldedProtection, Price = 2500, DisplayName = "Overshielded Protection", Description = ""},
+            new PerkItem { Limit = 1, Alias = "regen", PerkType = PerkType.EthericVitality, Price = 2800, DisplayName = "Etheric Vitality", Description = ""},
+			new PerkItem { Limit = 1, Alias = "revive", PerkType = PerkType.ResurgenceBeacon, Price = 3000, DisplayName = "Resurgence Beacon", Description = ""},
+            new PerkItem { Limit = 1, Alias = "speed", PerkType = PerkType.Hyperactivity, Price = 3200, DisplayName = "Hyperactivity", Description = ""},
+            new PerkItem { Limit = 1, Alias = "bliss", PerkType = PerkType.BlissfulUnawareness, Price = 3500, DisplayName = "Blissful Unawareness", Description = ""},
+            new PerkItem { Limit = 1, Alias = "selfres", PerkType = PerkType.EtherealIntervention, Price = 4200, DisplayName = "Ethereal Intervention", Description = ""},
 		};
 
-		[Description("A list of rooms that you cannot be teleported to")]
+		[Description("A list of rooms that you cannot be teleported to at your revival")]
 		public List<RoomType> ForbiddenRooms { get; set; } = new()
 		{
 			RoomType.EzCollapsedTunnel,

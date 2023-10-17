@@ -9,6 +9,8 @@ using System.Linq;
 using System;
 using MEC;
 using System.Collections.Generic;
+using PlayerRoles.PlayableScps.Scp939.Ripples;
+using Exiled.API.Features.Roles;
 
 namespace FoundationFortune.API.Perks
 {
@@ -54,11 +56,12 @@ namespace FoundationFortune.API.Perks
 
 		public static IEnumerator<float> BlissfulUnawarenessCoroutine(Player ply)
 		{
-			ply.EnableEffect<MovementBoost>(120);
+			/*ply.EnableEffect<MovementBoost>(120);
 			ply.ChangeEffectIntensity<MovementBoost>(25);
 			Log.Debug("Blissful Unawareness 1st coroutine started.");
 
 			yield return Timing.WaitForSeconds(80f);
+			*/
 
 			Log.Debug("Blissful Unawareness 1st coroutine finished.");
 			Log.Debug("Blissful Unawareness 2nd coroutine started.");
@@ -66,7 +69,7 @@ namespace FoundationFortune.API.Perks
 			    .FirstOrDefault(settings => settings.VoiceChatUsageType == PlayerVoiceChatUsageType.BlissfulUnawareness);
 			AudioPlayer.PlayAudio(ply, BlissfulAwarenessSettings.AudioFile, BlissfulAwarenessSettings.Volume, BlissfulAwarenessSettings.Loop, BlissfulAwarenessSettings.VoiceChat);
 
-			yield return Timing.WaitForSeconds(41f);
+            yield return Timing.WaitForSeconds(40f);
 
 			Log.Debug("Blissful Unawareness 2nd coroutine finished.");
 			Map.Explode(ply.Position, Exiled.API.Enums.ProjectileType.Scp2176, ply);

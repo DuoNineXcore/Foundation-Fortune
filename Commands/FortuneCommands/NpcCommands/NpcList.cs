@@ -1,4 +1,5 @@
 ﻿using CommandSystem;
+using Exiled.API.Features;
 using Exiled.Permissions.Extensions;
 using System;
 using System.Collections.Generic;
@@ -14,7 +15,7 @@ namespace FoundationFortune.Commands.FortuneCommands.NpcCommands
     {
         public string Command { get; } = "ff_npclist";
         public string Description { get; } = "List all NPCs in the game.";
-        public string[] Aliases { get; } = new string[] {};
+        public string[] Aliases { get; } = new string[] { };
 
         public bool Execute(ArraySegment<string> args, ICommandSender sender, out string response)
         {
@@ -30,26 +31,22 @@ namespace FoundationFortune.Commands.FortuneCommands.NpcCommands
                 return false;
             }
 
-            if (FoundationFortune.Singleton.BuyingBotIndexation == null)
-            {
-                response = "FoundationFortune.Singleton.BuyingBotIndexation is null.";
-                return false;
-            }
-
-            var buyingBots = FoundationFortune.Singleton.BuyingBotIndexation.Values.ToList();
-
-            if (buyingBots.Any())
-            {
-                response = "\tList of BuyingBots in the server:\n";
-
-                foreach (var botInfo in buyingBots) response += $"Indexation Number: {botInfo.indexation}, Name: {(botInfo.bot != null ? botInfo.bot.Nickname : "Null Nickname  ")}\n";
-            }
-            else
-            {
-                response = "No BuyingBots found in the server.";
-            }
-
+            StringBuilder sb = new();
+            sb.AppendLine("Foundation Fortune NPCs:");
+            AppendBotList(sb, "Buying Bots", FoundationFortune.Singleton.BuyingBots);
+            AppendBotList(sb, "Selling Bots", FoundationFortune.Singleton.SellingBots);
+            AppendBotList(sb, "Music Bots", FoundationFortune.Singleton.MusicBots);
+            response = sb.ToString();
             return true;
+        }
+
+        private void AppendBotList(StringBuilder sb, string title, Dictionary<string, (Npc? bot, int indexation)> botIndexation)
+        {
+            sb.AppendLine(title + ":");
+            foreach (var botInfo in botIndexation)
+            {
+                sb.AppendLine($"Name: {botInfo.Value.bot?.Nickname ?? "Null Nickname"}, Indexation: {botInfo.Value.indexation}");
+            }
         }
     }
 }
