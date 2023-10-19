@@ -155,7 +155,7 @@ namespace FoundationFortune.API.HintSystem
 				{
 					var killHint = FoundationFortune.Singleton.Translation.BountyKill
 						.Replace("%victim%", ev.Player.Nickname)
-						.Replace("%bountyPrice%", bountiedPlayer?.Value.ToString());
+						.Replace("%bountyPrice%", bountiedPlayer.Value.ToString());
 
 					EnqueueHint(ev.Attacker, killHint, config.MaxHintAge);
 					PlayerDataRepository.ModifyMoney(ev.Attacker.UserId, bountiedPlayer.Value);
