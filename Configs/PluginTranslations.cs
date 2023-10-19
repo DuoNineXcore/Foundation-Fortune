@@ -46,7 +46,7 @@ namespace FoundationFortune.Configs
 
 		[Description("Item and Perk list return messages.")] //todo
 		public string ItemsList { get; set; } = "%buyableItemDisplayName% (%buyableItemAlias%): %buyableItemPrice%";
-		public string PerksList { get; set; } = "%perkItemDisplayName% (%perkItemAlias%): %perkItemPrice%";
+		public string PerksList { get; set; } = "%perkItemDisplayName% (%perkItemAlias%) - %perkItemDescription%: %perkItemPrice%";
 
 		[Description("Revival System Hints")]
 		public string RevivalNoDeadPlayer { get; set; } = "<b>No dead player with Name: '%targetName%' found nearby to revive.</b>\\n";
