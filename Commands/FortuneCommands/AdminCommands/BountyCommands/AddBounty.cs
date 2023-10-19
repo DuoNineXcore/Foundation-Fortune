@@ -31,20 +31,20 @@ namespace FoundationFortune.Commands.FortuneCommands.BountyCommands
                 return false;
             }
 
-            string playerName = args.At(1);
+            string playerName = args.At(0);
             if (!Player.TryGet(playerName, out Player player))
             {
                 response = $"Player '{playerName}' not found.";
                 return false;
             }
 
-            if (!int.TryParse(args.At(2), out int bountyAmount) || bountyAmount <= 0)
+            if (!int.TryParse(args.At(1), out int bountyAmount) || bountyAmount <= 0)
             {
                 response = "Invalid bounty amount.";
                 return false;
             }
 
-            if (!int.TryParse(args.At(3), out int durationInSeconds) || durationInSeconds <= 0)
+            if (!int.TryParse(args.At(2), out int durationInSeconds) || durationInSeconds <= 0)
             {
                 response = "Invalid duration value in seconds.";
                 return false;
