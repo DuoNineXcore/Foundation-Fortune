@@ -30,6 +30,71 @@ namespace FoundationFortune.API.NPCs
             allowedMusicBotNameColors = allowedColors;
         }
 
+        public static Npc SpawnMusicBot(Player target)
+        {
+            int indexation = GetNextMusicBotIndexation(target.UserId);
+            Npc spawnedMusicBot = SpawnFix(target.Nickname, RoleTypeId.Spectator, indexation);
+            FoundationFortune.Singleton.MusicBots[target.UserId] = (spawnedMusicBot, indexation);
+
+            Log.Debug($"Generated Music Bot for player {target.Nickname} / Bot: {spawnedMusicBot.Nickname ?? "Null"}, Index {indexation}");
+            spawnedMusicBot.IsGodModeEnabled = true;
+
+            Round.IgnoredPlayers.Add(spawnedMusicBot.ReferenceHub);
+            return spawnedMusicBot;
+        }
+
+        public static Npc GetMusicBotByUserId(string userId)
+        {
+            if (FoundationFortune.Singleton.MusicBots.TryGetValue(userId, out var botData))
+            {
+                if (botData.bot != null)
+                {
+                    return botData.bot;
+                }
+                else
+                {
+                    Log.Debug("Bot object in botData is null.");
+                }
+            }
+            else
+            {
+                Log.Debug("BotData not found in MusicBots dictionary for user ID: " + userId);
+            }
+            return null;
+        }
+
+
+        public static Npc SpawnFix(string name, RoleTypeId role, int id = 0)
+        {
+            GameObject gameObject = UnityEngine.Object.Instantiate(NetworkManager.singleton.playerPrefab);
+            Npc npc = new(gameObject)
+            {
+                IsNPC = true
+            };
+            try
+            {
+                npc.ReferenceHub.roleManager.InitializeNewRole(RoleTypeId.None, RoleChangeReason.None, RoleSpawnFlags.None);
+            }
+            catch (Exception ex) { }
+
+            if (RecyclablePlayerId.FreeIds.Contains(id)) RecyclablePlayerId.FreeIds.RemoveFromQueue(id);
+            else if (RecyclablePlayerId._autoIncrement >= id) id = ++RecyclablePlayerId._autoIncrement;
+
+            NetworkServer.AddPlayerForConnection(new FakeConnection(id), gameObject);
+            try
+            {
+                npc.ReferenceHub.characterClassManager.InstanceMode = ClientInstanceMode.DedicatedServer;
+            }
+            catch (Exception ex) { }
+
+            npc.ReferenceHub.nicknameSync.Network_myNickSync = $"MusicBot-{name}";
+            Timing.CallDelayed(0.25f, delegate
+            {
+                npc.Role.Set(role, SpawnReason.ForceClass);
+            });
+            return npc;
+        }
+
         public static int GetNextMusicBotIndexation(string target)
         {
             if (FoundationFortune.Singleton.MusicBots.TryGetValue(target, out var botData))
@@ -44,14 +109,12 @@ namespace FoundationFortune.API.NPCs
 
             int nextAvailableIndex = 0;
             while (FoundationFortune.Singleton.MusicBots.Values.Any(data => data.indexation == nextAvailableIndex)) nextAvailableIndex++;
-            FoundationFortune.Singleton.MusicBots[target] = (null, nextAvailableIndex);
             return nextAvailableIndex;
         }
 
         public static bool RemoveMusicBot(string target)
         {
-            string botKey = $"MusicBot-{target}";
-            if (FoundationFortune.Singleton.MusicBots.TryGetValue(botKey, out var botData))
+            if (FoundationFortune.Singleton.MusicBots.TryGetValue(target, out var botData))
             {
                 var (bot, _) = botData;
                 if (bot != null)
@@ -61,7 +124,7 @@ namespace FoundationFortune.API.NPCs
                         CustomNetworkManager.TypedSingleton.OnServerDisconnect(bot.NetworkIdentity.connectionToClient);
                     });
                 }
-                FoundationFortune.Singleton.MusicBots.Remove(botKey);
+                FoundationFortune.Singleton.MusicBots.Remove(target);
                 return true;
             }
             return false;

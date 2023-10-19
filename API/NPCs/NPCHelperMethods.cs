@@ -58,7 +58,7 @@ namespace FoundationFortune.API.NPCs
             catch (Exception ex) { }
 
             npc.ReferenceHub.nicknameSync.Network_myNickSync = name;
-            Timing.CallDelayed(0.1f, delegate
+            Timing.CallDelayed(0.25f, delegate
             {
                 npc.Role.Set(role, SpawnReason.ForceClass, position.HasValue ? RoleSpawnFlags.AssignInventory : RoleSpawnFlags.All);
             });

@@ -20,7 +20,9 @@ namespace FoundationFortune.API.Perks
 	public static class PerkSystem
 	{
 		public static List<Player> EtherealInterventionPlayers = new();
-		public static void GrantPerk(Player ply, PerkType perk)
+        public static void ClearConsumedPerks(Player player) { if (FoundationFortune.Singleton.ConsumedPerks.ContainsKey(player)) FoundationFortune.Singleton.ConsumedPerks[player].Clear(); }
+
+        public static void GrantPerk(Player ply, PerkType perk)
 		{
 			switch (perk)
 			{
@@ -62,20 +64,17 @@ namespace FoundationFortune.API.Perks
             else consumedPerks[player][perkType] = 1;
         }
 
-        public static void ClearConsumedPerks(Player player)
-        {
-            if (FoundationFortune.Singleton.ConsumedPerks.ContainsKey(player)) FoundationFortune.Singleton.ConsumedPerks[player].Clear();
-        }
-
         public static IEnumerator<float> BlissfulUnawarenessCoroutine(Player ply)
 		{
-			ply.EnableEffect<MovementBoost>(120);
-			ply.ChangeEffectIntensity<MovementBoost>(25);
-			Log.Debug("Blissful Unawareness 1st coroutine started.");
+			/*Log.Debug("Blissful Unawareness 1st coroutine started.");
 
-			yield return Timing.WaitForSeconds(80f);
+            yield return Timing.WaitForSeconds(80f);*/
+            ply.EnableEffect<Blinded>(3);
+            ply.EnableEffect<MovementBoost>(120);
+            ply.EnableEffect<Invigorated>(120);
+            ply.ChangeEffectIntensity<MovementBoost>(25);
 
-			Scp330Bag.AddSimpleRegeneration(ply.ReferenceHub, 5f, 50f);
+            Scp330Bag.AddSimpleRegeneration(ply.ReferenceHub, 5f, 50f);
             Log.Debug("Blissful Unawareness 1st coroutine finished.");
 			Log.Debug("Blissful Unawareness 2nd coroutine started.");
 			PlayerVoiceChatSettings BlissfulAwarenessSettings = FoundationFortune.Singleton.Config.PlayerVoiceChatSettings
