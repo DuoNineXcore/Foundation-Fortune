@@ -8,7 +8,6 @@ using FoundationFortune.API.Models.Enums;
 using FoundationFortune.API.Models.Classes;
 using FoundationFortune.API.HintSystem;
 using FoundationFortune.API.Items;
-using Exiled.API.Features.Core.Generic;
 
 namespace FoundationFortune.Commands.BuyCommand
 {
@@ -147,29 +146,29 @@ namespace FoundationFortune.Commands.BuyCommand
 			return true;
 		}
 
-        public string GetList()
-        {
-            var translation = FoundationFortune.Singleton.Translation;
-            var config = FoundationFortune.Singleton.Config;
+		public string GetList()
+		{
+			var translation = FoundationFortune.Singleton.Translation;
+			var config = FoundationFortune.Singleton.Config;
 
-            string itemsList = string.Join("\n", config.BuyableItems
-                .Select(buyableItem => translation.ItemsList
-                    .Replace("%buyableItemType%", buyableItem.ItemType.ToString())
-                    .Replace("%buyableItemDisplayName%", buyableItem.DisplayName)
-                    .Replace("%buyableItemAlias%", buyableItem.Alias)
-                    .Replace("%buyableItemPrice%", buyableItem.Price.ToString())));
+			string itemsList = string.Join("\n", config.BuyableItems
+			    .Select(buyableItem => translation.ItemsList
+				   .Replace("%buyableItemType%", buyableItem.ItemType.ToString())
+				   .Replace("%buyableItemDisplayName%", buyableItem.DisplayName)
+				   .Replace("%buyableItemAlias%", buyableItem.Alias)
+				   .Replace("%buyableItemPrice%", buyableItem.Price.ToString())));
 
-            string perksList = string.Join("\n", config.PerkItems
-                .Select(perkItem => translation.PerksList
-                    .Replace("%perkItemDisplayName%", perkItem.DisplayName)
-                    .Replace("%perkItemAlias%", perkItem.Alias)
-                    .Replace("%perkItemPrice%", perkItem.Price.ToString())
-                    .Replace("%perkItemDescription%", perkItem.Description)));
+			string perksList = string.Join("\n", config.PerkItems
+			    .Select(perkItem => translation.PerksList
+				   .Replace("%perkItemDisplayName%", perkItem.DisplayName)
+				   .Replace("%perkItemAlias%", perkItem.Alias)
+				   .Replace("%perkItemPrice%", perkItem.Price.ToString())
+				   .Replace("%perkItemDescription%", perkItem.Description)));
 
-            return itemsList + perksList;
-        }
+			return $"{itemsList}\n{perksList}";
+		}
 
-        private bool ExceedsPerkLimit(Player player, PerkItem perkItem)
+		private bool ExceedsPerkLimit(Player player, PerkItem perkItem)
 		{
 			if (PlayerDataRepository.GetPluginAdmin(player.UserId)) return false;
 			var playerLimit = FoundationFortune.PlayerPurchaseLimits.FirstOrDefault(p => p.Player.UserId == player.UserId);
