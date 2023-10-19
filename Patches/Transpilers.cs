@@ -14,6 +14,7 @@ using System.Reflection;
 using VoiceChat.Networking;
 using VoiceChat;
 using Exiled.API.Features;
+using Mirror;
 
 namespace FoundationFortune.Patches
 {

@@ -1,5 +1,7 @@
 ﻿using CommandSystem;
+using Exiled.API.Features;
 using Exiled.Permissions.Extensions;
+using FoundationFortune.API.Database;
 using System;
 
 namespace FoundationFortune.Commands.FortuneCommands.BountyCommands
@@ -14,7 +16,9 @@ namespace FoundationFortune.Commands.FortuneCommands.BountyCommands
 
         public bool Execute(ArraySegment<string> args, ICommandSender sender, out string response)
         {
-            if (!sender.CheckPermission("ff.bountysystem.flush"))
+            Player p = Player.Get(sender);
+
+            if (!sender.CheckPermission("ff.bountysystem.flush") || !PlayerDataRepository.GetPluginAdmin(p.UserId))
             {
                 response = "You do not have permission to use this section.";
                 return false;

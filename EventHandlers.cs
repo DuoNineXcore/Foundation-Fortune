@@ -27,13 +27,19 @@ namespace FoundationFortune.API.HintSystem
 	public partial class ServerEvents
 	{
 		private CoroutineHandle moneyHintCoroutine;
+        private readonly Dictionary<(LeadingTeam, Team?), (PlayerTeamConditions, string)> teamConditionsMap = new()
+        {
+			{(LeadingTeam.FacilityForces, Team.FoundationForces), (PlayerTeamConditions.Winning, "#0080FF")},
+			{(LeadingTeam.FacilityForces, Team.Scientists), (PlayerTeamConditions.Winning, "#0080FF")},
+			{(LeadingTeam.ChaosInsurgency, Team.ChaosInsurgency), (PlayerTeamConditions.Winning, "#00FF00")},
+			{(LeadingTeam.ChaosInsurgency, Team.ClassD), (PlayerTeamConditions.Winning, "#FF00FF")},
+			{(LeadingTeam.Anomalies, Team.SCPs), (PlayerTeamConditions.Winning, "#FF0000")},
+			{(LeadingTeam.Draw, null), (PlayerTeamConditions.Draw, "#808080")}
+        };
 
-		public void RoundStart()
+        public void RoundStart()
 		{
             moneyHintCoroutine = Timing.RunCoroutine(UpdateMoneyAndHints());
-
-			FoundationFortune.PlayerLimits.Clear();
-			buyingBotPositions.Clear();
 
 			if (FoundationFortune.Singleton.Config.MoneyExtractionSystem)
 			{
@@ -42,12 +48,12 @@ namespace FoundationFortune.API.HintSystem
                 Log.Info($"Round Started. The first extraction will commence at T-{nextExtractionTime} Seconds.");
             }
 
-            ClearNPCIndexations();
+            ClearIndexations();
             InitializeWorkstationPositions();
 			InitializeFoundationFortuneNPCs();
 		}
 
-        public void RoundEnding(EndingRoundEventArgs ev)
+        public void RoundEnding(EndingRoundEventArgs ev) //what is this
         {
             IEnumerable<Player> players = Player.List.Where(p => !p.IsNPC);
             IEnumerable<Player> alivePlayers = players.Where(p => p.IsAlive);
@@ -74,7 +80,7 @@ namespace FoundationFortune.API.HintSystem
 					MoneyOnHold = 0,
 					MoneySaved = 0,
 					HintMinmode = true,
-					DisabledHintSystem = false,
+					DisabledHintSystem = true,
 					IsAdmin = false,
 					HintSize = 25,
 					HintOpacity = 100,
@@ -87,9 +93,12 @@ namespace FoundationFortune.API.HintSystem
 
 		public void EtherealInterventionHandler(DyingEventArgs ev)
 		{
+            if (FoundationFortune.Singleton.ConsumedPerks.ContainsKey(ev.Player)) FoundationFortune.Singleton.ConsumedPerks[ev.Player].Clear();
+
             if (!PerkSystem.EtherealInterventionPlayers.Contains(ev.Player)) return;
 			else
 			{
+				ev.IsAllowed = false;
                 RoleTypeId role = ev.Player.Role.Type;
                 Room room = Room.List.Where(r => r.Zone == ev.Player.Zone & !FoundationFortune.Singleton.Config.ForbiddenRooms.Contains(r.Type)).GetRandomValue();
                 List<Item> items = new();
@@ -99,19 +108,10 @@ namespace FoundationFortune.API.HintSystem
                 foreach (Item item in ev.Player.Items) items.Add(item);
                 foreach (var kvp in ev.Player.Ammo) ammos.Add(kvp.Key.GetAmmoType(), kvp.Value);
 
-                Timing.CallDelayed(0.5f, delegate
+                Timing.CallDelayed(0.1f, delegate
                 {
                     ev.Player.Role.Set(role, RoleSpawnFlags.None);
                     ev.Player.Teleport(room);
-
-                    foreach (Item item in items)
-                    {
-                        ev.Player.AddItem(item.Type);
-                    }
-                    foreach (var kvp in ammos)
-                    {
-                        ev.Player.AddAmmo(kvp.Key, kvp.Value);
-                    }
                 });
             }
 		}
@@ -121,11 +121,11 @@ namespace FoundationFortune.API.HintSystem
             if (!PerkSystem.EtherealInterventionPlayers.Contains(ev.Player)) return;
 			else
 			{
-                Timing.CallDelayed(0.15f, delegate
+                Timing.CallDelayed(0.2f, delegate
                 {
                     PlayerVoiceChatSettings EtherealInterventionAudio = FoundationFortune.Singleton.Config.PlayerVoiceChatSettings
 								.FirstOrDefault(settings => settings.VoiceChatUsageType == PlayerVoiceChatUsageType.EtherealIntervention);
-                    AudioPlayer.PlayAudio(ev.Player, EtherealInterventionAudio.AudioFile, EtherealInterventionAudio.Volume, EtherealInterventionAudio.Loop, EtherealInterventionAudio.VoiceChat);
+                    AudioPlayer.PlaySpecialAudio(ev.Player, EtherealInterventionAudio.AudioFile, EtherealInterventionAudio.Volume, EtherealInterventionAudio.Loop, EtherealInterventionAudio.VoiceChat);
                 });
                 PerkSystem.EtherealInterventionPlayers.Remove(ev.Player);
             }
@@ -136,7 +136,9 @@ namespace FoundationFortune.API.HintSystem
 			var config = FoundationFortune.Singleton.Config;
 			var bountiedPlayer = BountiedPlayers.FirstOrDefault(bounty => bounty.Player == ev.Player && bounty.IsBountied);
 
-			if (bountiedPlayer != null && ev.Attacker != null)
+			PerkSystem.ClearConsumedPerks(ev.Player);
+
+            if (bountiedPlayer != null && ev.Attacker != null)
 			{
 				foreach (Player ply in Player.List.Where(p => p != ev.Attacker && !p.IsDead))
 				{
@@ -168,7 +170,7 @@ namespace FoundationFortune.API.HintSystem
 				StopBounty(ev.Player);
 			}
 
-			if (ev.Attacker != null && ev.Attacker != ev.Player)
+			if (ev.Attacker != null && ev.Attacker != ev.Player && config.KillEvent)
 			{
 				var killHint = FoundationFortune.Singleton.Translation.Kill.Replace("%victim%", ev.Player.Nickname);
 				EnqueueHint(ev.Attacker, killHint, config.MaxHintAge);
@@ -181,8 +183,11 @@ namespace FoundationFortune.API.HintSystem
 		{
 			if (!ev.IsAllowed) return;
 			var config = FoundationFortune.Singleton.Config;
-			EnqueueHint(ev.Player, $"{FoundationFortune.Singleton.Translation.Escape}", config.MaxHintAge, HintAnim.Right);
-			PlayerDataRepository.ModifyMoney(ev.Player.UserId, config.EscapeReward, false, false, true);
+			if (config.EscapeEvent)
+			{
+                EnqueueHint(ev.Player, $"{FoundationFortune.Singleton.Translation.Escape}", config.MaxHintAge, HintAnim.Right);
+                PlayerDataRepository.ModifyMoney(ev.Player.UserId, config.EscapeRewards, false, false, true);
+            }
 		}
 
 		public void SellingItem(DroppingItemEventArgs ev)
@@ -253,17 +258,53 @@ namespace FoundationFortune.API.HintSystem
 			ev.IsAllowed = true;
 		}
 
-        public string GetConfirmationTimeLeft(Player ply)
+        public void RoundEnded(RoundEndedEventArgs ev)
         {
-            if (dropTimestamp.ContainsKey(ply.UserId))
-            {
-                float timeLeft = FoundationFortune.Singleton.Config.SellingConfirmationTime - (Time.time - dropTimestamp[ply.UserId]);
-                if (timeLeft > 0)
+            var config = FoundationFortune.Singleton.Config;
+            if (config.RoundEndEvent)
+			{
+                LeadingTeam leadingTeam = ev.LeadingTeam;
+                int winningAmount = config.RoundEndRewards.TryGetValue(PlayerTeamConditions.Winning, out var winningValue) ? winningValue : 0;
+                int losingAmount = config.RoundEndRewards.TryGetValue(PlayerTeamConditions.Losing, out var losingValue) ? losingValue : 0;
+                int drawAmount = config.RoundEndRewards.TryGetValue(PlayerTeamConditions.Draw, out var drawValue) ? drawValue : 0;
+
+                foreach (Player ply in Player.List.Where(p => p.IsAlive && !p.IsNPC))
                 {
-                    return timeLeft.ToString("F0");
+                    Team playerTeam = ply.Role.Team;
+                    string teamColor = "#FFFFFF";
+                    PlayerTeamConditions teamCondition = PlayerTeamConditions.Losing;
+
+                    if (teamConditionsMap.TryGetValue((leadingTeam, playerTeam), out var conditionTuple) || (leadingTeam == LeadingTeam.Draw && conditionTuple.Item1 == PlayerTeamConditions.Draw))
+                    {
+                        teamCondition = conditionTuple.Item1;
+                        teamColor = conditionTuple.Item2;
+                    }
+
+                    int reward = config.RoundEndRewards.TryGetValue(teamCondition, out var value) ? value : 0;
+
+                    switch (teamCondition)
+                    {
+                        case PlayerTeamConditions.Winning:
+                            PlayerDataRepository.ModifyMoney(ply.UserId, winningAmount, false, false, true);
+                            EnqueueHint(ply, FoundationFortune.Singleton.Translation.RoundEndWin
+                                .Replace("%winningFactionColor%", teamColor)
+                                .Replace("%winningAmount%", winningAmount.ToString()), config.MaxHintAge);
+                            break;
+                        case PlayerTeamConditions.Losing:
+                            PlayerDataRepository.ModifyMoney(ply.UserId, losingAmount, false, false, true);
+                            EnqueueHint(ply, FoundationFortune.Singleton.Translation.RoundEndLoss
+                                .Replace("%losingFactionColor%", teamColor)
+                                .Replace("%losingAmount%", losingAmount.ToString()), config.MaxHintAge);
+                            break;
+                        case PlayerTeamConditions.Draw:
+                            PlayerDataRepository.ModifyMoney(ply.UserId, drawAmount, false, false, true);
+                            EnqueueHint(ply, FoundationFortune.Singleton.Translation.RoundEndDraw
+                                .Replace("%drawFactionColor%", teamColor) 
+                                .Replace("%drawAmount%", drawAmount.ToString()), config.MaxHintAge);
+                            break;
+                    }
                 }
             }
-            return "0";
         }
 
         public void SpawningNpc(SpawningEventArgs ev) {if (ev.Player.IsNPC) RoundSummary.singleton.Network_chaosTargetCount -= 1;}

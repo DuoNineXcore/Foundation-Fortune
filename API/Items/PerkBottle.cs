@@ -12,9 +12,13 @@ using FoundationFortune.Commands.BuyCommand;
 using System.Collections.Generic;
 using FoundationFortune.API.Perks;
 using System.Text;
+using FoundationFortune.API.Models.Classes;
 
 namespace FoundationFortune.API.Items
 {
+	/// <summary>
+	/// SODA!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	/// </summary>
 	[CustomItem(ItemType.AntiSCP207)]
 	public class PerkBottle : CustomItem
 	{
@@ -38,17 +42,17 @@ namespace FoundationFortune.API.Items
 		}
 
         private void UsedPerkBottle(UsedItemEventArgs ev)
-		{
-			if (DroppedPerkBottles.TryGetValue(ev.Item.Serial, out var perkBottleData))
-			{
-				PerkType perkType = perkBottleData.perkType;
-				PerkSystem.GrantPerk(ev.Player, perkType);
-				FoundationFortune.Singleton.serverEvents.EnqueueHint(ev.Player, $"<b>You drank a <color=red>{perkType}</color> Perk bottle.</b>", 2f);
-				DroppedPerkBottles.Remove(ev.Item.Serial);
-			}
-		}
+        {
+            if (DroppedPerkBottles.TryGetValue(ev.Item.Serial, out var perkBottleData))
+            {
+                PerkType perkType = perkBottleData.perkType;
+                PerkSystem.GrantPerk(ev.Player, perkType);
+                FoundationFortune.Singleton.serverEvents.EnqueueHint(ev.Player, $"<b>You drank a <color=#FFC0CB>{perkType}</color> Perk bottle.</b>", 2f);
+                DroppedPerkBottles.Remove(ev.Item.Serial);
+            }
+        }
 
-		public static void GivePerkBottle(Player player, PerkType perkType)
+        public static void GivePerkBottle(Player player, PerkType perkType)
 		{
 			if (TrySpawn(331, player.Position, out Pickup perkBottle))
 			{
@@ -57,17 +61,17 @@ namespace FoundationFortune.API.Items
 			}
 		}
 
-		protected override void OnAcquired(Player player, Item item, bool displayMessage)
-		{
-			base.OnAcquired(player, item, false);
-		}
+        protected override void OnChanging(ChangingItemEventArgs ev)
+        {
+            base.OnChanging(ev);
+        }
 
         public static void GetHeldBottle(Player player, ref StringBuilder stringbuilder)
 		{
 			if (player.CurrentItem == null) return;
 			if (DroppedPerkBottles.TryGetValue(player.CurrentItem.Serial, out var perkBottleData))
 			{
-				stringbuilder.AppendLine($"<b>You are holding a <color=red>{perkBottleData.perkType}</color> perk bottle.</b>");
+				stringbuilder.AppendLine($"<b>You are holding a <color=#FFC0CB>{perkBottleData.perkType}</color> perk bottle.</b>");
 			}
 		}
 	}

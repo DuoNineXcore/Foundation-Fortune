@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using VoiceChat;
 using System.ComponentModel;
+using FoundationFortune.API.Models.Enums;
 
 namespace FoundationFortune.Configs
 {
@@ -14,6 +15,9 @@ namespace FoundationFortune.Configs
 		public string Kill { get; set; } = "<b><color=green>+$300</color> %victim%'s Termination.</b>\\n";
 		public string Escape { get; set; } = "<b><color=green>+$300</color> Successfully Escaped.</b>\\n";
         public string Death { get; set; } = "<b><color=red>$-%moneyBeforeDeath%.</color> You died.</b>\\n";
+        public string RoundEndWin { get; set; } = "<b><color=%winningFactionColor%>+$%winningAmount%</color> Winning Bonus.</b>\\n";
+        public string RoundEndDraw { get; set; } = "<b><color=%drawFactionColor%>+$%drawAmount%</color> Draw Bonus.</b>\\n";
+        public string RoundEndLoss { get; set; } = "<b><color=%losingFactionColor%>+$%losingAmount%</color> Losing Bonus.</b>\\n";
 
         [Description("Bot Proximity Hints")]
 		public string SellingWorkstation { get; set; } = "<b>You're on a Selling Workstation.</b>\\n";
@@ -21,7 +25,7 @@ namespace FoundationFortune.Configs
 		public string SellingBot { get; set; } = "<b>You're around a Selling bot. Drop Items twice to sell them.</b>\\n";
 
 		[Description("Hint System Counters")]
-		public string MoneyCounterSaved { get; set; } = "<b>Money Saved: <color=%rolecolor%>$%moneySaved%</color></b>\\n";
+		public string MoneyCounterSaved { get; set; } = "\\n<b>Money Saved: <color=%rolecolor%>$%moneySaved%</color></b>\\n";
         public string MoneyCounterOnHold { get; set; } = "<b>Money On Hold: <color=%rolecolor%>$%moneyOnHold%</color></b>\\n";
 
         [Description("Hint System Events")]
@@ -31,7 +35,7 @@ namespace FoundationFortune.Configs
 		public string ItemConfirmation { get; set; } = "<b>This item is worth <color=green>%price%</color>, Confirm sale? (%time% seconds left)</b>\\n</align>";
 		public string BuyItemSuccess { get; set; } = "<b><color=red>-$%itemPrice%</color> Bought %itemAlias%.</b>\\n";
 
-		[Description("Extraction Event")]
+		[Description("Extraction Events")]
         public string ExtractionEvent = "<b>A <color=green>Money</color> Extraction Zone has opened up. Room: %room% Time Left: %time%</b>\\n";
 		public string ExtractionTimer = "<b>You're in the extraction zone, extracting money in %time% seconds.</b>\\n";
         public string ExtractionStart = "<b>Extracting Money.</b>\\n";
@@ -39,6 +43,10 @@ namespace FoundationFortune.Configs
 
         [Description("Death Coins")]
 		public string DeathCoinPickup { get; set; } = "<b><color=green>+%coinValue%</color> Picked up Death Coin.</b>\\n";
+
+		[Description("Item and Perk list return messages.")] //todo
+		public string ItemsList { get; set; } = "";
+		public string PerksList { get; set; } = "";
 
 		[Description("Revival System Hints")]
 		public string RevivalNoDeadPlayer { get; set; } = "<b>No dead player with Name: '%targetName%' found nearby to revive.</b>\\n";

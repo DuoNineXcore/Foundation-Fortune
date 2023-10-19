@@ -2,6 +2,8 @@
 using System;
 using CommandSystem;
 using Exiled.API.Enums;
+using FoundationFortune.API.Database;
+using Exiled.API.Features;
 
 namespace FoundationFortune.Commands
 {
@@ -16,7 +18,9 @@ namespace FoundationFortune.Commands
 
         public bool Execute(ArraySegment<string> args, ICommandSender sender, out string response)
         {
-            if (!sender.CheckPermission("ff.extractionsystem.add"))
+            Player p = Player.Get(sender);
+
+            if (!sender.CheckPermission("ff.extractionsystem.add") || !PlayerDataRepository.GetPluginAdmin(p.UserId))
             {
                 response = "You do not have permission to use this command.";
                 return false;

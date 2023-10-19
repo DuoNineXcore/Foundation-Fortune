@@ -1,6 +1,8 @@
 ﻿using CommandSystem;
 using Exiled.API.Enums;
+using Exiled.API.Features;
 using Exiled.Permissions.Extensions;
+using FoundationFortune.API.Database;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,7 +21,9 @@ namespace FoundationFortune.Commands.FortuneCommands.ExtractionCommands
 
         public bool Execute(ArraySegment<string> args, ICommandSender sender, out string response)
         {
-            if (!sender.CheckPermission("ff.extractionsystem.deactivate"))
+            Player p = Player.Get(sender);
+
+            if (!sender.CheckPermission("ff.extractionsystem.deactivate") || !PlayerDataRepository.GetPluginAdmin(p.UserId))
             {
                 response = "You do not have permission to use this command.";
                 return false;

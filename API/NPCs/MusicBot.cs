@@ -10,6 +10,7 @@ using Exiled.API.Features.Components;
 using Mirror;
 using System;
 using System.Collections.Generic;
+using VoiceChat;
 
 namespace FoundationFortune.API.NPCs
 {
@@ -47,36 +48,6 @@ namespace FoundationFortune.API.NPCs
             return nextAvailableIndex;
         }
 
-        public static Npc SpawnMusicBot(string target, string Badge, string Color, RoleTypeId Role, ItemType? HeldItem, Vector3 scale)
-        {
-            string botKey = $"MusicBot-{target}";
-            int indexation = GetNextMusicBotIndexation(FoundationFortune.Singleton.MusicBots.Keys.ToString());
-            Npc spawnedMusicBot = NPCHelperMethods.SpawnFix(target, Role, indexation);
-
-            FoundationFortune.Singleton.MusicBots[botKey] = (spawnedMusicBot, indexation);
-
-            spawnedMusicBot.RankName = Badge;
-            spawnedMusicBot.RankColor = Color;
-            spawnedMusicBot.Scale = scale;
-            spawnedMusicBot.IsGodModeEnabled = true;
-            spawnedMusicBot.MaxHealth = 9999;
-            spawnedMusicBot.Health = 9999;
-
-            Round.IgnoredPlayers.Add(spawnedMusicBot.ReferenceHub);
-
-            Timing.CallDelayed(0.5f, () =>
-            {
-                spawnedMusicBot.ClearInventory();
-                if (HeldItem.HasValue)
-                {
-                    spawnedMusicBot.ClearInventory();
-                    spawnedMusicBot.CurrentItem = Item.Create((ItemType)HeldItem, spawnedMusicBot);
-                }
-            });
-
-            return spawnedMusicBot;
-        }
-
         public static bool RemoveMusicBot(string target)
         {
             string botKey = $"MusicBot-{target}";
@@ -85,10 +56,8 @@ namespace FoundationFortune.API.NPCs
                 var (bot, _) = botData;
                 if (bot != null)
                 {
-                    bot.ClearInventory();
                     Timing.CallDelayed(0.3f, () =>
                     {
-                        bot.Vaporize(bot);
                         CustomNetworkManager.TypedSingleton.OnServerDisconnect(bot.NetworkIdentity.connectionToClient);
                     });
                 }

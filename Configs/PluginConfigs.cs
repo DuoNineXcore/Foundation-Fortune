@@ -21,21 +21,29 @@ namespace FoundationFortune.Configs
 		[Description("Number of hints that can be shown")]
 		public int MaxHintsToShow { get; set; } = 3;
 
-		[Description("Killing player event.")]
-		public int KillReward { get; set; } = 300;
-		public bool KillRewardScpOnly { get; set; } = false;
+		[Description("Server Events with Rewards.")]
+		public bool KillEvent { get; set; } = true;
+        public bool EscapeEvent { get; set; } = true;
+		public bool RoundEndEvent { get; set; } = true;
 
-		[Description("Escaping player event.")]
-		public int EscapeReward { get; set; } = 300;
+        public bool KillEventRewardsOnlySCPS { get; set; } = false;
+        public int KillEventRewards { get; set; } = 300;
+		public int EscapeRewards { get; set; } = 300;
+        public Dictionary<PlayerTeamConditions, int> RoundEndRewards { get; set; } = new Dictionary<PlayerTeamConditions, int>
+		{
+			{ PlayerTeamConditions.Winning, 500 },
+			{ PlayerTeamConditions.Losing, 100 },
+			{ PlayerTeamConditions.Draw, 250 }
+		};
 
-		[Description("Revival Settings.")]
+        [Description("Resurgence Beacon Settings.")]
 		public bool HuntReviver { get; set; } = true;
 		public int RevivedPlayerHealth { get; set; } = 30;
 		public bool ResetRevivedInventory { get; set; } = false;
 		public int RevivalBountyKillReward { get; set; } = 5000;
 		public int RevivalBountyTimeSeconds { get; set; } = 300;
 
-		[Description("Money Extraction System Settings.")]
+        [Description("Money Extraction System Settings.")]
 		public bool MoneyExtractionSystem { get; set; } = true;
 		public List<RoomType> ExtractionPointRooms { get; set; } = new List<RoomType>
 		{
@@ -49,7 +57,7 @@ namespace FoundationFortune.Configs
 		public int MaxExtractionPointGenerationTime { get; set; } = 30;
 		public int ExtractionPointDuration { get; set; } = 120;
 
-		[Description("Update Rate Settings")]
+		[Description("Hint System Update Rate Settings")]
 		public float HintSystemUpdateRate { get; set; } = 0.5f;
 		public float AnimatedHintUpdateRate { get; set; } = 0.5f;
 
@@ -162,7 +170,21 @@ namespace FoundationFortune.Configs
             new PerkItem { Limit = 1, Alias = "selfres", PerkType = PerkType.EtherealIntervention, Price = 4200, DisplayName = "Ethereal Intervention", Description = ""},
 		};
 
-		[Description("A list of rooms that you cannot be teleported to at your revival")]
+        [Description("Perk System Icons")]
+        public Dictionary<PerkType, string> PerkEmojis { get; set; } = new Dictionary<PerkType, string>
+        {
+            { PerkType.OvershieldedProtection, "🛡️" },
+            { PerkType.BoostedResilience, "🔰" },
+            { PerkType.ConcealedPresence, "🕵️" },
+            { PerkType.EthericVitality, "❤️" },
+            { PerkType.Hyperactivity, "🏃" },
+            { PerkType.BlissfulUnawareness, "💞" },
+            { PerkType.ExtrasensoryPerception, "🔮" },
+            { PerkType.ResurgenceBeacon, "🚑" },
+            { PerkType.EtherealIntervention, "✨" }
+        };
+
+        [Description("A list of rooms that you cannot be teleported to at your revival")]
 		public List<RoomType> ForbiddenRooms { get; set; } = new()
 		{
 			RoomType.EzCollapsedTunnel,

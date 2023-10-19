@@ -31,10 +31,41 @@ namespace FoundationFortune.API.HintSystem
         public Dictionary<Npc, Vector3> sellingBotPositions = new();
         public Dictionary<Npc, Vector3> musicBotPositions = new();
 
-        public Npc GetNearestBuyingBot(Player player) => GetNearestFoundationFortuneBot(player, FoundationFortune.Singleton.BuyingBots.Select(x => x.Value.bot).ToDictionary(k => k, v => v.Position), BotType.Buying);
-        public Npc GetNearestSellingBot(Player player) => GetNearestFoundationFortuneBot(player, FoundationFortune.Singleton.SellingBots.Select(x => x.Value.bot).ToDictionary(k => k, v => v.Position), BotType.Selling);
-        public bool IsPlayerNearBuyingBot(Player player) => IsPlayerNearFoundationFortuneBot(player, FoundationFortune.Singleton.BuyingBots.Select(x => x.Value.bot).ToDictionary(k => k, v => v.Position), BotType.Buying);
-        public bool IsPlayerNearSellingBot(Player player) => IsPlayerNearFoundationFortuneBot(player, FoundationFortune.Singleton.SellingBots.Select(x => x.Value.bot).ToDictionary(k => k, v => v.Position), BotType.Selling);
+        public Npc GetNearestBuyingBot(Player player)
+        {
+            var botPositions = FoundationFortune.Singleton.BuyingBots
+                .Where(kvp => kvp.Value.bot != null)
+                .ToDictionary(kvp => kvp.Value.bot, kvp => kvp.Value.bot.Position);
+
+            return GetNearestFoundationFortuneBot(player, botPositions, BotType.Buying);
+        }
+
+        public Npc GetNearestSellingBot(Player player)
+        {
+            var botPositions = FoundationFortune.Singleton.SellingBots
+                .Where(kvp => kvp.Value.bot != null)
+                .ToDictionary(kvp => kvp.Value.bot, kvp => kvp.Value.bot.Position);
+
+            return GetNearestFoundationFortuneBot(player, botPositions, BotType.Selling);
+        }
+
+        public bool IsPlayerNearBuyingBot(Player player)
+        {
+            var botPositions = FoundationFortune.Singleton.BuyingBots
+                .Where(kvp => kvp.Value.bot != null)
+                .ToDictionary(kvp => kvp.Value.bot, kvp => kvp.Value.bot.Position);
+
+            return IsPlayerNearFoundationFortuneBot(player, botPositions, BotType.Buying);
+        }
+
+        public bool IsPlayerNearSellingBot(Player player)
+        {
+            var botPositions = FoundationFortune.Singleton.SellingBots
+                .Where(kvp => kvp.Value.bot != null)
+                .ToDictionary(kvp => kvp.Value.bot, kvp => kvp.Value.bot.Position);
+
+            return IsPlayerNearFoundationFortuneBot(player, botPositions, BotType.Selling);
+        }
 
         public void InitializeFoundationFortuneNPCs()
         {
@@ -77,7 +108,7 @@ namespace FoundationFortune.API.HintSystem
                             {
                                 bot.Teleport(Position);
                                 buyingBotPositions[bot] = bot.Position;
-                                Log.Debug($"Teleported BuyingBot with indexation {indexation} to room {roomType}, Pos: {bot.Position}, Rot: {bot.Rotation}");
+                                Log.Debug($"Teleported Buying Bot with indexation {indexation} to room {roomType}, Pos: {bot.Position}, Rot: {bot.Rotation}");
                             });
                         }
                         else Log.Warn($"Invalid indexation {indexation + 1} for BuyingBot");
@@ -110,10 +141,10 @@ namespace FoundationFortune.API.HintSystem
                             {
                                 bot.Teleport(Position);
                                 buyingBotPositions[bot] = bot.Position;
-                                Log.Debug($"Teleported BuyingBot to room {roomType}, Pos: {bot.Position}, Rot: {bot.Rotation}");
+                                Log.Debug($"Teleported Buying Bot to room {roomType}, Pos: {bot.Position}, Rot: {bot.Rotation}");
                             });
                         }
-                        else Log.Warn($"No available rooms for BuyingBot.");
+                        else Log.Warn($"No available rooms for Buying Bots.");
                     }
                 }
             }
@@ -123,12 +154,12 @@ namespace FoundationFortune.API.HintSystem
             {
                 Log.Debug($"Intitializing Selling Bot NPCs.");
 
-                buyingBotPositions.Clear();
+                sellingBotPositions.Clear();
 
-                foreach (BuyingBotSpawn spawn in FoundationFortune.Singleton.Config.BuyingBotSpawnSettings)
+                foreach (SellingBotSpawn spawn in FoundationFortune.Singleton.Config.SellingBotSpawnSettings)
                 {
                     Log.Debug($"Spawning Bot: {spawn.Name}");
-                    BuyingBot.SpawnBuyingBot(
+                    SellingBot.SpawnSellingBot(
                         spawn.Name,
                         spawn.Badge,
                         spawn.BadgeColor,
@@ -138,12 +169,12 @@ namespace FoundationFortune.API.HintSystem
                     );
                 }
 
-                if (FoundationFortune.Singleton.Config.BuyingBotFixedLocation)
+                if (FoundationFortune.Singleton.Config.SellingBotFixedLocation)
                 {
                     Log.Debug($"Bots spawned.");
-                    var rooms = FoundationFortune.Singleton.Config.BuyingBotSpawnSettings.Select(location => location.Room).ToList();
+                    var rooms = FoundationFortune.Singleton.Config.SellingBotSpawnSettings.Select(location => location.Room).ToList();
 
-                    foreach (var kvp in FoundationFortune.Singleton.BuyingBots)
+                    foreach (var kvp in FoundationFortune.Singleton.SellingBots)
                     {
                         var indexation = kvp.Value.indexation;
                         var bot = kvp.Value.bot;
@@ -156,23 +187,23 @@ namespace FoundationFortune.API.HintSystem
                             Timing.CallDelayed(1f, () =>
                             {
                                 bot.Teleport(Position);
-                                buyingBotPositions[bot] = bot.Position;
-                                Log.Debug($"Teleported BuyingBot with indexation {indexation} to room {roomType}, Pos: {bot.Position}, Rot: {bot.Rotation}");
+                                sellingBotPositions[bot] = bot.Position;
+                                Log.Debug($"Teleported Selling Bot with indexation {indexation} to room {roomType}, Pos: {bot.Position}, Rot: {bot.Rotation}");
                             });
                         }
-                        else Log.Warn($"Invalid indexation {indexation + 1} for BuyingBot");
+                        else Log.Warn($"Invalid indexation {indexation + 1} for Selling Bot");
                     }
                 }
                 else
                 {
                     Log.Debug($"Bots spawned randomly.");
-                    var rooms = Room.List.Where(r => FoundationFortune.Singleton.Config.BuyingBotRandomRooms.Contains(r.Type)).ToList();
+                    var rooms = Room.List.Where(r => FoundationFortune.Singleton.Config.SellingBotRandomRooms.Contains(r.Type)).ToList();
                     var availableIndexes = Enumerable.Range(0, rooms.Count).ToList();
 
                     availableIndexes.Clear();
                     availableIndexes.AddRange(Enumerable.Range(0, rooms.Count));
 
-                    foreach (var kvp in FoundationFortune.Singleton.BuyingBots)
+                    foreach (var kvp in FoundationFortune.Singleton.SellingBots)
                     {
                         var bot = kvp.Value.bot;
 
@@ -189,11 +220,11 @@ namespace FoundationFortune.API.HintSystem
                             Timing.CallDelayed(1f, () =>
                             {
                                 bot.Teleport(Position);
-                                buyingBotPositions[bot] = bot.Position;
-                                Log.Debug($"Teleported BuyingBot to room {roomType}, Pos: {bot.Position}, Rot: {bot.Rotation}");
+                                sellingBotPositions[bot] = bot.Position;
+                                Log.Debug($"Teleported Selling Bot to room {roomType}, Pos: {bot.Position}, Rot: {bot.Rotation}");
                             });
                         }
-                        else Log.Warn($"No available rooms for BuyingBot.");
+                        else Log.Warn($"No available rooms for Selling Bots.");
                     }
                 }
             }
@@ -263,8 +294,10 @@ namespace FoundationFortune.API.HintSystem
             return null;
         }
 
-        public void ClearNPCIndexations()
+        public void ClearIndexations()
         {
+            buyingBotPositions.Clear();
+            FoundationFortune.PlayerPurchaseLimits.Clear();
             FoundationFortune.Singleton.BuyingBots.Clear();
             FoundationFortune.Singleton.SellingBots.Clear();
             FoundationFortune.Singleton.MusicBots.Clear();

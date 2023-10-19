@@ -5,14 +5,19 @@
         Center, Right, Left,
     }
 
+    public enum BotType
+    {
+        Buying, Selling, Music,
+    }
+
     public enum HintAnim
     {
         Center, Right, Left, None,
     }
 
-    public enum NPCVoiceChatUsageType
-    { 
-        Selling, Buying, NotEnoughMoney, WrongBuyingBot, BuyingBotInRange, SellingBotInRange,
+    public enum PlayerTeamConditions
+    {
+        Winning, Losing, Draw
     }
 
     public enum PlayerVoiceChatUsageType
@@ -20,21 +25,13 @@
         Hunted, Hunter, BlissfulUnawareness, ResurgenceBeacon, EtherealIntervention,
     }
 
-    public enum BotType
+    public enum NPCVoiceChatUsageType
     {
-        Buying, Selling, Music,
+        Selling, Buying, NotEnoughMoney, WrongBuyingBot, BuyingBotInRange, SellingBotInRange,
     }
 
     public enum PerkType
     {
-        OvershieldedProtection,
-        BoostedResilience,
-        ConcealedPresence,
-        EthericVitality,
-        Hyperactivity,
-        BlissfulUnawareness,
-        ExtrasensoryPerception,
-        ResurgenceBeacon,
-        EtherealIntervention,
+        OvershieldedProtection, BoostedResilience, ConcealedPresence, EthericVitality, Hyperactivity, BlissfulUnawareness, ExtrasensoryPerception, ResurgenceBeacon, EtherealIntervention,
     }
 }

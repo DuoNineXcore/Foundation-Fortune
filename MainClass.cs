@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.IO;
 using FoundationFortune.API.Models.Classes;
 using FoundationFortune.API.HintSystem;
+using FoundationFortune.API.Models.Enums;
 
 namespace FoundationFortune
 {
@@ -23,11 +24,12 @@ namespace FoundationFortune
 		private Harmony _harmony;
 
 		public static FoundationFortune Singleton;
-		public static List<ObjectInteractions> PlayerLimits = new();
+		public static List<ObjectInteractions> PlayerPurchaseLimits = new();
         public ServerEvents serverEvents = new();
 		public LiteDatabase db;
 
-		public Dictionary<string, (Npc bot, int indexation)> BuyingBots { get; private set; } = new();
+		public Dictionary<Player, Dictionary<PerkType, int>> ConsumedPerks { get; private set; } = new();
+        public Dictionary<string, (Npc bot, int indexation)> BuyingBots { get; private set; } = new();
 		public Dictionary<string, (Npc bot, int indexation)> SellingBots { get; private set; } = new();
         public Dictionary<string, (Npc bot, int indexation)> MusicBots { get; private set; } = new();
 
@@ -70,6 +72,7 @@ namespace FoundationFortune
 			Exiled.Events.Handlers.Player.Spawning += serverEvents.SpawningNpc;
 			Exiled.Events.Handlers.Server.EndingRound += serverEvents.RoundEnding;
 			Exiled.Events.Handlers.Server.RestartingRound += serverEvents.RoundRestart;
+			Exiled.Events.Handlers.Server.RoundEnded += serverEvents.RoundEnded;
 		}
 
 		private void UnregisterEvents()
@@ -86,8 +89,9 @@ namespace FoundationFortune
 			Exiled.Events.Handlers.Player.Spawning -= serverEvents.SpawningNpc;
 			Exiled.Events.Handlers.Server.EndingRound -= serverEvents.RoundEnding;
 			Exiled.Events.Handlers.Server.RestartingRound -= serverEvents.RoundRestart;
+            Exiled.Events.Handlers.Server.RoundEnded -= serverEvents.RoundEnded;
 
-			serverEvents = null;
+            serverEvents = null;
 		}
 
 		private void CreateDatabase()

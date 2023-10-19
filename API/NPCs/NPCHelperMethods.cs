@@ -15,6 +15,7 @@ using System.IO;
 using System.Linq;
 using UnityEngine;
 using VoiceChat;
+using FoundationFortune.API.Models.Classes;
 
 namespace FoundationFortune.API.NPCs
 {
@@ -57,11 +58,9 @@ namespace FoundationFortune.API.NPCs
             catch (Exception ex) { }
 
             npc.ReferenceHub.nicknameSync.Network_myNickSync = name;
-            Player.Dictionary.Add(gameObject, npc);
-            Timing.CallDelayed(0.3f, delegate
+            Timing.CallDelayed(0.1f, delegate
             {
                 npc.Role.Set(role, SpawnReason.ForceClass, position.HasValue ? RoleSpawnFlags.AssignInventory : RoleSpawnFlags.All);
-                npc.ClearInventory();
             });
             if (position.HasValue)
             {

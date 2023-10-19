@@ -22,7 +22,28 @@ namespace FoundationFortune.API.HintSystem
         public static readonly Vector3 WorldPos = new(124f, 988f, 24f);
 		public const float RadiusSqr = 16f * 16f;
 
-		public void InitializeWorkstationPositions()
+        public static void UpdatePerkIndicator(Dictionary<Player, Dictionary<PerkType, int>> consumedPerks, ref StringBuilder perkIndicator)
+        {
+            foreach (var consumedPerkEntry in consumedPerks)
+            {
+                var consumedPerkTypes = consumedPerkEntry.Value;
+
+                foreach (var consumedPerk in consumedPerkTypes)
+                {
+                    if (FoundationFortune.Singleton.Config.PerkEmojis.TryGetValue(consumedPerk.Key, out var emoji))
+                    {
+                        perkIndicator.Append(emoji);
+                        if (consumedPerk.Value > 1)
+                        {
+                            perkIndicator.Append($"x{consumedPerk.Value}");
+                        }
+                        perkIndicator.Append("");
+                    }
+                }
+            }
+        }
+
+        public void InitializeWorkstationPositions()
 		{
 			Log.Debug($"Initializing Selling workstations.");
 			if (!FoundationFortune.Singleton.Config.UseSellingWorkstation)
@@ -40,6 +61,19 @@ namespace FoundationFortune.API.HintSystem
 
 			workstationPositions = selectedWorkstations.ToDictionary(workstation => workstation, workstation => workstation.transform.position);
 		}
+
+        public string GetConfirmationTimeLeft(Player ply)
+        {
+            if (dropTimestamp.ContainsKey(ply.UserId))
+            {
+                float timeLeft = FoundationFortune.Singleton.Config.SellingConfirmationTime - (Time.time - dropTimestamp[ply.UserId]);
+                if (timeLeft > 0)
+                {
+                    return timeLeft.ToString("F0");
+                }
+            }
+            return "0";
+        }
 
         private void UpdateWorkstationMessages(Player ply, ref StringBuilder hintMessage)
         {
@@ -89,11 +123,11 @@ namespace FoundationFortune.API.HintSystem
 
         public static void AddToPlayerLimits(Player player, PerkItem perkItem)
 		{
-			var playerLimit = FoundationFortune.PlayerLimits.FirstOrDefault(p => p.Player.UserId == player.UserId);
+			var playerLimit = FoundationFortune.PlayerPurchaseLimits.FirstOrDefault(p => p.Player.UserId == player.UserId);
 			if (playerLimit == null)
 			{
 				playerLimit = new ObjectInteractions(player);
-				FoundationFortune.PlayerLimits.Add(playerLimit);
+				FoundationFortune.PlayerPurchaseLimits.Add(playerLimit);
 			}
 
 			if (playerLimit.BoughtPerks.ContainsKey(perkItem)) playerLimit.BoughtPerks[perkItem]++;
@@ -102,11 +136,11 @@ namespace FoundationFortune.API.HintSystem
 
 		public static void AddToPlayerLimits(Player player, BuyableItem buyItem)
 		{
-			var playerLimit = FoundationFortune.PlayerLimits.FirstOrDefault(p => p.Player.UserId == player.UserId);
+			var playerLimit = FoundationFortune.PlayerPurchaseLimits.FirstOrDefault(p => p.Player.UserId == player.UserId);
 			if (playerLimit == null)
 			{
 				playerLimit = new ObjectInteractions(player);
-				FoundationFortune.PlayerLimits.Add(playerLimit);
+				FoundationFortune.PlayerPurchaseLimits.Add(playerLimit);
 			}
 
 			if (playerLimit.BoughtItems.ContainsKey(buyItem)) playerLimit.BoughtItems[buyItem]++;
@@ -115,11 +149,11 @@ namespace FoundationFortune.API.HintSystem
 
         public static void AddToPlayerLimits(Player player, SellableItem sellItem)
 		{
-			var playerLimit = FoundationFortune.PlayerLimits.FirstOrDefault(p => p.Player.UserId == player.UserId);
+			var playerLimit = FoundationFortune.PlayerPurchaseLimits.FirstOrDefault(p => p.Player.UserId == player.UserId);
 			if (playerLimit == null)
 			{
 				playerLimit = new ObjectInteractions(player);
-				FoundationFortune.PlayerLimits.Add(playerLimit);
+				FoundationFortune.PlayerPurchaseLimits.Add(playerLimit);
 			}
 
 			if (playerLimit.SoldItems.ContainsKey(sellItem)) playerLimit.SoldItems[sellItem]++;

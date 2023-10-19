@@ -9,6 +9,7 @@ using UnityEngine;
 using Exiled.API.Features.Items;
 using System.Text;
 using FoundationFortune.API.Items;
+using System;
 
 namespace FoundationFortune.API.HintSystem
 {
@@ -45,6 +46,8 @@ namespace FoundationFortune.API.HintSystem
                         string moneySavedString;
                         string moneyHoldString;
 
+                        UpdatePerkIndicator(FoundationFortune.Singleton.ConsumedPerks, ref hintMessageBuilder);
+
                         if (PlayerDataRepository.GetPluginAdmin(ply.UserId))
                         {
                             moneySavedString = FoundationFortune.Singleton.Translation.MoneyCounterSaved
@@ -72,7 +75,7 @@ namespace FoundationFortune.API.HintSystem
                     UpdateNPCProximityMessages(ply, ref hintMessageBuilder);
                     UpdateWorkstationMessages(ply, ref hintMessageBuilder);
                     UpdateBountyMessages(ply, ref hintMessageBuilder);
-					PerkBottle.GetHeldBottle(ply, ref hintMessageBuilder);
+                    PerkBottle.GetHeldBottle(ply, ref hintMessageBuilder);
 
                     string recentHintsText = GetRecentHints(ply.UserId);
                     if (!string.IsNullOrEmpty(recentHintsText)) hintMessageBuilder.Append(recentHintsText);

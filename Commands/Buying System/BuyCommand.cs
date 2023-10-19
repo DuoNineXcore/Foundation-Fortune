@@ -8,6 +8,7 @@ using FoundationFortune.API.Models.Enums;
 using FoundationFortune.API.Models.Classes;
 using FoundationFortune.API.HintSystem;
 using FoundationFortune.API.Items;
+using Exiled.API.Features.Core.Generic;
 
 namespace FoundationFortune.Commands.BuyCommand
 {
@@ -146,24 +147,32 @@ namespace FoundationFortune.Commands.BuyCommand
 			return true;
 		}
 
-		private string GetList()
-		{
-			string itemsToBuy = "\n<color=green>Available Items:</color>\n" +
-							string.Join("\n", FoundationFortune.Singleton.Config.BuyableItems
-								.Select(buyableItem => $"{buyableItem.ItemType} - {buyableItem.DisplayName} ({buyableItem.Alias}) - {buyableItem.Price}$")) +
-							"\n";
+        public string GetList()
+        {
+            var translation = FoundationFortune.Singleton.Translation;
+            var config = FoundationFortune.Singleton.Config;
 
-			string perksToBuy = "<color=green>Available Perks:</color>\n" +
-							string.Join("\n", FoundationFortune.Singleton.Config.PerkItems
-								.Select(perkItem => $"{perkItem.DisplayName} ({perkItem.Alias}) - {perkItem.Price}$ - {perkItem.Description}")) +
-							"\n";
-			return itemsToBuy + perksToBuy;
-		}
+            string itemsList = string.Join("\n", config.BuyableItems
+                .Select(buyableItem => translation.ItemsList
+                    .Replace("%buyableItemType%", buyableItem.ItemType.ToString())
+                    .Replace("%buyableItemDisplayName%", buyableItem.DisplayName)
+                    .Replace("%buyableItemAlias%", buyableItem.Alias)
+                    .Replace("%buyableItemPrice%", buyableItem.Price.ToString())));
 
-		private bool ExceedsPerkLimit(Player player, PerkItem perkItem)
+            string perksList = string.Join("\n", config.PerkItems
+                .Select(perkItem => translation.PerksList
+                    .Replace("%perkItemDisplayName%", perkItem.DisplayName)
+                    .Replace("%perkItemAlias%", perkItem.Alias)
+                    .Replace("%perkItemPrice%", perkItem.Price.ToString())
+                    .Replace("%perkItemDescription%", perkItem.Description)));
+
+            return itemsList + perksList;
+        }
+
+        private bool ExceedsPerkLimit(Player player, PerkItem perkItem)
 		{
 			if (PlayerDataRepository.GetPluginAdmin(player.UserId)) return false;
-			var playerLimit = FoundationFortune.PlayerLimits.FirstOrDefault(p => p.Player.UserId == player.UserId);
+			var playerLimit = FoundationFortune.PlayerPurchaseLimits.FirstOrDefault(p => p.Player.UserId == player.UserId);
 			if (playerLimit != null)
 			{
 				var perkCount = playerLimit.BoughtPerks.Count(pair => pair.Key.PerkType == perkItem.PerkType);
@@ -175,7 +184,7 @@ namespace FoundationFortune.Commands.BuyCommand
 		private bool ExceedsItemLimit(Player player, BuyableItem buyItem)
 		{
 			if (PlayerDataRepository.GetPluginAdmin(player.UserId)) return false;
-			var playerLimit = FoundationFortune.PlayerLimits.FirstOrDefault(p => p.Player.UserId == player.UserId);
+			var playerLimit = FoundationFortune.PlayerPurchaseLimits.FirstOrDefault(p => p.Player.UserId == player.UserId);
 			if (playerLimit != null)
 			{
 				var itemCount = playerLimit.BoughtItems.Count(pair => pair.Key.ItemType == buyItem.ItemType);
