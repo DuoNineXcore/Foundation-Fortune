@@ -56,9 +56,10 @@ namespace FoundationFortune
 			Singleton = null;
 			CustomItem.UnregisterItems();
             _harmony?.UnpatchAll(_harmony.Id);
+            serverEvents = null;
         }
 
-		private void RegisterEvents()
+        private void RegisterEvents()
 		{
 			Exiled.Events.Handlers.Server.RoundStarted += serverEvents.RoundStart;
 			Exiled.Events.Handlers.Player.Verified += serverEvents.RegisterInDatabase;
@@ -73,6 +74,8 @@ namespace FoundationFortune
 			Exiled.Events.Handlers.Server.EndingRound += serverEvents.RoundEnding;
 			Exiled.Events.Handlers.Server.RestartingRound += serverEvents.RoundRestart;
 			Exiled.Events.Handlers.Server.RoundEnded += serverEvents.RoundEnded;
+			Exiled.Events.Handlers.Server.RespawningTeam += serverEvents.PreventBotsFromSpawning;
+			Exiled.Events.Handlers.Player.Left += serverEvents.DestroyMusicBots;
 		}
 
 		private void UnregisterEvents()
@@ -90,8 +93,8 @@ namespace FoundationFortune
 			Exiled.Events.Handlers.Server.EndingRound -= serverEvents.RoundEnding;
 			Exiled.Events.Handlers.Server.RestartingRound -= serverEvents.RoundRestart;
             Exiled.Events.Handlers.Server.RoundEnded -= serverEvents.RoundEnded;
-
-            serverEvents = null;
+            Exiled.Events.Handlers.Server.RespawningTeam -= serverEvents.PreventBotsFromSpawning;
+            Exiled.Events.Handlers.Player.Left -= serverEvents.DestroyMusicBots;
 		}
 
 		private void CreateDatabase()

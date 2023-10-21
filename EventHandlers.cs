@@ -89,9 +89,11 @@ namespace FoundationFortune.API.HintSystem
 				};
 				PlayerDataRepository.InsertPlayer(newPlayer);
 			}
-		}
 
-		public void EtherealInterventionHandler(DyingEventArgs ev)
+            if (!FoundationFortune.Singleton.MusicBots.ContainsKey(ev.Player.UserId) && !ev.Player.IsNPC) MusicBot.SpawnMusicBot(ev.Player);
+        }
+
+        public void EtherealInterventionHandler(DyingEventArgs ev)
 		{
 			if (FoundationFortune.Singleton.ConsumedPerks.ContainsKey(ev.Player)) FoundationFortune.Singleton.ConsumedPerks[ev.Player].Clear();
 
@@ -158,7 +160,7 @@ namespace FoundationFortune.API.HintSystem
 						.Replace("%bountyPrice%", bountiedPlayer.Value.ToString());
 
 					EnqueueHint(ev.Attacker, killHint, config.MaxHintAge);
-					PlayerDataRepository.ModifyMoney(ev.Attacker.UserId, bountiedPlayer.Value);
+					PlayerDataRepository.ModifyMoney(ev.Attacker.UserId, bountiedPlayer.Value, false, true, false);
 				}
 				StopBounty(ev.Player);
 			}
@@ -308,9 +310,11 @@ namespace FoundationFortune.API.HintSystem
 			}
 		}
 
-		public void SpawningNpc(SpawningEventArgs ev) { if (ev.Player.IsNPC) RoundSummary.singleton.Network_chaosTargetCount -= 1; }
-		public void RoundRestart() { if (moneyHintCoroutine.IsRunning) Timing.KillCoroutines(moneyHintCoroutine); }
+        public void DestroyMusicBots(LeftEventArgs ev) { if (FoundationFortune.Singleton.MusicBots.ContainsKey(ev.Player.UserId)) MusicBot.RemoveMusicBot(ev.Player.UserId); }
+        public void SpawningNpc(SpawningEventArgs ev) { if (ev.Player.IsNPC) RoundSummary.singleton.Network_chaosTargetCount -= 1; }
+        public void RoundRestart() { if (moneyHintCoroutine.IsRunning) Timing.KillCoroutines(moneyHintCoroutine); }
 		public void FuckYourAbility(ActivatingSenseEventArgs ev) { if (ev.Target != null && ev.Target.IsNPC) ev.IsAllowed = false; }
 		public void FuckYourOtherAbility(TriggeringBloodlustEventArgs ev) { if (ev.Target != null && ev.Target.IsNPC) ev.IsAllowed = false; }
-	}
+        public void PreventBotsFromSpawning(RespawningTeamEventArgs ev) { foreach (Player player in ev.Players) if (NPCHelperMethods.IsFoundationFortuneNPC(player.ReferenceHub)) ev.Players.Remove(player); }
+    }
 }
