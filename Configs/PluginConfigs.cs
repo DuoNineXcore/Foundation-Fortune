@@ -162,7 +162,7 @@ namespace FoundationFortune.Configs
 	    {
 			new PerkItem { Limit = 1, Alias = "extrahp", PerkType = PerkType.BoostedResilience, Price = 1800, DisplayName = "Boosted Resilience", Description = ""},
 			new PerkItem { Limit = 1, Alias = "invis", PerkType = PerkType.ConcealedPresence, Price = 2000, DisplayName = "Concealed Presence", Description = ""},
-            new PerkItem { Limit = 1, Alias = "ahp", PerkType = PerkType.OvershieldedProtection, Price = 2500, DisplayName = "Overshielded Protection", Description = ""},
+            new PerkItem { Limit = 1, Alias = "ahp", PerkType = PerkType.OvershieldedProtection, Price = 2500, DisplayName = "Over-Shielded Protection", Description = ""},
             new PerkItem { Limit = 1, Alias = "regen", PerkType = PerkType.EthericVitality, Price = 2800, DisplayName = "Etheric Vitality", Description = ""},
 			new PerkItem { Limit = 1, Alias = "revive", PerkType = PerkType.ResurgenceBeacon, Price = 3000, DisplayName = "Resurgence Beacon", Description = ""},
             new PerkItem { Limit = 1, Alias = "speed", PerkType = PerkType.Hyperactivity, Price = 3200, DisplayName = "Hyperactivity", Description = ""},

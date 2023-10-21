@@ -24,7 +24,7 @@ namespace FoundationFortune.Commands.FortuneCommands.BountyCommands
                 return false;
             }
 
-            FoundationFortune.Singleton.serverEvents.BountiedPlayers.Clear();
+            FoundationFortune.Singleton.ServerEvents.BountiedPlayers.Clear();
             response = "All bounties have been flushed.";
             return true;
         }

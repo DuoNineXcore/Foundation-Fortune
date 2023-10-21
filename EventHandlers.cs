@@ -43,12 +43,11 @@ namespace FoundationFortune.API.HintSystem
 
 			if (FoundationFortune.Singleton.Config.MoneyExtractionSystem)
 			{
-				int nextExtractionTime = Random.Range(FoundationFortune.Singleton.Config.MinExtractionPointGenerationTime, FoundationFortune.Singleton.Config.MaxExtractionPointGenerationTime + 1);
-				Timing.CallDelayed(nextExtractionTime, () => StartExtractionEvent());
-				Log.Info($"Round Started. The first extraction will commence at T-{nextExtractionTime} Seconds.");
+				int extractionTime = Random.Range(FoundationFortune.Singleton.Config.MinExtractionPointGenerationTime, FoundationFortune.Singleton.Config.MaxExtractionPointGenerationTime + 1);
+				Timing.CallDelayed(extractionTime, StartExtractionEvent);
+				Log.Info($"Round Started. The first extraction will commence at T-{extractionTime} Seconds.");
 			}
 
-			ClearIndexations();
 			InitializeWorkstationPositions();
 			InitializeFoundationFortuneNPCs();
 		}
@@ -61,15 +60,15 @@ namespace FoundationFortune.API.HintSystem
 			int mtf = alivePlayers.Count(p => p.IsNTF || p.Role.Type == RoleTypeId.Scientist);
 			int scps = alivePlayers.Count(p => p.IsScp);
 
-			if (!Round.IsLocked && !Round.IsEnded)
-			{
-				if (alivePlayers.Count() <= 1) ev.IsRoundEnded = true;
-				if (chaos >= 1 && mtf == 0 && scps == 0 || mtf >= 1 && chaos == 0 && scps == 0) ev.IsRoundEnded = true;
-			}
+			if (Round.IsLocked || Round.IsEnded) return;
+			if (alivePlayers.Count() <= 1) ev.IsRoundEnded = true;
+			if (chaos >= 1 && mtf == 0 && scps == 0 || mtf >= 1 && chaos == 0 && scps == 0) ev.IsRoundEnded = true;
 		}
 
 		public void RegisterInDatabase(VerifiedEventArgs ev)
 		{
+			if (FoundationFortune.Singleton.MusicBotPairs.All(pair => pair.Player.UserId != ev.Player.UserId) && !ev.Player.IsNPC) MusicBot.SpawnMusicBot(ev.Player);
+
 			var existingPlayer = PlayerDataRepository.GetPlayerById(ev.Player.UserId);
 			if (existingPlayer == null && !ev.Player.IsNPC)
 			{
@@ -80,8 +79,8 @@ namespace FoundationFortune.API.HintSystem
 					MoneyOnHold = 0,
 					MoneySaved = 0,
 					HintMinmode = true,
-					DisabledHintSystem = true,
-					IsAdmin = false,
+					HintSystem = true,
+					HintAdmin = false,
 					HintSize = 25,
 					HintOpacity = 100,
 					HintAnim = HintAnim.None,
@@ -89,9 +88,7 @@ namespace FoundationFortune.API.HintSystem
 				};
 				PlayerDataRepository.InsertPlayer(newPlayer);
 			}
-
-            if (!FoundationFortune.Singleton.MusicBots.ContainsKey(ev.Player.UserId) && !ev.Player.IsNPC) MusicBot.SpawnMusicBot(ev.Player);
-        }
+		}
 
         public void EtherealInterventionHandler(DyingEventArgs ev)
 		{
@@ -208,17 +205,14 @@ namespace FoundationFortune.API.HintSystem
 			{
 				if (!confirmSell.ContainsKey(ev.Player.UserId))
 				{
-					foreach (var sellableItem in FoundationFortune.Singleton.Config.SellableItems)
+					foreach (var sellableItem in FoundationFortune.Singleton.Config.SellableItems.Where(sellableItem => ev.Item.Type == sellableItem.ItemType))
 					{
-						if (ev.Item.Type == sellableItem.ItemType)
-						{
-							itemsBeingSold[ev.Player.UserId] = (ev.Item, sellableItem.Price);
+						itemsBeingSold[ev.Player.UserId] = (ev.Item, sellableItem.Price);
 
-							confirmSell[ev.Player.UserId] = true;
-							dropTimestamp[ev.Player.UserId] = Time.time;
-							ev.IsAllowed = false;
-							return;
-						}
+						confirmSell[ev.Player.UserId] = true;
+						dropTimestamp[ev.Player.UserId] = Time.time;
+						ev.IsAllowed = false;
+						return;
 					}
 				}
 
@@ -264,53 +258,51 @@ namespace FoundationFortune.API.HintSystem
 		public void RoundEnded(RoundEndedEventArgs ev)
 		{
 			var config = FoundationFortune.Singleton.Config;
-			if (config.RoundEndEvent)
+			if (!config.RoundEndEvent) return;
+			LeadingTeam leadingTeam = ev.LeadingTeam;
+			int winningAmount = config.RoundEndRewards.TryGetValue(PlayerTeamConditions.Winning, out var winningValue) ? winningValue : 0;
+			int losingAmount = config.RoundEndRewards.TryGetValue(PlayerTeamConditions.Losing, out var losingValue) ? losingValue : 0;
+			int drawAmount = config.RoundEndRewards.TryGetValue(PlayerTeamConditions.Draw, out var drawValue) ? drawValue : 0;
+
+			foreach (Player ply in Player.List.Where(p => p.IsAlive && !p.IsNPC))
 			{
-				LeadingTeam leadingTeam = ev.LeadingTeam;
-				int winningAmount = config.RoundEndRewards.TryGetValue(PlayerTeamConditions.Winning, out var winningValue) ? winningValue : 0;
-				int losingAmount = config.RoundEndRewards.TryGetValue(PlayerTeamConditions.Losing, out var losingValue) ? losingValue : 0;
-				int drawAmount = config.RoundEndRewards.TryGetValue(PlayerTeamConditions.Draw, out var drawValue) ? drawValue : 0;
+				Team playerTeam = ply.Role.Team;
+				string teamColor = "#FFFFFF";
+				PlayerTeamConditions teamCondition = PlayerTeamConditions.Losing;
 
-				foreach (Player ply in Player.List.Where(p => p.IsAlive && !p.IsNPC))
+				if (teamConditionsMap.TryGetValue((leadingTeam, playerTeam), out var conditionTuple) || (leadingTeam == LeadingTeam.Draw && conditionTuple.Item1 == PlayerTeamConditions.Draw))
 				{
-					Team playerTeam = ply.Role.Team;
-					string teamColor = "#FFFFFF";
-					PlayerTeamConditions teamCondition = PlayerTeamConditions.Losing;
+					teamCondition = conditionTuple.Item1;
+					teamColor = conditionTuple.Item2;
+				}
 
-					if (teamConditionsMap.TryGetValue((leadingTeam, playerTeam), out var conditionTuple) || (leadingTeam == LeadingTeam.Draw && conditionTuple.Item1 == PlayerTeamConditions.Draw))
-					{
-						teamCondition = conditionTuple.Item1;
-						teamColor = conditionTuple.Item2;
-					}
+				int reward = config.RoundEndRewards.TryGetValue(teamCondition, out var value) ? value : 0;
 
-					int reward = config.RoundEndRewards.TryGetValue(teamCondition, out var value) ? value : 0;
-
-					switch (teamCondition)
-					{
-						case PlayerTeamConditions.Winning:
-							PlayerDataRepository.ModifyMoney(ply.UserId, winningAmount, false, false, true);
-							EnqueueHint(ply, FoundationFortune.Singleton.Translation.RoundEndWin
-							    .Replace("%winningFactionColor%", teamColor)
-							    .Replace("%winningAmount%", winningAmount.ToString()), config.MaxHintAge);
-							break;
-						case PlayerTeamConditions.Losing:
-							PlayerDataRepository.ModifyMoney(ply.UserId, losingAmount, false, false, true);
-							EnqueueHint(ply, FoundationFortune.Singleton.Translation.RoundEndLoss
-							    .Replace("%losingFactionColor%", teamColor)
-							    .Replace("%losingAmount%", losingAmount.ToString()), config.MaxHintAge);
-							break;
-						case PlayerTeamConditions.Draw:
-							PlayerDataRepository.ModifyMoney(ply.UserId, drawAmount, false, false, true);
-							EnqueueHint(ply, FoundationFortune.Singleton.Translation.RoundEndDraw
-							    .Replace("%drawFactionColor%", teamColor)
-							    .Replace("%drawAmount%", drawAmount.ToString()), config.MaxHintAge);
-							break;
-					}
+				switch (teamCondition)
+				{
+					case PlayerTeamConditions.Winning:
+						PlayerDataRepository.ModifyMoney(ply.UserId, winningAmount, false, false, true);
+						EnqueueHint(ply, FoundationFortune.Singleton.Translation.RoundEndWin
+							.Replace("%winningFactionColor%", teamColor)
+							.Replace("%winningAmount%", winningAmount.ToString()), config.MaxHintAge);
+						break;
+					case PlayerTeamConditions.Losing:
+						PlayerDataRepository.ModifyMoney(ply.UserId, losingAmount, false, false, true);
+						EnqueueHint(ply, FoundationFortune.Singleton.Translation.RoundEndLoss
+							.Replace("%losingFactionColor%", teamColor)
+							.Replace("%losingAmount%", losingAmount.ToString()), config.MaxHintAge);
+						break;
+					case PlayerTeamConditions.Draw:
+						PlayerDataRepository.ModifyMoney(ply.UserId, drawAmount, false, false, true);
+						EnqueueHint(ply, FoundationFortune.Singleton.Translation.RoundEndDraw
+							.Replace("%drawFactionColor%", teamColor)
+							.Replace("%drawAmount%", drawAmount.ToString()), config.MaxHintAge);
+						break;
 				}
 			}
 		}
 
-        public void DestroyMusicBots(LeftEventArgs ev) { if (FoundationFortune.Singleton.MusicBots.ContainsKey(ev.Player.UserId)) MusicBot.RemoveMusicBot(ev.Player.UserId); }
+        public void DestroyMusicBots(LeftEventArgs ev) { if (FoundationFortune.Singleton.MusicBotPairs.Find(pair => pair.Player.Nickname == ev.Player.Nickname) != null) MusicBot.RemoveMusicBot(ev.Player.Nickname); }
         public void SpawningNpc(SpawningEventArgs ev) { if (ev.Player.IsNPC) RoundSummary.singleton.Network_chaosTargetCount -= 1; }
         public void RoundRestart() { if (moneyHintCoroutine.IsRunning) Timing.KillCoroutines(moneyHintCoroutine); }
 		public void FuckYourAbility(ActivatingSenseEventArgs ev) { if (ev.Target != null && ev.Target.IsNPC) ev.IsAllowed = false; }

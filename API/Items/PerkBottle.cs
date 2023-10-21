@@ -47,7 +47,7 @@ namespace FoundationFortune.API.Items
             {
                 PerkType perkType = perkBottleData.perkType;
                 PerkSystem.GrantPerk(ev.Player, perkType);
-                FoundationFortune.Singleton.serverEvents.EnqueueHint(ev.Player, $"<b>You drank a <color=#FFC0CB>{perkType}</color> Perk bottle.</b>", 2f);
+                FoundationFortune.Singleton.ServerEvents.EnqueueHint(ev.Player, $"<b>You drank a <color=#FFC0CB>{perkType}</color> Perk bottle.</b>", 2f);
                 DroppedPerkBottles.Remove(ev.Item.Serial);
             }
         }
@@ -61,9 +61,9 @@ namespace FoundationFortune.API.Items
 			}
 		}
 
-        protected override void OnChanging(ChangingItemEventArgs ev)
+        protected override void OnAcquired(Player player, Item item, bool displayMessage)
         {
-            base.OnChanging(ev);
+	        base.OnAcquired(player, item, false);
         }
 
         public static void GetHeldBottle(Player player, ref StringBuilder stringbuilder)

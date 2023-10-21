@@ -21,30 +21,27 @@ namespace FoundationFortune
 		public override string Prefix => "this plugin is a performance issue";
 		public override Version Version => new(1, 0, 0);
 
-		private Harmony _harmony;
+		private Harmony harmony;
 
 		public static FoundationFortune Singleton;
 		public static List<ObjectInteractions> PlayerPurchaseLimits = new();
-        public ServerEvents serverEvents = new();
+        public ServerEvents ServerEvents = new();
 		public LiteDatabase db;
 
-		public Dictionary<Player, Dictionary<PerkType, int>> ConsumedPerks { get; private set; } = new();
-        public Dictionary<string, (Npc bot, int indexation)> BuyingBots { get; private set; } = new();
-		public Dictionary<string, (Npc bot, int indexation)> SellingBots { get; private set; } = new();
-        public Dictionary<string, (Npc bot, int indexation)> MusicBots { get; private set; } = new();
-
-        public override void OnEnabled()
+		public Dictionary<Player, Dictionary<PerkType, int>> ConsumedPerks = new();
+        public Dictionary<string, (Npc bot, int indexation)> BuyingBots  = new();
+		public Dictionary<string, (Npc bot, int indexation)> SellingBots = new();
+		public List<PlayerMusicBotPair> MusicBotPairs { get; private set; } = new();
+		public override void OnEnabled()
 		{
 			Singleton = this;
 			CreateDatabase();
 			RegisterEvents();
 			Startup.SetupDependencies();
 			CustomItem.RegisterItems();
-			if (_harmony == null)
-			{
-				_harmony = new("FoundationFortune");
-				_harmony.PatchAll();
-			}
+			if (harmony != null) return;
+			harmony = new("FoundationFortune");
+			harmony.PatchAll();
 		}
 
 		public override void OnDisabled()
@@ -55,46 +52,46 @@ namespace FoundationFortune
 			UnregisterEvents();
 			Singleton = null;
 			CustomItem.UnregisterItems();
-            _harmony?.UnpatchAll(_harmony.Id);
-            serverEvents = null;
+            harmony?.UnpatchAll(harmony.Id);
+            ServerEvents = null;
         }
 
         private void RegisterEvents()
 		{
-			Exiled.Events.Handlers.Server.RoundStarted += serverEvents.RoundStart;
-			Exiled.Events.Handlers.Player.Verified += serverEvents.RegisterInDatabase;
-			Exiled.Events.Handlers.Player.Dying += serverEvents.EtherealInterventionHandler;
-			Exiled.Events.Handlers.Player.Spawned += serverEvents.EtherealInterventionSpawn;
-			Exiled.Events.Handlers.Player.Died += serverEvents.KillingReward;
-			Exiled.Events.Handlers.Player.Escaping += serverEvents.EscapingReward;
-			Exiled.Events.Handlers.Player.DroppingItem += serverEvents.SellingItem;
-			Exiled.Events.Handlers.Scp049.ActivatingSense += serverEvents.FuckYourAbility;
-			Exiled.Events.Handlers.Scp0492.TriggeringBloodlust += serverEvents.FuckYourOtherAbility;
-			Exiled.Events.Handlers.Player.Spawning += serverEvents.SpawningNpc;
-			Exiled.Events.Handlers.Server.EndingRound += serverEvents.RoundEnding;
-			Exiled.Events.Handlers.Server.RestartingRound += serverEvents.RoundRestart;
-			Exiled.Events.Handlers.Server.RoundEnded += serverEvents.RoundEnded;
-			Exiled.Events.Handlers.Server.RespawningTeam += serverEvents.PreventBotsFromSpawning;
-			Exiled.Events.Handlers.Player.Left += serverEvents.DestroyMusicBots;
+			Exiled.Events.Handlers.Server.RoundStarted += ServerEvents.RoundStart;
+			Exiled.Events.Handlers.Player.Verified += ServerEvents.RegisterInDatabase;
+			Exiled.Events.Handlers.Player.Dying += ServerEvents.EtherealInterventionHandler;
+			Exiled.Events.Handlers.Player.Spawned += ServerEvents.EtherealInterventionSpawn;
+			Exiled.Events.Handlers.Player.Died += ServerEvents.KillingReward;
+			Exiled.Events.Handlers.Player.Escaping += ServerEvents.EscapingReward;
+			Exiled.Events.Handlers.Player.DroppingItem += ServerEvents.SellingItem;
+			Exiled.Events.Handlers.Scp049.ActivatingSense += ServerEvents.FuckYourAbility;
+			Exiled.Events.Handlers.Scp0492.TriggeringBloodlust += ServerEvents.FuckYourOtherAbility;
+			Exiled.Events.Handlers.Player.Spawning += ServerEvents.SpawningNpc;
+			Exiled.Events.Handlers.Server.EndingRound += ServerEvents.RoundEnding;
+			Exiled.Events.Handlers.Server.RestartingRound += ServerEvents.RoundRestart;
+			Exiled.Events.Handlers.Server.RoundEnded += ServerEvents.RoundEnded;
+			Exiled.Events.Handlers.Server.RespawningTeam += ServerEvents.PreventBotsFromSpawning;
+			Exiled.Events.Handlers.Player.Left += ServerEvents.DestroyMusicBots;
 		}
 
 		private void UnregisterEvents()
 		{
-			Exiled.Events.Handlers.Server.RoundStarted -= serverEvents.RoundStart;
-			Exiled.Events.Handlers.Player.Verified -= serverEvents.RegisterInDatabase;
-			Exiled.Events.Handlers.Player.Dying -= serverEvents.EtherealInterventionHandler;
-            Exiled.Events.Handlers.Player.Spawned -= serverEvents.EtherealInterventionSpawn;
-            Exiled.Events.Handlers.Player.Died -= serverEvents.KillingReward;
-			Exiled.Events.Handlers.Player.Escaping -= serverEvents.EscapingReward;
-			Exiled.Events.Handlers.Player.DroppingItem -= serverEvents.SellingItem;
-			Exiled.Events.Handlers.Scp049.ActivatingSense -= serverEvents.FuckYourAbility;
-			Exiled.Events.Handlers.Scp0492.TriggeringBloodlust -= serverEvents.FuckYourOtherAbility;
-			Exiled.Events.Handlers.Player.Spawning -= serverEvents.SpawningNpc;
-			Exiled.Events.Handlers.Server.EndingRound -= serverEvents.RoundEnding;
-			Exiled.Events.Handlers.Server.RestartingRound -= serverEvents.RoundRestart;
-            Exiled.Events.Handlers.Server.RoundEnded -= serverEvents.RoundEnded;
-            Exiled.Events.Handlers.Server.RespawningTeam -= serverEvents.PreventBotsFromSpawning;
-            Exiled.Events.Handlers.Player.Left -= serverEvents.DestroyMusicBots;
+			Exiled.Events.Handlers.Server.RoundStarted -= ServerEvents.RoundStart;
+			Exiled.Events.Handlers.Player.Verified -= ServerEvents.RegisterInDatabase;
+			Exiled.Events.Handlers.Player.Dying -= ServerEvents.EtherealInterventionHandler;
+            Exiled.Events.Handlers.Player.Spawned -= ServerEvents.EtherealInterventionSpawn;
+            Exiled.Events.Handlers.Player.Died -= ServerEvents.KillingReward;
+			Exiled.Events.Handlers.Player.Escaping -= ServerEvents.EscapingReward;
+			Exiled.Events.Handlers.Player.DroppingItem -= ServerEvents.SellingItem;
+			Exiled.Events.Handlers.Scp049.ActivatingSense -= ServerEvents.FuckYourAbility;
+			Exiled.Events.Handlers.Scp0492.TriggeringBloodlust -= ServerEvents.FuckYourOtherAbility;
+			Exiled.Events.Handlers.Player.Spawning -= ServerEvents.SpawningNpc;
+			Exiled.Events.Handlers.Server.EndingRound -= ServerEvents.RoundEnding;
+			Exiled.Events.Handlers.Server.RestartingRound -= ServerEvents.RoundRestart;
+            Exiled.Events.Handlers.Server.RoundEnded -= ServerEvents.RoundEnded;
+            Exiled.Events.Handlers.Server.RespawningTeam -= ServerEvents.PreventBotsFromSpawning;
+            Exiled.Events.Handlers.Player.Left -= ServerEvents.DestroyMusicBots;
 		}
 
 		private void CreateDatabase()

@@ -9,7 +9,6 @@ using UnityEngine;
 using Exiled.API.Features.Items;
 using System.Text;
 using FoundationFortune.API.Items;
-using System;
 
 namespace FoundationFortune.API.HintSystem
 {
@@ -72,7 +71,7 @@ namespace FoundationFortune.API.HintSystem
                     }
 
                     UpdateExtractionMessages(ply, ref hintMessageBuilder);
-                    UpdateNPCProximityMessages(ply, ref hintMessageBuilder);
+                    UpdateNpcProximityMessages(ply, ref hintMessageBuilder);
                     UpdateWorkstationMessages(ply, ref hintMessageBuilder);
                     UpdateBountyMessages(ply, ref hintMessageBuilder);
                     PerkBottle.GetHeldBottle(ply, ref hintMessageBuilder);
@@ -99,9 +98,9 @@ namespace FoundationFortune.API.HintSystem
 
         public string GetRecentHints(string userId)
 		{
-			if (recentHints.ContainsKey(userId))
+			if (recentHints.TryGetValue(userId, out var hint))
 			{
-				var currentHints = recentHints[userId]
+				var currentHints = hint
 				    .Where(entry => !entry.IsAnimated && (Time.time - entry.Timestamp) <= FoundationFortune.Singleton.Config.MaxHintAge)
 				    .Select(entry => entry.Text);
 
@@ -113,9 +112,9 @@ namespace FoundationFortune.API.HintSystem
 
 		public string GetAnimatedHints(string userId)
 		{
-			if (recentHints.ContainsKey(userId))
+			if (recentHints.TryGetValue(userId, out var hint))
 			{
-				var currentHints = recentHints[userId]
+				var currentHints = hint
 				    .Where(entry => entry.IsAnimated && (Time.time - entry.Timestamp) <= FoundationFortune.Singleton.Config.MaxHintAge)
 				    .Select(entry => entry.Text);
 

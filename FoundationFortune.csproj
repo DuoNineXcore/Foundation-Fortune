@@ -2,7 +2,7 @@
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
-    <LangVersion>10.0</LangVersion>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -36,11 +36,38 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="0Harmony">
+      <HintPath>..\..\Documents\C# References\0Harmony.dll</HintPath>
+    </Reference>
     <Reference Include="Assembly-CSharp">
       <HintPath>..\..\Documents\C# References\Assembly-CSharp.dll</HintPath>
     </Reference>
     <Reference Include="Assembly-CSharp-firstpass">
-      <HintPath>..\..\..\Documents\C# References\Assembly-CSharp-firstpass.dll</HintPath>
+      <HintPath>..\..\Documents\C# References\Assembly-CSharp-firstpass.dll</HintPath>
+    </Reference>
+    <Reference Include="CommandSystem.Core">
+      <HintPath>..\..\Documents\C# References\CommandSystem.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Exiled.API">
+      <HintPath>..\..\Documents\C# References\Exiled.API.dll</HintPath>
+    </Reference>
+    <Reference Include="Exiled.CreditTags">
+      <HintPath>..\..\Documents\C# References\Exiled.CreditTags.dll</HintPath>
+    </Reference>
+    <Reference Include="Exiled.CustomItems">
+      <HintPath>..\..\Documents\C# References\Exiled.CustomItems.dll</HintPath>
+    </Reference>
+    <Reference Include="Exiled.CustomRoles">
+      <HintPath>..\..\Documents\C# References\Exiled.CustomRoles.dll</HintPath>
+    </Reference>
+    <Reference Include="Exiled.Events">
+      <HintPath>..\..\Documents\C# References\Exiled.Events.dll</HintPath>
+    </Reference>
+    <Reference Include="Exiled.Permissions">
+      <HintPath>..\..\Documents\C# References\Exiled.Permissions.dll</HintPath>
+    </Reference>
+    <Reference Include="Exiled.Updater">
+      <HintPath>..\..\Documents\C# References\Exiled.Updater.dll</HintPath>
     </Reference>
     <Reference Include="LiteDB">
       <HintPath>..\..\Documents\C# References\LiteDB.dll</HintPath>
@@ -49,20 +76,48 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\Documents\C# References\Mirror.dll</HintPath>
     </Reference>
+    <Reference Include="NorthwoodLib">
+      <HintPath>..\..\Documents\C# References\NorthwoodLib.dll</HintPath>
+    </Reference>
+    <Reference Include="PluginAPI">
+      <HintPath>..\..\Documents\C# References\PluginAPI.dll</HintPath>
+    </Reference>
     <Reference Include="Pooling, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\Documents\C# References\Pooling.dll</HintPath>
     </Reference>
-    <Reference Include="SCPSLAudioApi, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Debug\SCPSLAudioApi.dll</HintPath>
+    <Reference Include="SCPSLAudioApi">
+      <HintPath>..\..\AppData\Roaming\EXILED\Plugins\dependencies\SCPSLAudioApi.dll</HintPath>
     </Reference>
-    <Reference Include="System" />
+    <Reference Include="System">
+      <HintPath>..\..\Documents\C# References\System.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Core">
+      <HintPath>..\..\Documents\C# References\System.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="System.IO.Compression">
+      <HintPath>..\..\Documents\C# References\System.IO.Compression.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Net.Http">
+      <HintPath>..\..\Documents\C# References\System.Net.Http.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine">
+      <HintPath>..\..\Documents\C# References\UnityEngine.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>D:\SteamLibrary\steamapps\common\ULTRAKILL\ULTRAKILL_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.PhysicsModule">
-      <HintPath>..\..\..\Documents\C# References\UnityEngine.PhysicsModule.dll</HintPath>
+      <HintPath>..\..\Documents\C# References\UnityEngine.PhysicsModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UnityWebRequestModule">
+      <HintPath>..\..\Documents\C# References\UnityEngine.UnityWebRequestModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UnityWebRequestWWWModule">
+      <HintPath>..\..\Documents\C# References\UnityEngine.UnityWebRequestWWWModule.dll</HintPath>
+    </Reference>
+    <Reference Include="YamlDotNet">
+      <HintPath>..\..\Documents\C# References\YamlDotNet.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -80,6 +135,7 @@
     <Compile Include="API\NPCs\BuyingBot.cs" />
     <Compile Include="API\NPCs\MusicBot.cs" />
     <Compile Include="API\NPCs\SellingBot.cs" />
+    <Compile Include="API\Updater.cs" />
     <Compile Include="Commands\FortuneCommands\AdminCommands\AddAdmin.cs" />
     <Compile Include="Commands\FortuneCommands\AdminCommands\RemoveAdmin.cs" />
     <Compile Include="Commands\FortuneCommands\AdminCommands\BountyCommands\AddBounty.cs" />
@@ -126,6 +182,9 @@
     </PackageReference>
     <PackageReference Include="Northwood.PluginAPI">
       <Version>13.1.1</Version>
+    </PackageReference>
+    <PackageReference Include="System.Collections">
+      <Version>4.3.0</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup />

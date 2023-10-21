@@ -15,8 +15,8 @@ namespace FoundationFortune.API.Database
 
         //player settings
         public static bool GetHintMinmode(string userId) => PlayersCollection.FindOne(p => p.UserId == userId)?.HintMinmode ?? false;
-        public static bool GetHintDisable(string userId) => PlayersCollection.FindOne(p => p.UserId == userId)?.DisabledHintSystem ?? false;
-        public static bool GetPluginAdmin(string userId) => PlayersCollection.FindOne(p => p.UserId == userId)?.IsAdmin ?? false;
+        public static bool GetHintDisable(string userId) => PlayersCollection.FindOne(p => p.UserId == userId)?.HintSystem ?? false;
+        public static bool GetPluginAdmin(string userId) => PlayersCollection.FindOne(p => p.UserId == userId)?.HintAdmin ?? false;
         public static int GetHintAlpha(string userId) => PlayersCollection.FindOne(p => p.UserId == userId)?.HintOpacity ?? 50;
         public static int GetHintSize(string userId) => PlayersCollection.FindOne(p => p.UserId == userId)?.HintSize ?? 25;
         public static HintAnim GetHintAnim(string userId) => PlayersCollection.FindOne(p => p.UserId == userId)?.HintAnim ?? HintAnim.None;
@@ -77,23 +77,17 @@ namespace FoundationFortune.API.Database
         public static bool ToggleHintDisable(string userId, bool enable)
         {
             var player = GetPlayerById(userId);
-            if (player != null)
-            {
-                player.DisabledHintSystem = enable;
-                return PlayersCollection.Update(player);
-            }
-            return false;
+            if (player == null) return false;
+            player.HintAdmin = enable;
+            return PlayersCollection.Update(player);
         }
 
         public static bool TogglePluginAdmin(string userId, bool enable)
         {
             var player = GetPlayerById(userId);
-            if (player != null)
-            {
-                player.IsAdmin = enable;
-                return PlayersCollection.Update(player);
-            }
-            return false;
+            if (player == null) return false;
+            player.HintAdmin = enable;
+            return PlayersCollection.Update(player);
         }
 
         public static HintAlign? GetUserHintAlign(string userId)
@@ -130,50 +124,44 @@ namespace FoundationFortune.API.Database
         public static void ModifyMoney(string userId, int amount, bool subtract = false, bool hold = false, bool saved = true)
         {
             var player = GetPlayerById(userId);
-            if (player != null)
+            if (player == null) return;
+            if (hold)
             {
-                if (hold)
-                {
-                    if (subtract) player.MoneyOnHold -= amount;
-                    else player.MoneyOnHold += amount;
-                }
-                else if (saved)
-                {
-                    if (subtract) player.MoneySaved -= amount;
-                    else player.MoneySaved += amount;
-                }
-                PlayersCollection.Update(player);
+                if (subtract) player.MoneyOnHold -= amount;
+                else player.MoneyOnHold += amount;
             }
+            else if (saved)
+            {
+                if (subtract) player.MoneySaved -= amount;
+                else player.MoneySaved += amount;
+            }
+            PlayersCollection.Update(player);
         }
 
         public static void EmptyMoney(string userId, bool onHold = false, bool saved = false)
         {
             var player = GetPlayerById(userId);
-            if (player != null)
-            {
-                if (onHold) player.MoneyOnHold = 0;
-                if (saved) player.MoneySaved = 0;
-                PlayersCollection.Update(player);
-            }
+            if (player == null) return;
+            if (onHold) player.MoneyOnHold = 0;
+            if (saved) player.MoneySaved = 0;
+            PlayersCollection.Update(player);
         }
 
         public static void TransferMoney(string userId, bool onHoldToSaved = false)
         {
             var player = GetPlayerById(userId);
-            if (player != null)
+            if (player == null) return;
+            if (onHoldToSaved)
             {
-                if (onHoldToSaved)
-                {
-                    player.MoneySaved += player.MoneyOnHold;
-                    player.MoneyOnHold = 0;
-                }
-                else
-                {
-                    player.MoneyOnHold += player.MoneySaved;
-                    player.MoneySaved = 0;
-                }
-                PlayersCollection.Update(player);
+                player.MoneySaved += player.MoneyOnHold;
+                player.MoneyOnHold = 0;
             }
+            else
+            {
+                player.MoneyOnHold += player.MoneySaved;
+                player.MoneySaved = 0;
+            }
+            PlayersCollection.Update(player);
         }
     }
 }

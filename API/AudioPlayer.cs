@@ -1,18 +1,17 @@
 ﻿using Exiled.API.Features;
 using FoundationFortune.API.NPCs;
-using PlayerRoles;
 using SCPSLAudioApi.AudioCore;
-using System;
-using System.Collections.Generic;
 using System.IO;
+using Exiled.API.Enums;
+using Exiled.API.Features.Roles;
+using MEC;
+using PlayerRoles;
 using VoiceChat;
-using VoiceChat.Networking;
-using YamlDotNet.Core.Tokens;
 
 namespace FoundationFortune.API
 {
     /// <summary>
-    /// This class is just for playing audios from both NPCs and Players.
+    /// This class is just for playing audios from NPCs or Players.
     /// </summary>
     public static class AudioPlayer
     {
@@ -41,85 +40,47 @@ namespace FoundationFortune.API
             audioPlayer.Continue = true;
             audioPlayer.Play(0);
         }
-
+        
         public static Npc PlaySpecialAudio(Player ply, string audioFile, byte volume, bool loop, VoiceChatChannel channel)
         {
-            try
+            var path = Path.Combine(Path.Combine(Paths.Configs, "Foundation Fortune"), audioFile);
+            PlayAudio(ply, audioFile, volume, loop, channel);
+
+            Npc spawnedMusicBot = MusicBot.GetMusicBotByPlayer(ply);
+            var ap2 = AudioPlayerBase.Get(spawnedMusicBot.ReferenceHub);
+            
+            spawnedMusicBot.Role.Set(RoleTypeId.Spectator);
+
+            Timing.CallDelayed(0.20f, delegate
             {
-                if (ply == null)
-                {
-                    Log.Debug("Player object is null.");
-                    return null;
-                }
+                spawnedMusicBot.Role.Set(RoleTypeId.Spectator, SpawnReason.None);
+            });
+            ap2.Enqueue(path, -1);
+            ap2.LogDebug = false;
+            ap2.BroadcastChannel = VoiceChatChannel.Mimicry;
+            ap2.Volume = volume;
+            ap2.Loop = loop;
+            ap2.Continue = true;
+            ap2.Play(0);
+            ap2.BroadcastTo.Add(ply.ReferenceHub.PlayerId);
 
-                var path = Path.Combine(Path.Combine(Paths.Configs, "Foundation Fortune"), audioFile);
-                var ap = AudioPlayerBase.Get(ply.ReferenceHub);
-                if (ap == null)
-                {
-                    Log.Debug("AudioPlayerBase for player is null.");
-                    return null;
-                }
-
-                ap.Enqueue(path, -1);
-                ap.LogDebug = false;
-                ap.BroadcastChannel = channel;
-                ap.Volume = volume;
-                ap.Loop = loop;
-                ap.Continue = true;
-                ap.Play(0);
-
-                Npc spawnedMusicBot = MusicBot.GetMusicBotByUserId(ply.UserId);
-
-                if (spawnedMusicBot == null)
-                {
-                    Log.Debug("Spawned music bot is null.");
-                    return null;
-                }
-
-                var ap2 = AudioPlayerBase.Get(spawnedMusicBot.ReferenceHub);
-                if (ap2 == null)
-                {
-                    Log.Debug("AudioPlayerBase for spawned music bot is null.");
-                    return null;
-                }
-
-                ap2.Enqueue(path, -1);
-                ap2.LogDebug = false;
-                ap2.BroadcastChannel = VoiceChatChannel.None;
-                ap2.Volume = volume;
-                ap2.Loop = loop;
-                ap2.Continue = true;
-                ap2.Play(0);
-                ap2.BroadcastTo.Add(ply.ReferenceHub.PlayerId);
-
-                return spawnedMusicBot;
-            }
-            catch (Exception ex)
-            {
-                Log.Debug(ex);
-                return null;
-            }
+            return spawnedMusicBot;
         }
-
 
         public static void StopAudio(Npc ply)
         {
             var audioPlayer = AudioPlayerBase.Get(ply.ReferenceHub);
-            if (audioPlayer.CurrentPlay != null)
-            {
-                audioPlayer.Stoptrack(true);
-                audioPlayer.OnDestroy();
-            }
+            if (audioPlayer.CurrentPlay == null) return;
+            audioPlayer.Stoptrack(true);
+            audioPlayer.OnDestroy();
         }
 
         public static void StopAudio(Player ply)
         {
             var audioPlayer = AudioPlayerBase.Get(ply.ReferenceHub);
-            if (audioPlayer.CurrentPlay != null)
-            {
-                audioPlayer.Stoptrack(true);
-                audioPlayer.OnDestroy();
-            }
+            if (audioPlayer.CurrentPlay == null) return;
+            audioPlayer.Stoptrack(true);
+            audioPlayer.OnDestroy();
         }
     }
 }

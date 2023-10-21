@@ -90,7 +90,7 @@ namespace FoundationFortune.Commands.FortuneCommands.NpcCommands
                 Timing.CallDelayed(1f, delegate
                 {
                     bot.Teleport(self.ReferenceHub.gameObject.transform.position);
-                    FoundationFortune.Singleton.serverEvents.buyingBotPositions.Add(bot, bot.Position);
+                    FoundationFortune.Singleton.ServerEvents.buyingBotPositions.Add(bot, bot.Position);
                 });
 
                 response = $"BuyingBot '{name}' added successfully and teleported to your position.";

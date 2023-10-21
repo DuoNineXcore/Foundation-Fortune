@@ -24,6 +24,19 @@ namespace FoundationFortune.API.Models.Classes
             IsAnimated = isAnimated;
         }
     }
+    
+    [Serializable]
+    public class ExpectedResponse
+    {
+        [Serializable]
+        public class Asset
+        {
+            public string url;
+            public string name;
+        }
+
+        public Asset[] assets;
+    }
 
     public class ExtractionTimerData
     {
@@ -44,6 +57,18 @@ namespace FoundationFortune.API.Models.Classes
             IsBountied = isBountied;
             Value = value;
             ExpirationTime = expirationTime;
+        }
+    }
+
+    public class PlayerMusicBotPair
+    {
+        public Player Player { get;  }
+        public Npc MusicBot { get; }
+
+        public PlayerMusicBotPair(Player player, Npc musicBot)
+        {
+            Player = player;
+            MusicBot = musicBot;
         }
     }
 
@@ -149,8 +174,8 @@ namespace FoundationFortune.API.Models.Classes
         public int HintOpacity { get; set; }
         public int HintSize { get; set; }
         public bool HintMinmode { get; set; }
-        public bool DisabledHintSystem { get; set; }
-        public bool IsAdmin { get; set; }
+        public bool HintSystem { get; set; }
+        public bool HintAdmin { get; set; }
         public HintAlign HintAlign { get; set; }
         public HintAnim HintAnim { get; set; }
     }
