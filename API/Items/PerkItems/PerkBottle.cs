@@ -43,47 +43,38 @@ namespace FoundationFortune.API.Items.PerkItems
 
 		private void UsedPerkBottle(UsedItemEventArgs ev)
 		{
-			if (DroppedPerkBottles.TryGetValue(ev.Item.Serial, out var perkBottleData))
+			if (!DroppedPerkBottles.TryGetValue(ev.Item.Serial, out var perkBottleData)) return;
+			PerkType perkType = perkBottleData.perkType;
+			PerkSystem.GrantPerk(ev.Player, perkType);
+
+			// Add the consumed perk to the consumedPerks dictionary
+			if (!FoundationFortune.Singleton.ConsumedPerks.TryGetValue(ev.Player, out var playerPerks))
 			{
-				PerkType perkType = perkBottleData.perkType;
-				PerkSystem.GrantPerk(ev.Player, perkType);
-
-				// Add the consumed perk to the consumedPerks dictionary
-				if (!FoundationFortune.Singleton.ConsumedPerks.TryGetValue(ev.Player, out var playerPerks))
-				{
-					playerPerks = new Dictionary<PerkType, int>();
-					FoundationFortune.Singleton.ConsumedPerks[ev.Player] = playerPerks;
-				}
-
-				if (playerPerks.TryGetValue(perkType, out var count))
-				{
-					playerPerks[perkType] = count + 1;
-				}
-				else
-				{
-					playerPerks[perkType] = 1;
-				}
-
-				FoundationFortune.Singleton.ServerEvents.EnqueueHint(ev.Player, $"<b>You drank a <color=#FFC0CB>{perkType}</color> Perk bottle.</b>", 2f);
-				DroppedPerkBottles.Remove(ev.Item.Serial);
+				playerPerks = new Dictionary<PerkType, int>();
+				FoundationFortune.Singleton.ConsumedPerks[ev.Player] = playerPerks;
 			}
+
+			if (playerPerks.TryGetValue(perkType, out var count))
+			{
+				playerPerks[perkType] = count + 1;
+			}
+			else
+			{
+				playerPerks[perkType] = 1;
+			}
+
+			FoundationFortune.Singleton.ServerEvents.EnqueueHint(ev.Player, $"<b>You drank a <color=#FFC0CB>{perkType}</color> Perk bottle.</b>", 2f);
+			DroppedPerkBottles.Remove(ev.Item.Serial);
 		}
 
 
         public static void GivePerkBottle(Player player, PerkType perkType)
-		{
-			if (TrySpawn(331, player.Position, out Pickup perkBottle))
-			{
-				Log.Debug($"Spawned Perk Bottle at Pos:{perkBottle.Position} Serial: {perkBottle.Serial}, PerkType: {perkType}");
-				DroppedPerkBottles[perkBottle.Serial] = (perkType, player);
-			}
-		}
-
-        protected override void OnChanging(ChangingItemEventArgs ev)
         {
-	        base.OnChanging(ev);
+	        if (!TrySpawn(331, player.Position, out Pickup perkBottle)) return;
+	        Log.Debug($"Spawned Perk Bottle at Pos:{perkBottle.Position} Serial: {perkBottle.Serial}, PerkType: {perkType}");
+	        DroppedPerkBottles[perkBottle.Serial] = (perkType, player);
         }
-        
+
         protected override void OnAcquired(Player player, Item item, bool displayMessage)
         {
 	        base.OnAcquired(player, item, false);

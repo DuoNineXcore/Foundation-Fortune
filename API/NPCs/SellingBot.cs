@@ -21,11 +21,7 @@ namespace FoundationFortune.API.NPCs
         {
             ServerRoles serverRoles = NetworkManager.singleton.playerPrefab.GetComponent<ServerRoles>();
             List<string> allowedColors = new(serverRoles.NamedColors.Length);
-            foreach (ServerRoles.NamedColor namedColor in serverRoles.NamedColors)
-            {
-                if (namedColor.Restricted) continue;
-                allowedColors.Add(namedColor.Name);
-            }
+            allowedColors.AddRange(from namedColor in serverRoles.NamedColors where !namedColor.Restricted select namedColor.Name);
             allowedSellingBotNameColors = allowedColors;
         }
 

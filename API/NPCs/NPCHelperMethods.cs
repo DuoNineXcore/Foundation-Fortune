@@ -46,7 +46,10 @@ namespace FoundationFortune.API.NPCs
             {
                 npc.ReferenceHub.roleManager.InitializeNewRole(RoleTypeId.None, RoleChangeReason.None, RoleSpawnFlags.None);
             }
-            catch (Exception ex) { }
+            catch (Exception)
+            {
+                // ignored
+            }
 
             if (RecyclablePlayerId.FreeIds.Contains(id)) RecyclablePlayerId.FreeIds.RemoveFromQueue(id);
             else if (RecyclablePlayerId._autoIncrement >= id) id = ++RecyclablePlayerId._autoIncrement;
@@ -56,7 +59,10 @@ namespace FoundationFortune.API.NPCs
             {
                 npc.ReferenceHub.characterClassManager.InstanceMode = ClientInstanceMode.DedicatedServer;
             }
-            catch (Exception ex) { }
+            catch (Exception)
+            {
+                // ignored
+            }
 
             npc.ReferenceHub.nicknameSync.Network_myNickSync = name;
             Timing.CallDelayed(0.25f, delegate
@@ -80,8 +86,15 @@ namespace FoundationFortune.API.NPCs
             float outfHorizontal = rotation.eulerAngles.y;
             float outfVertical = -rotation.eulerAngles.x;
 
-            if (outfVertical < -90f) outfVertical += 360f;
-            else if (outfVertical > 270f) outfVertical -= 360f;
+            switch (outfVertical)
+            {
+                case < -90f:
+                    outfVertical += 360f;
+                    break;
+                case > 270f:
+                    outfVertical -= 360f;
+                    break;
+            }
             return (ToHorizontal(outfHorizontal), ToVertical(outfVertical));
 
             static ushort ToHorizontal(float horizontal)

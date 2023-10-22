@@ -92,26 +92,22 @@ namespace FoundationFortune.API.HintSystem
 
         public void EtherealInterventionHandler(DyingEventArgs ev)
 		{
-			if (FoundationFortune.Singleton.ConsumedPerks.ContainsKey(ev.Player)) FoundationFortune.Singleton.ConsumedPerks[ev.Player].Clear();
+			if (FoundationFortune.Singleton.ConsumedPerks.TryGetValue(ev.Player, out var perk)) perk.Clear();
 
-			if (PerkSystem.EtherealInterventionPlayers.Contains(ev.Player))
+			if (!PerkSystem.EtherealInterventionPlayers.Contains(ev.Player)) return;
+			ev.IsAllowed = false;
+			RoleTypeId role = ev.Player.Role.Type;
+			Room room = Room.List.Where(r => r.Zone == ev.Player.Zone & !FoundationFortune.Singleton.Config.ForbiddenRooms.Contains(r.Type)).GetRandomValue();
+			ev.ItemsToDrop = new List<Item>();
+
+			List<Item> items = ev.Player.Items.ToList();
+			Dictionary<AmmoType, ushort> ammos = ev.Player.Ammo.ToDictionary(kvp => kvp.Key.GetAmmoType(), kvp => kvp.Value);
+
+			Timing.CallDelayed(0.1f, delegate
 			{
-				ev.IsAllowed = false;
-				RoleTypeId role = ev.Player.Role.Type;
-				Room room = Room.List.Where(r => r.Zone == ev.Player.Zone & !FoundationFortune.Singleton.Config.ForbiddenRooms.Contains(r.Type)).GetRandomValue();
-				List<Item> items = new();
-				Dictionary<AmmoType, ushort> ammos = new();
-				ev.ItemsToDrop = new List<Item>();
-
-				foreach (Item item in ev.Player.Items) items.Add(item);
-				foreach (var kvp in ev.Player.Ammo) ammos.Add(kvp.Key.GetAmmoType(), kvp.Value);
-
-				Timing.CallDelayed(0.1f, delegate
-				{
-					ev.Player.Role.Set(role, RoleSpawnFlags.None);
-					ev.Player.Teleport(room);
-				});
-			}
+				ev.Player.Role.Set(role, RoleSpawnFlags.None);
+				ev.Player.Teleport(room);
+			});
 		}
 
 		public void EtherealInterventionSpawn(SpawnedEventArgs ev)

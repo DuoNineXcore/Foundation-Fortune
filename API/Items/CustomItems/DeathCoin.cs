@@ -38,36 +38,30 @@ namespace FoundationFortune.API.Items.CustomItems
 			if (PerkSystem.EtherealInterventionPlayers.Contains(ev.Player)) return;
 
 			int moneyBeforeDeath = PlayerDataRepository.GetMoneyOnHold(ev.Player.UserId);
-			if (moneyBeforeDeath > 0 && !PlayerDataRepository.GetPluginAdmin(ev.Player.UserId))
+			if (moneyBeforeDeath <= 0 || PlayerDataRepository.GetPluginAdmin(ev.Player.UserId)) return;
+			FoundationFortune.Singleton.ServerEvents.EnqueueHint(ev.Player, FoundationFortune.Singleton.Translation.Death.Replace("%moneyBeforeDeath%", moneyBeforeDeath.ToString()), 5f);
+			PlayerDataRepository.EmptyMoney(ev.Player.UserId, true, false);
+			int coinValue = moneyBeforeDeath / FoundationFortune.Singleton.Config.DeathCoinsToDrop;
+			for (int i = 0; i < FoundationFortune.Singleton.Config.DeathCoinsToDrop; i++)
 			{
-				FoundationFortune.Singleton.ServerEvents.EnqueueHint(ev.Player, FoundationFortune.Singleton.Translation.Death.Replace("%moneyBeforeDeath%", moneyBeforeDeath.ToString()), 5f);
-				PlayerDataRepository.EmptyMoney(ev.Player.UserId, true, false);
-				int coinValue = moneyBeforeDeath / FoundationFortune.Singleton.Config.DeathCoinsToDrop;
-				for (int i = 0; i < FoundationFortune.Singleton.Config.DeathCoinsToDrop; i++)
-				{
-					if (TrySpawn(Id, ev.Player.Position, out Pickup coin))
-					{
-						Log.Debug($"Spawned coin at Pos:{coin.Position} Rotation:{coin.Rotation}, Serial: {coin.Serial}, Value: {coinValue}");
-						droppedCoins[coin.Serial] = (coinValue, ev.Player);
-					}
-				}
+				if (!TrySpawn(Id, ev.Player.Position, out Pickup coin)) continue;
+				Log.Debug($"Spawned coin at Pos:{coin.Position} Rotation:{coin.Rotation}, Serial: {coin.Serial}, Value: {coinValue}");
+				droppedCoins[coin.Serial] = (coinValue, ev.Player);
 			}
 		}
 
 		protected override void OnAcquired(Player player, Item item, bool displayMessage)
 		{
 			base.OnAcquired(player, item, false);
-			if (item.Type == ItemType.Coin)
+			if (item.Type != ItemType.Coin) return;
+			if (droppedCoins.TryGetValue(item.Serial, out var coinData))
 			{
-				if (droppedCoins.TryGetValue(item.Serial, out var coinData))
-				{
-					int coinValue = coinData.coinValue;
-					FoundationFortune.Singleton.ServerEvents.EnqueueHint(player, FoundationFortune.Singleton.Translation.DeathCoinPickup.Replace("%coinValue%", coinValue.ToString()), 3f);
-					PlayerDataRepository.ModifyMoney(player.UserId, coinValue, false, true, false);
-					droppedCoins.Remove(item.Serial);
-				}
-				item.Destroy();
+				int coinValue = coinData.coinValue;
+				FoundationFortune.Singleton.ServerEvents.EnqueueHint(player, FoundationFortune.Singleton.Translation.DeathCoinPickup.Replace("%coinValue%", coinValue.ToString()), 3f);
+				PlayerDataRepository.ModifyMoney(player.UserId, coinValue, false, true, false);
+				droppedCoins.Remove(item.Serial);
 			}
+			item.Destroy();
 		}
 	}
 }

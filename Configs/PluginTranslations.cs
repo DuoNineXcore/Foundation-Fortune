@@ -47,8 +47,8 @@ namespace FoundationFortune.Configs
 		public string RevivalSuccess { get; set; } = "<b><color=%rolecolor%>%nickname%</color> Has Revived <color=%rolecolor%>%target%</color></b>\\n";
 
 		[Description("Bounty System Hints")]
-		public string SelfBounty { get; set; } = "<b><color=red>You're Being Hunted!</color>Reward: $3000 Duration: %duration%</b>\\n";
-		public string OtherBounty { get; set; } = "<b><color=red>%player% is being Hunted!</color></b>\\nReward: $3000 Duration: %duration%";
+		public string SelfBounty { get; set; } = "<b><color=red>You're Being Hunted!</color> Reward: %bountyReward% Duration: %duration%</b>\\n";
+		public string OtherBounty { get; set; } = "<b><color=red>%player% is being Hunted!</color></b>\\nReward: %bountyReward% Duration: %duration%";
 		public string BountyFinished { get; set; } = "<b><color=%victimrolecolor%>%victim%</color> has been killed by <color=%attackercolor%>%attacker%</color>, Bounty Finished.</b>\\n";
 		public string BountyPlayerDied { get; set; } = "<b>%victim% Died from unknown reasons, Bounty Finished.</b>\\n";
 		public string BountyKill { get; set; } = "<b><color=green>+%bountyPrice%$</color> You killed %victim%. Bounty Finished.</b>\\n";

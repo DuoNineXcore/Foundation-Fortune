@@ -20,7 +20,7 @@ namespace FoundationFortune.API.Perks
 	public static class PerkSystem
 	{
 		public static readonly List<Player> EtherealInterventionPlayers = new();
-        public static void ClearConsumedPerks(Player player) { if (FoundationFortune.Singleton.ConsumedPerks.ContainsKey(player)) FoundationFortune.Singleton.ConsumedPerks[player].Clear(); }
+        public static void ClearConsumedPerks(Player player) { if (FoundationFortune.Singleton.ConsumedPerks.TryGetValue(player, out var perk)) perk.Clear(); }
 
         public static void GrantPerk(Player ply, PerkType perk)
 		{
@@ -76,10 +76,10 @@ namespace FoundationFortune.API.Perks
             Scp330Bag.AddSimpleRegeneration(ply.ReferenceHub, 5f, 50f);
             Log.Debug("Blissful Unawareness 1st coroutine finished.");
 			Log.Debug("Blissful Unawareness 2nd coroutine started.");
-			PlayerVoiceChatSettings BlissfulAwarenessSettings = FoundationFortune.Singleton.Config.PlayerVoiceChatSettings
+			PlayerVoiceChatSettings BlissfulUnawarenessSettings = FoundationFortune.Singleton.Config.PlayerVoiceChatSettings
 			    .FirstOrDefault(settings => settings.VoiceChatUsageType == PlayerVoiceChatUsageType.BlissfulUnawareness);
 			ply.EnableEffect<SoundtrackMute>(50f);
-			AudioPlayer.PlaySpecialAudio(ply, BlissfulAwarenessSettings.AudioFile, BlissfulAwarenessSettings.Volume, BlissfulAwarenessSettings.Loop, BlissfulAwarenessSettings.VoiceChat);
+			AudioPlayer.PlaySpecialAudio(ply, BlissfulUnawarenessSettings.AudioFile, BlissfulUnawarenessSettings.Volume, BlissfulUnawarenessSettings.Loop, BlissfulUnawarenessSettings.VoiceChat);
 
             yield return Timing.WaitForSeconds(41f);
 

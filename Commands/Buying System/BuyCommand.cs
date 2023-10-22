@@ -82,7 +82,7 @@ namespace FoundationFortune.Commands.BuyCommand
 			return false;
 		}
 
-		private bool TryPurchasePerk(Player player, string aliasOrEnum, out string response)
+		private static bool TryPurchasePerk(Player player, string aliasOrEnum, out string response)
 		{
 			PerkItem perkItem = FoundationFortune.Singleton.Config.PerkItems.FirstOrDefault(p =>
 				p.Alias.Equals(aliasOrEnum, StringComparison.OrdinalIgnoreCase) ||
@@ -101,7 +101,8 @@ namespace FoundationFortune.Commands.BuyCommand
 				response = $"You have successfully bought {perkItem.DisplayName} for ${perkItem.Price}";
 				return true;
 			}
-			else if (perkItem != null && ExceedsPerkLimit(player, perkItem))
+
+			if (perkItem != null && ExceedsPerkLimit(player, perkItem))
 			{
 				response = $"You have exceeded the Perk Limit for the Perk '{perkItem.DisplayName}'";
 				return true;
@@ -111,7 +112,7 @@ namespace FoundationFortune.Commands.BuyCommand
 			return false;
 		}
 
-		private bool TryPurchaseItem(Player player, string aliasOrEnum, out string response)
+		private static bool TryPurchaseItem(Player player, string aliasOrEnum, out string response)
 		{
 			BuyableItem buyItem = FoundationFortune.Singleton.Config.BuyableItems.FirstOrDefault(p =>
 			    p.Alias.Equals(aliasOrEnum, StringComparison.OrdinalIgnoreCase) ||
@@ -123,13 +124,14 @@ namespace FoundationFortune.Commands.BuyCommand
 				    .Replace("%itemAlias%", buyItem.Alias)
 				    .Replace("%itemPrice%", buyItem.Price.ToString());
 				FoundationFortune.Singleton.ServerEvents.EnqueueHint(player, $"{BoughtHint}", 3f);
-				PlayerDataRepository.ModifyMoney(player.UserId, buyItem.Price, true, false, true);
+				PlayerDataRepository.ModifyMoney(player.UserId, buyItem.Price, true);
 				player.AddItem(buyItem.ItemType);
 				ServerEvents.AddToPlayerLimits(player, buyItem);
 				response = $"You have successfully bought {buyItem.DisplayName} for ${buyItem.Price}";
 				return true;
 			}
-			else if (buyItem != null && ExceedsItemLimit(player, buyItem))
+
+			if (buyItem != null && ExceedsItemLimit(player, buyItem))
 			{
 				response = $"You have exceeded the Item Limit for the Item '{buyItem.DisplayName}'";
 				return true;
@@ -139,15 +141,14 @@ namespace FoundationFortune.Commands.BuyCommand
 			return false;
 		}
 
-		private bool CanPurchase(Player player, int price)
+		private static bool CanPurchase(Player player, int price)
 		{
 			if (PlayerDataRepository.GetPluginAdmin(player.UserId)) return true;
 			int money = PlayerDataRepository.GetMoneySaved(player.UserId);
-			if (money < price) return false;
-			return true;
+			return money >= price;
 		}
 
-		public string GetList()
+		private static string GetList()
 		{
 			var translation = FoundationFortune.Singleton.Translation;
 			var config = FoundationFortune.Singleton.Config;
@@ -169,28 +170,22 @@ namespace FoundationFortune.Commands.BuyCommand
 			return $"{itemsList}\n{perksList}";
 		}
 
-		private bool ExceedsPerkLimit(Player player, PerkItem perkItem)
+		private static bool ExceedsPerkLimit(Player player, PerkItem perkItem)
 		{
 			if (PlayerDataRepository.GetPluginAdmin(player.UserId)) return false;
 			var playerLimit = FoundationFortune.PlayerPurchaseLimits.FirstOrDefault(p => p.Player.UserId == player.UserId);
-			if (playerLimit != null)
-			{
-				var perkCount = playerLimit.BoughtPerks.Count(pair => pair.Key.PerkType == perkItem.PerkType);
-				return perkCount >= perkItem.Limit;
-			}
-			return false;
+			if (playerLimit == null) return false;
+			var perkCount = playerLimit.BoughtPerks.Count(pair => pair.Key.PerkType == perkItem.PerkType);
+			return perkCount >= perkItem.Limit;
 		}
 
-		private bool ExceedsItemLimit(Player player, BuyableItem buyItem)
+		private static bool ExceedsItemLimit(Player player, BuyableItem buyItem)
 		{
 			if (PlayerDataRepository.GetPluginAdmin(player.UserId)) return false;
 			var playerLimit = FoundationFortune.PlayerPurchaseLimits.FirstOrDefault(p => p.Player.UserId == player.UserId);
-			if (playerLimit != null)
-			{
-				var itemCount = playerLimit.BoughtItems.Count(pair => pair.Key.ItemType == buyItem.ItemType);
-				return itemCount >= buyItem.Limit;
-			}
-			return false;
+			if (playerLimit == null) return false;
+			var itemCount = playerLimit.BoughtItems.Count(pair => pair.Key.ItemType == buyItem.ItemType);
+			return itemCount >= buyItem.Limit;
 		}
 	}
 }

@@ -67,7 +67,7 @@ namespace FoundationFortune.API.NPCs
             {
                 npc.ReferenceHub.roleManager.InitializeNewRole(RoleTypeId.None, RoleChangeReason.None, RoleSpawnFlags.None);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 // ignored
             }
@@ -80,7 +80,10 @@ namespace FoundationFortune.API.NPCs
             {
                 npc.ReferenceHub.characterClassManager.InstanceMode = ClientInstanceMode.DedicatedServer;
             }
-            catch (Exception ex) { }
+            catch (Exception)
+            {
+                // ignored
+            }
 
             npc.ReferenceHub.nicknameSync.Network_myNickSync = $"MusicBot-{name}";
             Timing.CallDelayed(0.5f, delegate

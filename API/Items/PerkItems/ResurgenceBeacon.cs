@@ -33,19 +33,12 @@ namespace FoundationFortune.API.Items.PerkItems
             Exiled.Events.Handlers.Player.UsingRadioBattery -= RevivePlayer;
         }
 
-        protected override void OnChanging(ChangingItemEventArgs ev)
-        {
-            base.OnChanging(ev);
-        }
-
         private void RevivePlayer(UsingRadioBatteryEventArgs ev)
         {
-            if (RevivalData.TryGetValue(ev.Item.Serial, out var revivalInfo) && ev.Radio.IsEnabled)
-            {
-                PerkSystem.ActivateResurgenceBeacon(revivalInfo.RevivingPlayer, revivalInfo.PlayerToRevive.Nickname);
-                revivalInfo.PlayerToRevive.RemoveItem(ev.Item, true);
-                ev.IsAllowed = false;
-            }
+            if (!RevivalData.TryGetValue(ev.Item.Serial, out var revivalInfo) || !ev.Radio.IsEnabled) return;
+            PerkSystem.ActivateResurgenceBeacon(revivalInfo.RevivingPlayer, revivalInfo.PlayerToRevive.Nickname);
+            revivalInfo.PlayerToRevive.RemoveItem(ev.Item, true);
+            ev.IsAllowed = false;
         }
 
         public static bool SpawnResurgenceBeacon(Player giver, string targetPlayerUserId)
@@ -53,13 +46,10 @@ namespace FoundationFortune.API.Items.PerkItems
             Player targetPlayer = Player.Get(targetPlayerUserId);
             if (targetPlayer == null) return false;
 
-            if (TrySpawn(332, giver.Position, out Pickup resurgencebeacon))
-            {
-                Log.Debug($"Spawned Perk Bottle at Pos:{resurgencebeacon.Position} Serial: {resurgencebeacon.Serial}, Player to be revived: {targetPlayer}");
-                RevivalData[resurgencebeacon.Serial] = (giver, targetPlayer);
-                return true;
-            }
-            return false;
+            if (!TrySpawn(332, giver.Position, out Pickup resurgencebeacon)) return false;
+            Log.Debug($"Spawned Perk Bottle at Pos:{resurgencebeacon.Position} Serial: {resurgencebeacon.Serial}, Player to be revived: {targetPlayer}");
+            RevivalData[resurgencebeacon.Serial] = (giver, targetPlayer);
+            return true;
         }
     }
 }

@@ -21,11 +21,7 @@ namespace FoundationFortune.API.NPCs
         {
             ServerRoles serverRoles = NetworkManager.singleton.playerPrefab.GetComponent<ServerRoles>();
             List<string> allowedColors = new(serverRoles.NamedColors.Length);
-            foreach (ServerRoles.NamedColor namedColor in serverRoles.NamedColors)
-            {
-                if (namedColor.Restricted) continue;
-                allowedColors.Add(namedColor.Name);
-            }
+            allowedColors.AddRange(from namedColor in serverRoles.NamedColors where !namedColor.Restricted select namedColor.Name);
             allowedBuyingBotNameColors = allowedColors;
         }
 
@@ -64,12 +60,9 @@ namespace FoundationFortune.API.NPCs
 
             Timing.CallDelayed(0.5f, () =>
             {
+                if (!HeldItem.HasValue) return;
                 spawnedBuyingBot.ClearInventory();
-                if (HeldItem.HasValue)
-                {
-                    spawnedBuyingBot.ClearInventory();
-                    spawnedBuyingBot.CurrentItem = Item.Create((ItemType)HeldItem, spawnedBuyingBot);
-                }
+                spawnedBuyingBot.CurrentItem = Item.Create((ItemType)HeldItem, spawnedBuyingBot);
             });
 
             return spawnedBuyingBot;
@@ -78,22 +71,19 @@ namespace FoundationFortune.API.NPCs
         public static bool RemoveBuyingBot(string target)
         {
             string botKey = $"BuyingBot-{target}";
-            if (FoundationFortune.Singleton.BuyingBots.TryGetValue(botKey, out var botData))
+            if (!FoundationFortune.Singleton.BuyingBots.TryGetValue(botKey, out var botData)) return false;
+            var (bot, _) = botData;
+            if (bot != null)
             {
-                var (bot, _) = botData;
-                if (bot != null)
+                bot.ClearInventory();
+                Timing.CallDelayed(0.3f, () =>
                 {
-                    bot.ClearInventory();
-                    Timing.CallDelayed(0.3f, () =>
-                    {
-                        bot.Vaporize(bot);
-                        CustomNetworkManager.TypedSingleton.OnServerDisconnect(bot.NetworkIdentity.connectionToClient);
-                    });
-                }
-                FoundationFortune.Singleton.BuyingBots.Remove(botKey);
-                return true;
+                    bot.Vaporize(bot);
+                    CustomNetworkManager.TypedSingleton.OnServerDisconnect(bot.NetworkIdentity.connectionToClient);
+                });
             }
-            return false;
+            FoundationFortune.Singleton.BuyingBots.Remove(botKey);
+            return true;
         }
     }
 }

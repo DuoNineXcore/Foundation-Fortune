@@ -21,6 +21,8 @@ namespace FoundationFortune.API.HintSystem
 
 		private static readonly Vector3 WorldPos = new(124f, 988f, 24f);
 		private const float RadiusSqr = 16f * 16f;
+		
+		public bool IsPlayerOnSellingWorkstation(Player player) => workstationPositions.Count != 0 && workstationPositions.Values.Select(workstationPosition => Vector3.Distance(player.Position, workstationPosition)).Any(distance => distance <= FoundationFortune.Singleton.Config.SellingWorkstationRadius);
 
 		private static void UpdatePerkIndicator(Dictionary<Player, Dictionary<PerkType, int>> consumedPerks, ref StringBuilder perkIndicator)
 		{
@@ -78,18 +80,6 @@ namespace FoundationFortune.API.HintSystem
 		{
 			float distanceSqr = (player.Position - WorldPos).sqrMagnitude;
 			return distanceSqr <= RadiusSqr;
-		}
-
-		public bool IsPlayerOnSellingWorkstation(Player player)
-		{
-			if (workstationPositions.Count == 0) return false;
-
-			foreach (var workstationPosition in workstationPositions.Values)
-			{
-				float distance = Vector3.Distance(player.Position, workstationPosition);
-				if (distance <= FoundationFortune.Singleton.Config.SellingWorkstationRadius) return true;
-			}
-			return false;
 		}
 
         private static string IntToHexAlpha(int value)

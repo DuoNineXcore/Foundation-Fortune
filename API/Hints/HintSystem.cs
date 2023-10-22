@@ -83,44 +83,37 @@ namespace FoundationFortune.API.HintSystem
 
                     ply.ShowHint($"{IntToHexAlpha(hintAlpha)}<size={hintSize}><align={hintAlignment}>{hintMessageBuilder}</align>", 2);
 
-                    if (confirmSell.ContainsKey(ply.UserId) && Time.time - dropTimestamp[ply.UserId] >= FoundationFortune.Singleton.Config.SellingConfirmationTime)
-                    {
-                        confirmSell.Remove(ply.UserId);
-                        dropTimestamp.Remove(ply.UserId);
-                    }
+                    if (!confirmSell.ContainsKey(ply.UserId) || !(Time.time - dropTimestamp[ply.UserId] >=
+                                                                  FoundationFortune.Singleton.Config
+	                                                                  .SellingConfirmationTime)) continue;
+                    confirmSell.Remove(ply.UserId);
+                    dropTimestamp.Remove(ply.UserId);
                 }
 
                 yield return Timing.WaitForSeconds(updateRate);
             }
         }
 
-
         public string GetRecentHints(string userId)
 		{
-			if (recentHints.TryGetValue(userId, out var hint))
-			{
-				var currentHints = hint
-				    .Where(entry => !entry.IsAnimated && (Time.time - entry.Timestamp) <= FoundationFortune.Singleton.Config.MaxHintAge)
-				    .Select(entry => entry.Text);
+			if (!recentHints.TryGetValue(userId, out var hint)) return "";
+			var currentHints = hint
+				.Where(entry => !entry.IsAnimated && (Time.time - entry.Timestamp) <= FoundationFortune.Singleton.Config.MaxHintAge)
+				.Select(entry => entry.Text);
 
-				return string.Join("\n", currentHints);
-			}
+			return string.Join("\n", currentHints);
 
-			return "";
 		}
 
 		public string GetAnimatedHints(string userId)
 		{
-			if (recentHints.TryGetValue(userId, out var hint))
-			{
-				var currentHints = hint
-				    .Where(entry => entry.IsAnimated && (Time.time - entry.Timestamp) <= FoundationFortune.Singleton.Config.MaxHintAge)
-				    .Select(entry => entry.Text);
+			if (!recentHints.TryGetValue(userId, out var hint)) return "";
+			var currentHints = hint
+				.Where(entry => entry.IsAnimated && (Time.time - entry.Timestamp) <= FoundationFortune.Singleton.Config.MaxHintAge)
+				.Select(entry => entry.Text);
 
-				return string.Join("\n", currentHints);
-			}
+			return string.Join("\n", currentHints);
 
-			return "";
 		}
 
 		public void EnqueueHint(Player player, string hint, float duration)
@@ -180,7 +173,7 @@ namespace FoundationFortune.API.HintSystem
 				if (recentHints.TryGetValue(userId, out Queue<HintEntry> hintQueue) && hintQueue.Count > 0)
 				{
 					var lastEntry = hintQueue.Last();
-					if (lastEntry != null && lastEntry.IsAnimated)
+					if (lastEntry is { IsAnimated: true })
 					{
 						lastEntry.Text = animatedText;
 						lastEntry.Timestamp = Time.time;

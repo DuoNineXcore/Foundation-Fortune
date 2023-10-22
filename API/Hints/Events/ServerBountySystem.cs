@@ -23,6 +23,12 @@ namespace FoundationFortune.API.HintSystem
 				.FirstOrDefault(settings => settings.VoiceChatUsageType == PlayerVoiceChatUsageType.Hunted);
 			if (hunted != null) AudioPlayer.PlayTo(player, hunted.AudioFile, hunted.Volume, hunted.Loop, hunted.VoiceChat);
 			
+			PlayerVoiceChatSettings hunter = FoundationFortune.Singleton.Config.PlayerVoiceChatSettings
+				.FirstOrDefault(settings => settings.VoiceChatUsageType == PlayerVoiceChatUsageType.Hunter);
+			
+			foreach (Player ply in Player.List.Where(p => !p.IsNPC && p == player)) 
+				if (hunter != null) AudioPlayer.PlayTo(ply, hunter.AudioFile, hunter.Volume, hunter.Loop, hunter.VoiceChat);
+
 			Timing.CallDelayed((float)duration.TotalSeconds, () => StopBounty(player));
 		}
 
@@ -36,14 +42,12 @@ namespace FoundationFortune.API.HintSystem
         {
             Bounty bounty = BountiedPlayers.FirstOrDefault(b => b.Player == ply);
 
-            if (bounty != null)
-            {
-                TimeSpan timeLeft = bounty.ExpirationTime - DateTime.Now;
-                string bountyMessage = ply.UserId == bounty.Player.UserId
-                    ? FoundationFortune.Singleton.Translation.SelfBounty.Replace("%duration%", timeLeft.ToString(@"hh\:mm\:ss"))
-                    : FoundationFortune.Singleton.Translation.OtherBounty.Replace("%player%", bounty.Player.Nickname).Replace("%duration%", timeLeft.ToString(@"hh\:mm\:ss"));
-                hintMessage.Append($"{bountyMessage}");
-            }
+            if (bounty == null) return;
+            TimeSpan timeLeft = bounty.ExpirationTime - DateTime.Now;
+            string bountyMessage = ply.UserId == bounty.Player.UserId
+	            ? FoundationFortune.Singleton.Translation.SelfBounty.Replace("%duration%", timeLeft.ToString(@"hh\:mm\:ss"))
+	            : FoundationFortune.Singleton.Translation.OtherBounty.Replace("%player%", bounty.Player.Nickname).Replace("%duration%", timeLeft.ToString(@"hh\:mm\:ss"));
+            hintMessage.Append($"{bountyMessage}");
         }
     }
 }

@@ -1,12 +1,10 @@
 ﻿using System;
 using Exiled.API.Features;
-using System.Linq;
 using Exiled.API.Enums;
 using MEC;
 using UnityEngine;
 using System.Collections.Generic;
 using FoundationFortune.API.Database;
-using FoundationFortune.API.Models.Enums;
 using FoundationFortune.API.Models.Classes;
 using System.Text;
 
@@ -14,21 +12,21 @@ namespace FoundationFortune.API.HintSystem
 {
 	public partial class ServerEvents
 	{
-		private bool isExtractionPointActive = false;
-		public bool limitReached = false;
+		private bool isExtractionPointActive;
+		public bool limitReached;
 		private RoomType activeExtractionRoom;
-		private int extractionCount = 0;
-		private int nextExtractionTime = 0;
+		private int extractionCount;
+		private int nextExtractionTime;
 		private float extractionStartTime;
 		private Dictionary<Player, ExtractionTimerData> extractionTimers = new();
 
-		private bool IsPlayerInExtractionRoom(Player player, RoomType roomType)
+		private static bool IsPlayerInExtractionRoom(Player player, RoomType roomType)
 		{
 			if (player.CurrentRoom != null) return player.CurrentRoom.Type == roomType;
 			else return false;
 		}
 
-		public void StartExtractionEvent()
+		private void StartExtractionEvent()
 		{
 			if (!FoundationFortune.Singleton.Config.MoneyExtractionSystem) return;
 			if (extractionCount >= FoundationFortune.Singleton.Config.ExtractionLimit)
@@ -65,57 +63,52 @@ namespace FoundationFortune.API.HintSystem
 			if (restart)
 			{
 				isExtractionPointActive = false;
-				if (extractionCount < FoundationFortune.Singleton.Config.ExtractionLimit)
-				{
-					nextExtractionTime = UnityEngine.Random.Range(FoundationFortune.Singleton.Config.MinExtractionPointGenerationTime, FoundationFortune.Singleton.Config.MaxExtractionPointGenerationTime + 1);
-					Log.Debug($"Extraction point in room {activeExtractionRoom} deactivated. Next extraction in T-{nextExtractionTime} Seconds.");
-					Timing.CallDelayed(nextExtractionTime, () => StartExtractionEvent());
-				}
+				if (extractionCount >= FoundationFortune.Singleton.Config.ExtractionLimit) return;
+				nextExtractionTime = UnityEngine.Random.Range(FoundationFortune.Singleton.Config.MinExtractionPointGenerationTime, FoundationFortune.Singleton.Config.MaxExtractionPointGenerationTime + 1);
+				Log.Debug($"Extraction point in room {activeExtractionRoom} deactivated. Next extraction in T-{nextExtractionTime} Seconds.");
+				Timing.CallDelayed(nextExtractionTime, StartExtractionEvent);
 			}
             else isExtractionPointActive = false;
         }
 
         private void UpdateExtractionMessages(Player ply, ref StringBuilder hintMessage)
         {
-            if (isExtractionPointActive)
-            {
-                if (IsPlayerInExtractionRoom(ply, activeExtractionRoom))
-                {
-                    int totalMoneyOnHold = PlayerDataRepository.GetMoneyOnHold(ply.UserId);
+	        if (!isExtractionPointActive) return;
+	        
+	        if (IsPlayerInExtractionRoom(ply, activeExtractionRoom))
+	        {
+		        int totalMoneyOnHold = PlayerDataRepository.GetMoneyOnHold(ply.UserId);
 
-                    if (totalMoneyOnHold <= 0)
-                    {
-                        hintMessage.Append($"{FoundationFortune.Singleton.Translation.ExtractionNoMoney}");
-                    }
-                    else
-                    {
-                        if (!extractionTimers.ContainsKey(ply)) StartExtractionTimer(ply);
+		        if (totalMoneyOnHold <= 0)
+		        {
+			        hintMessage.Append($"{FoundationFortune.Singleton.Translation.ExtractionNoMoney}");
+		        }
+		        else
+		        {
+			        if (!extractionTimers.ContainsKey(ply)) StartExtractionTimer(ply);
 
-                        ExtractionTimerData timerData = extractionTimers[ply];
-                        float elapsedTime = Time.time - timerData.StartTime;
-                        TimeSpan timeLeft = TimeSpan.FromSeconds(10 - elapsedTime);
+			        ExtractionTimerData timerData = extractionTimers[ply];
+			        float elapsedTime = Time.time - timerData.StartTime;
+			        TimeSpan timeLeft = TimeSpan.FromSeconds(10 - elapsedTime);
 
-                        string waitTimerHint = FoundationFortune.Singleton.Translation.ExtractionTimer
-                            .Replace("%time%", timeLeft.ToString(@"ss"));
-                        hintMessage.Append(waitTimerHint);
+			        string waitTimerHint = FoundationFortune.Singleton.Translation.ExtractionTimer
+				        .Replace("%time%", timeLeft.ToString(@"ss"));
+			        hintMessage.Append(waitTimerHint);
 
-                        if (IsExtractionTimerFinished(ply) && totalMoneyOnHold > 0)
-                        {
-                            CancelExtractionTimer(ply);
-                            hintMessage.Append($"{FoundationFortune.Singleton.Translation.ExtractionStart}");
-                        }
-                    }
-                }
-                else
-                {
-                    CancelExtractionTimer(ply);
+			        if (!IsExtractionTimerFinished(ply)) return;
+			        CancelExtractionTimer(ply);
+			        hintMessage.Append($"{FoundationFortune.Singleton.Translation.ExtractionStart}");
+		        }
+	        }
+	        else
+	        {
+		        CancelExtractionTimer(ply);
 
-                    string extractionHint = FoundationFortune.Singleton.Translation.ExtractionEvent
-                        .Replace("%room%", activeExtractionRoom.ToString())
-                        .Replace("%time%", TimeSpan.FromSeconds(FoundationFortune.Singleton.Config.ExtractionPointDuration - (Time.time - extractionStartTime)).ToString(@"hh\:mm\:ss"));
-                    hintMessage.Append(extractionHint);
-                }
-            }
+		        string extractionHint = FoundationFortune.Singleton.Translation.ExtractionEvent
+			        .Replace("%room%", activeExtractionRoom.ToString())
+			        .Replace("%time%", TimeSpan.FromSeconds(FoundationFortune.Singleton.Config.ExtractionPointDuration - (Time.time - extractionStartTime)).ToString(@"hh\:mm\:ss"));
+		        hintMessage.Append(extractionHint);
+	        }
         }
 
         private IEnumerator<float> ExtractMoneyCoroutine(Player player)
@@ -139,17 +132,14 @@ namespace FoundationFortune.API.HintSystem
 		private bool IsExtractionTimerFinished(Player player)
 		{
 			Log.Debug($"Extraction timer finished for player {player.UserId}");
-			if (extractionTimers.TryGetValue(player, out var timer))
-			{
-				float elapsedTime = Time.time - timer.StartTime;
-				TimeSpan timeLeft = TimeSpan.FromSeconds(10 - elapsedTime);
+			if (!extractionTimers.TryGetValue(player, out var timer)) return false;
+			float elapsedTime = Time.time - timer.StartTime;
+			TimeSpan timeLeft = TimeSpan.FromSeconds(10 - elapsedTime);
 
-				if (timeLeft.TotalSeconds > 0) return true;
-			}
-			return false;
+			return timeLeft.TotalSeconds > 0;
 		}
 
-		public void StartExtractionTimer(Player player)
+		private void StartExtractionTimer(Player player)
 		{
 			CoroutineHandle timerHandle = Timing.RunCoroutine(ExtractionTimerCoroutine(player));
 			ExtractionTimerData timerData = new()
@@ -190,14 +180,12 @@ namespace FoundationFortune.API.HintSystem
 
 			CancelExtractionTimer(player);
 		}
-		
-		public void CancelExtractionTimer(Player player)
+
+		private void CancelExtractionTimer(Player player)
 		{
-			if (extractionTimers.ContainsKey(player))
-			{
-				Timing.KillCoroutines(extractionTimers[player].CoroutineHandle);
-				extractionTimers.Remove(player);
-			}
+			if (!extractionTimers.ContainsKey(player)) return;
+			Timing.KillCoroutines(extractionTimers[player].CoroutineHandle);
+			extractionTimers.Remove(player);
 		}
 	}
 }
