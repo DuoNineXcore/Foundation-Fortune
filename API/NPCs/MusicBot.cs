@@ -85,7 +85,7 @@ namespace FoundationFortune.API.NPCs
             npc.ReferenceHub.nicknameSync.Network_myNickSync = $"MusicBot-{name}";
             Timing.CallDelayed(0.5f, delegate
             {
-                npc.Role.Set(role, SpawnReason.ForceClass);
+                npc.Role.Set(role);
             });
             return npc;
         }

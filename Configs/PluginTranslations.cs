@@ -1,11 +1,5 @@
-﻿using Exiled.API.Enums;
-using Exiled.API.Interfaces;
-using PlayerRoles;
-using System.Collections.Generic;
-using UnityEngine;
-using VoiceChat;
+﻿using Exiled.API.Interfaces;
 using System.ComponentModel;
-using FoundationFortune.API.Models.Enums;
 
 namespace FoundationFortune.Configs
 {

@@ -94,8 +94,7 @@ namespace FoundationFortune.API.HintSystem
 		{
 			if (FoundationFortune.Singleton.ConsumedPerks.ContainsKey(ev.Player)) FoundationFortune.Singleton.ConsumedPerks[ev.Player].Clear();
 
-			if (!PerkSystem.EtherealInterventionPlayers.Contains(ev.Player)) return;
-			else
+			if (PerkSystem.EtherealInterventionPlayers.Contains(ev.Player))
 			{
 				ev.IsAllowed = false;
 				RoleTypeId role = ev.Player.Role.Type;
@@ -118,16 +117,13 @@ namespace FoundationFortune.API.HintSystem
 		public void EtherealInterventionSpawn(SpawnedEventArgs ev)
 		{
 			if (!PerkSystem.EtherealInterventionPlayers.Contains(ev.Player)) return;
-			else
+			Timing.CallDelayed(0.2f, delegate
 			{
-				Timing.CallDelayed(0.2f, delegate
-				{
-					PlayerVoiceChatSettings EtherealInterventionAudio = FoundationFortune.Singleton.Config.PlayerVoiceChatSettings
-								 .FirstOrDefault(settings => settings.VoiceChatUsageType == PlayerVoiceChatUsageType.EtherealIntervention);
-					AudioPlayer.PlaySpecialAudio(ev.Player, EtherealInterventionAudio.AudioFile, EtherealInterventionAudio.Volume, EtherealInterventionAudio.Loop, EtherealInterventionAudio.VoiceChat);
-				});
-				PerkSystem.EtherealInterventionPlayers.Remove(ev.Player);
-			}
+				PlayerVoiceChatSettings EtherealInterventionAudio = FoundationFortune.Singleton.Config.PlayerVoiceChatSettings
+					.FirstOrDefault(settings => settings.VoiceChatUsageType == PlayerVoiceChatUsageType.EtherealIntervention);
+				AudioPlayer.PlaySpecialAudio(ev.Player, EtherealInterventionAudio.AudioFile, EtherealInterventionAudio.Volume, EtherealInterventionAudio.Loop, EtherealInterventionAudio.VoiceChat);
+			});
+			PerkSystem.EtherealInterventionPlayers.Remove(ev.Player);
 		}
 
 		public void KillingReward(DiedEventArgs ev)

@@ -7,14 +7,6 @@ using PlayerRoles.PlayableScps.Scp939.Ripples;
 using System.Collections.Generic;
 using System.Reflection.Emit;
 using FoundationFortune.API.NPCs;
-using PlayerRoles.PlayableScps.Scp939.Mimicry;
-using PlayerRoles.Voice;
-using PlayerRoles;
-using System.Reflection;
-using VoiceChat.Networking;
-using VoiceChat;
-using Exiled.API.Features;
-using Mirror;
 
 namespace FoundationFortune.Patches
 {

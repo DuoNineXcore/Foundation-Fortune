@@ -125,22 +125,22 @@ namespace FoundationFortune.Configs
 		[Description("NPC-Related Event Sound Effects.")]
 		public List<NPCVoiceChatSettings> FFNPCVoiceChatSettings { get; set; } = new List<NPCVoiceChatSettings>()
 		{
-			new NPCVoiceChatSettings { VoiceChatUsageType = NPCVoiceChatUsageType.Selling, VoiceChat = VoiceChatChannel.Mimicry, Loop = false, AudioFile = "BuySuccess.ogg", Volume = 50},
+			new NPCVoiceChatSettings { VoiceChatUsageType = NPCVoiceChatUsageType.Selling, VoiceChat = VoiceChatChannel.Mimicry, Loop = false, AudioFile = "SellSuccess.ogg", Volume = 50},
 			new NPCVoiceChatSettings { VoiceChatUsageType = NPCVoiceChatUsageType.Buying, VoiceChat = VoiceChatChannel.Mimicry, Loop = false, AudioFile = "BuySuccess.ogg", Volume = 50},
-			new NPCVoiceChatSettings { VoiceChatUsageType = NPCVoiceChatUsageType.WrongBuyingBot, VoiceChat = VoiceChatChannel.Mimicry, Loop = false, AudioFile = "BuySuccess.ogg", Volume = 50},
-			new NPCVoiceChatSettings { VoiceChatUsageType = NPCVoiceChatUsageType.NotEnoughMoney, VoiceChat = VoiceChatChannel.Mimicry, Loop = false, AudioFile = "BuySuccess.ogg", Volume = 50},
-			new NPCVoiceChatSettings { VoiceChatUsageType = NPCVoiceChatUsageType.BuyingBotInRange, VoiceChat = VoiceChatChannel.Mimicry, Loop = false, AudioFile = "BuySuccess.ogg", Volume = 50},
-			new NPCVoiceChatSettings { VoiceChatUsageType = NPCVoiceChatUsageType.SellingBotInRange, VoiceChat = VoiceChatChannel.Mimicry, Loop = false, AudioFile = "BuySuccess.ogg", Volume = 50}
+			new NPCVoiceChatSettings { VoiceChatUsageType = NPCVoiceChatUsageType.WrongBuyingBot, VoiceChat = VoiceChatChannel.Mimicry, Loop = false, AudioFile = "WrongBot.ogg", Volume = 50},
+			new NPCVoiceChatSettings { VoiceChatUsageType = NPCVoiceChatUsageType.NotEnoughMoney, VoiceChat = VoiceChatChannel.Mimicry, Loop = false, AudioFile = "NoMoney.ogg", Volume = 50},
+			new NPCVoiceChatSettings { VoiceChatUsageType = NPCVoiceChatUsageType.BuyingBotInRange, VoiceChat = VoiceChatChannel.Mimicry, Loop = false, AudioFile = "BuyingRange.ogg", Volume = 50},
+			new NPCVoiceChatSettings { VoiceChatUsageType = NPCVoiceChatUsageType.SellingBotInRange, VoiceChat = VoiceChatChannel.Mimicry, Loop = false, AudioFile = "SellingRange.ogg", Volume = 50}
 		};
 
 		[Description("Player-Related Event Sound Effects.")]
 		public List<PlayerVoiceChatSettings> PlayerVoiceChatSettings { get; set; } = new List<PlayerVoiceChatSettings>()
 		{
 			new PlayerVoiceChatSettings { VoiceChatUsageType = PlayerVoiceChatUsageType.EtherealIntervention, VoiceChat = VoiceChatChannel.Mimicry, Loop = false, AudioFile = "BuySuccess.ogg", Volume = 50},
-			new PlayerVoiceChatSettings { VoiceChatUsageType = PlayerVoiceChatUsageType.BlissfulUnawareness, VoiceChat = VoiceChatChannel.Mimicry, Loop = false, AudioFile = "explode.ogg", Volume = 50},
-			new PlayerVoiceChatSettings { VoiceChatUsageType = PlayerVoiceChatUsageType.ResurgenceBeacon, VoiceChat = VoiceChatChannel.Mimicry, Loop = false, AudioFile = "BuySuccess.ogg", Volume = 50},
-			new PlayerVoiceChatSettings { VoiceChatUsageType = PlayerVoiceChatUsageType.Hunted, VoiceChat = VoiceChatChannel.Mimicry, Loop = false, AudioFile = "hunted.ogg", Volume = 50},
-			new PlayerVoiceChatSettings { VoiceChatUsageType = PlayerVoiceChatUsageType.Hunter, VoiceChat = VoiceChatChannel.Mimicry, Loop = false, AudioFile = "BuySuccess.ogg", Volume = 50},
+			new PlayerVoiceChatSettings { VoiceChatUsageType = PlayerVoiceChatUsageType.BlissfulUnawareness, VoiceChat = VoiceChatChannel.Mimicry, Loop = false, AudioFile = "Explode.ogg", Volume = 50},
+			new PlayerVoiceChatSettings { VoiceChatUsageType = PlayerVoiceChatUsageType.ResurgenceBeacon, VoiceChat = VoiceChatChannel.Mimicry, Loop = false, AudioFile = "Beacon.ogg", Volume = 50},
+			new PlayerVoiceChatSettings { VoiceChatUsageType = PlayerVoiceChatUsageType.Hunted, VoiceChat = VoiceChatChannel.Mimicry, Loop = false, AudioFile = "Hunted.ogg", Volume = 50},
+			new PlayerVoiceChatSettings { VoiceChatUsageType = PlayerVoiceChatUsageType.Hunter, VoiceChat = VoiceChatChannel.Mimicry, Loop = false, AudioFile = "Hunter.ogg", Volume = 50},
 		};
 
 		[Description("List of items that can be sold.")]
@@ -191,7 +191,9 @@ namespace FoundationFortune.Configs
 			RoomType.HczTestRoom,
 			RoomType.Hcz049,
 			RoomType.Lcz173,
-			RoomType.HczTesla
+			RoomType.HczTesla,
+			RoomType.HczHid,
+			RoomType.Lcz330
 		};
 	}
 }
