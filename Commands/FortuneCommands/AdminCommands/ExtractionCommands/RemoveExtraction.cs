@@ -23,7 +23,7 @@ namespace FoundationFortune.Commands.FortuneCommands.ExtractionCommands
         {
             Player p = Player.Get(sender);
 
-            if (!sender.CheckPermission("ff.extractionsystem.deactivate") || !PlayerDataRepository.GetPluginAdmin(p.UserId))
+            if (!sender.CheckPermission("ff.extractionsystem.deactivate") && !PlayerDataRepository.GetPluginAdmin(p.UserId))
             {
                 response = "You do not have permission to use this command.";
                 return false;

@@ -18,7 +18,7 @@ namespace FoundationFortune.Commands.FortuneCommands.BountyCommands
         {
             Player p = Player.Get(sender);
 
-            if (!sender.CheckPermission("ff.bountysystem.flush") || !PlayerDataRepository.GetPluginAdmin(p.UserId))
+            if (!sender.CheckPermission("ff.bountysystem.flush") && !PlayerDataRepository.GetPluginAdmin(p.UserId))
             {
                 response = "You do not have permission to use this section.";
                 return false;

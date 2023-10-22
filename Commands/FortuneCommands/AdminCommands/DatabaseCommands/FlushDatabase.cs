@@ -20,7 +20,7 @@ namespace FoundationFortune.Commands.FortuneCommands.DatabaseCommands
             var pluginTranslations = FoundationFortune.Singleton.Translation;
             Player p = Player.Get(sender);
 
-            if (!sender.CheckPermission("ff.database.flush") || !PlayerDataRepository.GetPluginAdmin(p.UserId))
+            if (!sender.CheckPermission("ff.database.flush") && !PlayerDataRepository.GetPluginAdmin(p.UserId))
             {
                 response = "You do not have permission to use this command.";
                 return false;

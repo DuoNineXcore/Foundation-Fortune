@@ -20,7 +20,7 @@ namespace FoundationFortune.Commands
         {
             Player p = Player.Get(sender);
 
-            if (!sender.CheckPermission("ff.extractionsystem.add") || !PlayerDataRepository.GetPluginAdmin(p.UserId))
+            if (!sender.CheckPermission("ff.extractionsystem.add") && !PlayerDataRepository.GetPluginAdmin(p.UserId))
             {
                 response = "You do not have permission to use this command.";
                 return false;
