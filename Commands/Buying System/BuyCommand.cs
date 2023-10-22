@@ -8,6 +8,7 @@ using FoundationFortune.API.Models.Enums;
 using FoundationFortune.API.Models.Classes;
 using FoundationFortune.API.HintSystem;
 using FoundationFortune.API.Items;
+using FoundationFortune.API.Items.PerkItems;
 
 namespace FoundationFortune.Commands.BuyCommand
 {

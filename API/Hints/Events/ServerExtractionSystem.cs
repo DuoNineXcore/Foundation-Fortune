@@ -89,7 +89,7 @@ namespace FoundationFortune.API.HintSystem
                     }
                     else
                     {
-                        if (!extractionTimers.ContainsKey(ply)) StartExtractionTimer(ply, TimeSpan.FromSeconds(10));
+                        if (!extractionTimers.ContainsKey(ply)) StartExtractionTimer(ply);
 
                         ExtractionTimerData timerData = extractionTimers[ply];
                         float elapsedTime = Time.time - timerData.StartTime;
@@ -102,7 +102,6 @@ namespace FoundationFortune.API.HintSystem
                         if (IsExtractionTimerFinished(ply) && totalMoneyOnHold > 0)
                         {
                             CancelExtractionTimer(ply);
-                            StartMoneyExtractionTimer(ply);
                             hintMessage.Append($"{FoundationFortune.Singleton.Translation.ExtractionStart}");
                         }
                     }
@@ -119,35 +118,30 @@ namespace FoundationFortune.API.HintSystem
             }
         }
 
-
         private IEnumerator<float> ExtractMoneyCoroutine(Player player)
-		{
-			Log.Debug($"Extraction coroutine started for player {player.UserId}");
+        {
+	        while (IsPlayerInExtractionRoom(player, activeExtractionRoom))
+	        {
+		        int totalMoneyOnHold = PlayerDataRepository.GetMoneyOnHold(player.UserId);
 
-			while (IsPlayerInExtractionRoom(player, activeExtractionRoom) && !IsExtractionTimerFinished(player))
-			{
-				int totalMoneyOnHold = PlayerDataRepository.GetMoneyOnHold(player.UserId);
-
-				if (totalMoneyOnHold > 0)
-				{
-					float transferAmount = Mathf.Max(totalMoneyOnHold * 0.1f, 1f);
-					PlayerDataRepository.ModifyMoney(player.UserId, (int)transferAmount, true, true, false);
-					PlayerDataRepository.ModifyMoney(player.UserId, (int)transferAmount, false, false, true);
-					Log.Debug($"Transferred {transferAmount} money to player {player.UserId}");
-				}
-				yield return Timing.WaitForSeconds(0.5f);
-			}
-
-			Log.Debug($"Extraction coroutine finished for player {player.UserId}");
-		}
+		        if (totalMoneyOnHold > 0)
+		        {
+			        float transferAmount = Mathf.Max(totalMoneyOnHold * 0.1f, 1f);
+			        PlayerDataRepository.ModifyMoney(player.UserId, (int)transferAmount, true, true, false);
+			        PlayerDataRepository.ModifyMoney(player.UserId, (int)transferAmount, false, false, true);
+			        Log.Debug($"Transferred {transferAmount} money to player {player.UserId}");
+		        }
+		        yield return Timing.WaitForSeconds(1f);
+	        }
+	        Log.Debug($"Money extraction coroutine finished for player {player.UserId}");
+        }
 
 		private bool IsExtractionTimerFinished(Player player)
 		{
 			Log.Debug($"Extraction timer finished for player {player.UserId}");
-			if (extractionTimers.ContainsKey(player))
+			if (extractionTimers.TryGetValue(player, out var timer))
 			{
-				ExtractionTimerData timerData = extractionTimers[player];
-				float elapsedTime = Time.time - timerData.StartTime;
+				float elapsedTime = Time.time - timer.StartTime;
 				TimeSpan timeLeft = TimeSpan.FromSeconds(10 - elapsedTime);
 
 				if (timeLeft.TotalSeconds > 0) return true;
@@ -155,9 +149,9 @@ namespace FoundationFortune.API.HintSystem
 			return false;
 		}
 
-		public void StartExtractionTimer(Player player, TimeSpan duration)
+		public void StartExtractionTimer(Player player)
 		{
-			CoroutineHandle timerHandle = Timing.RunCoroutine(ExtractionTimerCoroutine(player, duration));
+			CoroutineHandle timerHandle = Timing.RunCoroutine(ExtractionTimerCoroutine(player));
 			ExtractionTimerData timerData = new()
 			{
 				CoroutineHandle = timerHandle,
@@ -166,6 +160,37 @@ namespace FoundationFortune.API.HintSystem
 			extractionTimers[player] = timerData;
 		}
 
+		private IEnumerator<float> ExtractionTimerCoroutine(Player player)
+		{
+			float startTime = Time.time;
+			while (Time.time - startTime < 10f)
+			{
+				if (!IsPlayerInExtractionRoom(player, activeExtractionRoom))
+				{
+					Log.Debug($"Extraction timer canceled for player {player.UserId}");
+					CancelExtractionTimer(player);
+					yield break;
+				}
+				yield return Timing.WaitForSeconds(1f);
+			}
+
+			Log.Debug($"Initial extraction timer finished for player {player.UserId}");
+			CoroutineHandle moneyExtractionHandle = Timing.RunCoroutine(ExtractMoneyCoroutine(player));
+			ExtractionTimerData timerData = new()
+			{
+				CoroutineHandle = moneyExtractionHandle,
+				StartTime = Time.time
+			};
+			extractionTimers[player] = timerData;
+
+			while (IsPlayerInExtractionRoom(player, activeExtractionRoom))
+			{
+				yield return Timing.WaitForSeconds(1f);
+			}
+
+			CancelExtractionTimer(player);
+		}
+		
 		public void CancelExtractionTimer(Player player)
 		{
 			if (extractionTimers.ContainsKey(player))
@@ -173,36 +198,6 @@ namespace FoundationFortune.API.HintSystem
 				Timing.KillCoroutines(extractionTimers[player].CoroutineHandle);
 				extractionTimers.Remove(player);
 			}
-		}
-
-		private void StartMoneyExtractionTimer(Player player)
-		{
-			CoroutineHandle timerHandle = Timing.RunCoroutine(ExtractMoneyCoroutine(player));
-			ExtractionTimerData timerData = new()
-			{
-				CoroutineHandle = timerHandle,
-				StartTime = Time.time
-			};
-			extractionTimers[player] = timerData;
-		}
-
-		private void CancelMoneyExtractionTimer(Player player)
-		{
-			if (extractionTimers.ContainsKey(player))
-			{
-				Timing.KillCoroutines(extractionTimers[player].CoroutineHandle);
-				extractionTimers.Remove(player);
-			}
-		}
-
-		private IEnumerator<float> ExtractionTimerCoroutine(Player player, TimeSpan duration)
-		{
-			float startTime = Time.time;
-			while (Time.time - startTime < duration.TotalSeconds)
-			{
-				yield return Timing.WaitForSeconds(1f);
-			}
-			CancelExtractionTimer(player);
 		}
 	}
 }

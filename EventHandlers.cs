@@ -275,9 +275,7 @@ namespace FoundationFortune.API.HintSystem
 					teamCondition = conditionTuple.Item1;
 					teamColor = conditionTuple.Item2;
 				}
-
-				int reward = config.RoundEndRewards.TryGetValue(teamCondition, out var value) ? value : 0;
-
+				
 				switch (teamCondition)
 				{
 					case PlayerTeamConditions.Winning:
@@ -304,9 +302,9 @@ namespace FoundationFortune.API.HintSystem
 
         public void DestroyMusicBots(LeftEventArgs ev) { if (FoundationFortune.Singleton.MusicBotPairs.Find(pair => pair.Player.Nickname == ev.Player.Nickname) != null) MusicBot.RemoveMusicBot(ev.Player.Nickname); }
         public void SpawningNpc(SpawningEventArgs ev) { if (ev.Player.IsNPC) RoundSummary.singleton.Network_chaosTargetCount -= 1; }
-        public void RoundRestart() { if (moneyHintCoroutine.IsRunning) Timing.KillCoroutines(moneyHintCoroutine); }
-		public void FuckYourAbility(ActivatingSenseEventArgs ev) { if (ev.Target != null && ev.Target.IsNPC) ev.IsAllowed = false; }
+        public void RoundRestart() => ClearIndexations();
+        public void FuckYourAbility(ActivatingSenseEventArgs ev) { if (ev.Target != null && ev.Target.IsNPC) ev.IsAllowed = false; }
 		public void FuckYourOtherAbility(TriggeringBloodlustEventArgs ev) { if (ev.Target != null && ev.Target.IsNPC) ev.IsAllowed = false; }
-        public void PreventBotsFromSpawning(RespawningTeamEventArgs ev) { foreach (Player player in ev.Players) if (NPCHelperMethods.IsFoundationFortuneNPC(player.ReferenceHub)) ev.Players.Remove(player); }
+        public void PreventBotsFromSpawning(RespawningTeamEventArgs ev) { foreach (Player player in ev.Players.Where(p => p.IsNPC)) ev.Players.Remove(player); }
     }
 }

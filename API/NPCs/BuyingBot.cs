@@ -59,8 +59,6 @@ namespace FoundationFortune.API.NPCs
             spawnedBuyingBot.RankColor = Color;
             spawnedBuyingBot.Scale = scale;
             spawnedBuyingBot.IsGodModeEnabled = true;
-            spawnedBuyingBot.MaxHealth = 9999;
-            spawnedBuyingBot.Health = 9999;
 
             Round.IgnoredPlayers.Add(spawnedBuyingBot.ReferenceHub);
 

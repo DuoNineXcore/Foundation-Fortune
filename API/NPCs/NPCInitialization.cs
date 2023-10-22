@@ -289,10 +289,13 @@ namespace FoundationFortune.API.HintSystem
 
         private void ClearIndexations()
         {
+            foreach (var botData in FoundationFortune.Singleton.BuyingBots.Values.ToList()) BuyingBot.RemoveBuyingBot(botData.bot.Nickname);
+            foreach (var botData in FoundationFortune.Singleton.SellingBots.Values.ToList()) SellingBot.RemoveSellingBot(botData.bot.Nickname);
+            foreach (var botData in FoundationFortune.Singleton.MusicBotPairs.ToList()) MusicBot.RemoveMusicBot(botData.MusicBot.Nickname);
             buyingBotPositions.Clear();
+            workstationPositions.Clear();
+            FoundationFortune.Singleton.ConsumedPerks.Clear();
             FoundationFortune.PlayerPurchaseLimits.Clear();
-            FoundationFortune.Singleton.BuyingBots.Clear();
-            FoundationFortune.Singleton.SellingBots.Clear();
         }
     }
 }

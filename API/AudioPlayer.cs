@@ -45,12 +45,8 @@ namespace FoundationFortune.API
         {
             var path = Path.Combine(Path.Combine(Paths.Configs, "Foundation Fortune"), audioFile);
             PlayAudio(ply, audioFile, volume, loop, channel);
-
             Npc spawnedMusicBot = MusicBot.GetMusicBotByPlayer(ply);
             var ap2 = AudioPlayerBase.Get(spawnedMusicBot.ReferenceHub);
-            
-            spawnedMusicBot.Role.Set(RoleTypeId.Spectator);
-
             Timing.CallDelayed(0.20f, delegate
             {
                 spawnedMusicBot.Role.Set(RoleTypeId.Spectator, SpawnReason.None);
@@ -63,7 +59,26 @@ namespace FoundationFortune.API
             ap2.Continue = true;
             ap2.Play(0);
             ap2.BroadcastTo.Add(ply.ReferenceHub.PlayerId);
-
+            return spawnedMusicBot;
+        }
+        
+        public static Npc PlayTo(Player ply, string audioFile, byte volume, bool loop, VoiceChatChannel channel)
+        {
+            var path = Path.Combine(Path.Combine(Paths.Configs, "Foundation Fortune"), audioFile);
+            Npc spawnedMusicBot = MusicBot.GetMusicBotByPlayer(ply);
+            var ap2 = AudioPlayerBase.Get(spawnedMusicBot.ReferenceHub);
+            Timing.CallDelayed(0.20f, delegate
+            {
+                spawnedMusicBot.Role.Set(RoleTypeId.Spectator, SpawnReason.None);
+            });
+            ap2.Enqueue(path, -1);
+            ap2.LogDebug = false;
+            ap2.BroadcastChannel = VoiceChatChannel.Mimicry;
+            ap2.Volume = volume;
+            ap2.Loop = loop;
+            ap2.Continue = true;
+            ap2.Play(0);
+            ap2.BroadcastTo.Add(ply.ReferenceHub.PlayerId);
             return spawnedMusicBot;
         }
 

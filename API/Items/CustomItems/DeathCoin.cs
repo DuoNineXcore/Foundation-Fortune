@@ -9,7 +9,7 @@ using Exiled.API.Features.Items;
 using System.Collections.Generic;
 using FoundationFortune.API.Perks;
 
-namespace FoundationFortune.API.Items
+namespace FoundationFortune.API.Items.CustomItems
 {
 	[CustomItem(ItemType.Coin)]
 	public class DeathCoin : CustomItem

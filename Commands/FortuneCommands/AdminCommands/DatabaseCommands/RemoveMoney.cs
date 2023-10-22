@@ -119,7 +119,7 @@ namespace FoundationFortune.Commands.FortuneCommands.DatabaseCommands
                                 if (subtractSaved) PlayerDataRepository.ModifyMoney(targetPlayer.UserId, steamIdAmount, true, false, false);
                                 if (subtractOnHold) PlayerDataRepository.ModifyMoney(targetPlayer.UserId, steamIdAmount, true, false, true);
 
-                                string SteamIdRemoveMoney = pluginTranslations.AllRemoveMoney.Replace("%amount%", steamIdAmount.ToString());
+                                string SteamIdRemoveMoney = pluginTranslations.SteamIDRemoveMoney.Replace("%amount%", steamIdAmount.ToString());
                                 FoundationFortune.Singleton.ServerEvents.EnqueueHint(targetPlayer, $"{SteamIdRemoveMoney}", 5f);
                             }
                         }

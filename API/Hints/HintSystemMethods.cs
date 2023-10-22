@@ -24,21 +24,16 @@ namespace FoundationFortune.API.HintSystem
 
 		private static void UpdatePerkIndicator(Dictionary<Player, Dictionary<PerkType, int>> consumedPerks, ref StringBuilder perkIndicator)
 		{
-			foreach (var consumedPerk in consumedPerks.Select(consumedPerkEntry => consumedPerkEntry.Value).SelectMany(consumedPerkTypes => consumedPerkTypes))
+			foreach (var perkEntry in consumedPerks.SelectMany(playerPerks => playerPerks.Value))
 			{
-				if (!FoundationFortune.Singleton.Config.PerkEmojis.TryGetValue(consumedPerk.Key, out var emoji))
-					continue;
-				
-				perkIndicator.Append(emoji);
-				if (consumedPerk.Value > 1)
-				{
-					perkIndicator.Append($"x{consumedPerk.Value}");
-				}
-				perkIndicator.Append("");
+				var (perkType, count) = (perkEntry.Key, perkEntry.Value);
+				if (!FoundationFortune.Singleton.Config.PerkEmojis.TryGetValue(perkType, out var emoji)) continue;
+				perkIndicator.Append(count > 1 ? $"{emoji}x{count} " : $"{emoji} "); 
 			}
+			perkIndicator.AppendLine();
 		}
-
-        private void InitializeWorkstationPositions()
+		
+		private void InitializeWorkstationPositions()
         {
 	        Log.Debug($"Initializing Selling workstations.");
 	        if (!FoundationFortune.Singleton.Config.UseSellingWorkstation)

@@ -125,11 +125,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="API\AudioPlayer.cs" />
-    <Compile Include="API\Items\PerkBottle.cs" />
-    <Compile Include="API\Items\ResurgenceBeacon.cs" />
+    <Compile Include="API\Items\CustomItems\DeathCoin.cs" />
+    <Compile Include="API\Items\PerkItems\PerkBottle.cs" />
+    <Compile Include="API\Items\PerkItems\ResurgenceBeacon.cs" />
     <Compile Include="API\Models\Classes.cs" />
     <Compile Include="API\Models\Enums.cs" />
-    <Compile Include="API\Items\DeathCoin.cs" />
     <Compile Include="API\NPCs\NPCHelperMethods.cs" />
     <Compile Include="API\Database\PlayerDataRepository.cs" />
     <Compile Include="API\NPCs\BuyingBot.cs" />
@@ -187,6 +187,8 @@
       <Version>4.3.0</Version>
     </PackageReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="API\Items\CustomItems\Weapons\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

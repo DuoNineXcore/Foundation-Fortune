@@ -8,7 +8,7 @@ using System.Linq;
 using UnityEngine;
 using Exiled.API.Features.Items;
 using System.Text;
-using FoundationFortune.API.Items;
+using FoundationFortune.API.Items.PerkItems;
 
 namespace FoundationFortune.API.HintSystem
 {
@@ -39,14 +39,13 @@ namespace FoundationFortune.API.HintSystem
                     int hintSize = PlayerDataRepository.GetHintSize(ply.UserId);
 
                     StringBuilder hintMessageBuilder = new();
+                    UpdatePerkIndicator(FoundationFortune.Singleton.ConsumedPerks, ref hintMessageBuilder);
 
                     if (!PlayerDataRepository.GetHintMinmode(ply.UserId))
                     {
                         string moneySavedString;
                         string moneyHoldString;
-
-                        UpdatePerkIndicator(FoundationFortune.Singleton.ConsumedPerks, ref hintMessageBuilder);
-
+                        
                         if (PlayerDataRepository.GetPluginAdmin(ply.UserId))
                         {
                             moneySavedString = FoundationFortune.Singleton.Translation.MoneyCounterSaved

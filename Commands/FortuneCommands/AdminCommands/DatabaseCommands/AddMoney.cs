@@ -3,6 +3,7 @@ using Exiled.Permissions.Extensions;
 using RemoteAdmin;
 using System;
 using Exiled.API.Features;
+using Exiled.API.Features.Doors;
 using FoundationFortune.API.Database;
 
 namespace FoundationFortune.Commands.FortuneCommands.DatabaseCommands
@@ -52,7 +53,7 @@ namespace FoundationFortune.Commands.FortuneCommands.DatabaseCommands
                         return false;
                     }
 
-                    string SelfAddMoney = pluginTranslations.AllAddMoney.Replace("%amount%", amount.ToString());
+                    string SelfAddMoney = pluginTranslations.SelfAddMoney.Replace("%amount%", amount.ToString());
                     FoundationFortune.Singleton.ServerEvents.EnqueueHint(ply, $"{SelfAddMoney}", 5f);
                     PlayerDataRepository.ModifyMoney(ply.UserId, amount, false, true, false);
                     response = $"Gave {amount} money to player '{ply}'.";

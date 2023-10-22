@@ -137,9 +137,9 @@ namespace FoundationFortune.Configs
 		public List<PlayerVoiceChatSettings> PlayerVoiceChatSettings { get; set; } = new List<PlayerVoiceChatSettings>()
 		{
 			new PlayerVoiceChatSettings { VoiceChatUsageType = PlayerVoiceChatUsageType.EtherealIntervention, VoiceChat = VoiceChatChannel.Mimicry, Loop = false, AudioFile = "BuySuccess.ogg", Volume = 50},
-			new PlayerVoiceChatSettings { VoiceChatUsageType = PlayerVoiceChatUsageType.BlissfulUnawareness, VoiceChat = VoiceChatChannel.Mimicry, Loop = false, AudioFile = "urgoingtodie.ogg", Volume = 50},
+			new PlayerVoiceChatSettings { VoiceChatUsageType = PlayerVoiceChatUsageType.BlissfulUnawareness, VoiceChat = VoiceChatChannel.Mimicry, Loop = false, AudioFile = "explode.ogg", Volume = 50},
 			new PlayerVoiceChatSettings { VoiceChatUsageType = PlayerVoiceChatUsageType.ResurgenceBeacon, VoiceChat = VoiceChatChannel.Mimicry, Loop = false, AudioFile = "BuySuccess.ogg", Volume = 50},
-			new PlayerVoiceChatSettings { VoiceChatUsageType = PlayerVoiceChatUsageType.Hunted, VoiceChat = VoiceChatChannel.Mimicry, Loop = false, AudioFile = "BuySuccess.ogg", Volume = 50},
+			new PlayerVoiceChatSettings { VoiceChatUsageType = PlayerVoiceChatUsageType.Hunted, VoiceChat = VoiceChatChannel.Mimicry, Loop = false, AudioFile = "hunted.ogg", Volume = 50},
 			new PlayerVoiceChatSettings { VoiceChatUsageType = PlayerVoiceChatUsageType.Hunter, VoiceChat = VoiceChatChannel.Mimicry, Loop = false, AudioFile = "BuySuccess.ogg", Volume = 50},
 		};
 
@@ -173,15 +173,15 @@ namespace FoundationFortune.Configs
         [Description("Perk System Icons")]
         public Dictionary<PerkType, string> PerkEmojis { get; set; } = new Dictionary<PerkType, string>
         {
-            { PerkType.OvershieldedProtection, "🛡️" },
+            { PerkType.OvershieldedProtection, "🔰" },
             { PerkType.BoostedResilience, "🔰" },
             { PerkType.ConcealedPresence, "🕵️" },
             { PerkType.EthericVitality, "❤️" },
             { PerkType.Hyperactivity, "🏃" },
             { PerkType.BlissfulUnawareness, "💞" },
-            { PerkType.ExtrasensoryPerception, "🔮" },
-            { PerkType.ResurgenceBeacon, "🚑" },
-            { PerkType.EtherealIntervention, "✨" }
+            { PerkType.ExtrasensoryPerception, "◎" },
+            { PerkType.ResurgenceBeacon, "🚑" }, //the beacon is a radio item so this doesnt serve any purpose bc you dont actually drink it
+            { PerkType.EtherealIntervention, "✚" } 
         };
 
         [Description("A list of rooms that you cannot be teleported to at your revival")]
