@@ -12,8 +12,8 @@ namespace FoundationFortune.Commands.FortuneCommands.BountyCommands
     {
         public string Command { get; } = "ff_addbounty";
         public string Description { get; } = "Add a bounty to a player.";
-        public string[] Aliases { get; } = new string[] { "placebounty", "bountyadd" };
-        public string[] Usage { get; } = new string[] { "<playerName> <amount> <durationInSeconds>" };
+        public string[] Aliases { get; } = new string[] {};
+        public string[] Usage { get; } = new string[] { "<s64> <amount> <durationInSeconds>" };
 
         public bool Execute(ArraySegment<string> args, ICommandSender sender, out string response)
         {
@@ -21,23 +21,18 @@ namespace FoundationFortune.Commands.FortuneCommands.BountyCommands
 
             if (!sender.CheckPermission("ff.bountysystem.add") || !PlayerDataRepository.GetPluginAdmin(p.UserId))
             {
-                response = "You do not have permission to use this section.";
+                response = "You do not have permission to use this command.";
                 return false;
             }
 
             if (args.Count < 3)
             {
-                response = "Usage: ff_addbounty <playerName> <amount> <durationInSeconds>";
+                response = "Usage: ff_addbounty <s64> <amount> <durationInSeconds>";
                 return false;
             }
 
-            string playerName = args.At(0);
-            if (!Player.TryGet(playerName, out Player player))
-            {
-                response = $"Player '{playerName}' not found.";
-                return false;
-            }
-
+            Player player = Player.Get(args.At(0));
+            
             if (!int.TryParse(args.At(1), out int bountyAmount) || bountyAmount <= 0)
             {
                 response = "Invalid bounty amount.";
@@ -51,7 +46,7 @@ namespace FoundationFortune.Commands.FortuneCommands.BountyCommands
             }
 
             TimeSpan bountyDuration = TimeSpan.FromSeconds(durationInSeconds);
-            FoundationFortune.Singleton.serverEvents.AddBounty(player, bountyAmount, bountyDuration);
+            FoundationFortune.Singleton.ServerEvents.AddBounty(player, bountyAmount, bountyDuration);
             response = $"Bounty of ${bountyAmount} added to {player.Nickname} for {durationInSeconds} seconds.";
             return true;
         }

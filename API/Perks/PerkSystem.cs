@@ -19,7 +19,7 @@ namespace FoundationFortune.API.Perks
 	/// </summary>
 	public static class PerkSystem
 	{
-		public static List<Player> EtherealInterventionPlayers = new();
+		public static readonly List<Player> EtherealInterventionPlayers = new();
         public static void ClearConsumedPerks(Player player) { if (FoundationFortune.Singleton.ConsumedPerks.ContainsKey(player)) FoundationFortune.Singleton.ConsumedPerks[player].Clear(); }
 
         public static void GrantPerk(Player ply, PerkType perk)
@@ -64,14 +64,13 @@ namespace FoundationFortune.API.Perks
             else consumedPerks[player][perkType] = 1;
         }
 
-        public static IEnumerator<float> BlissfulUnawarenessCoroutine(Player ply)
+        private static IEnumerator<float> BlissfulUnawarenessCoroutine(Player ply)
 		{
 			/*Log.Debug("Blissful Unawareness 1st coroutine started.");
 
             yield return Timing.WaitForSeconds(80f);*/
-            ply.EnableEffect<Blinded>(3);
+            ply.EnableEffect<Blinded>(1);
             ply.EnableEffect<MovementBoost>(120);
-            ply.EnableEffect<Invigorated>(120);
             ply.ChangeEffectIntensity<MovementBoost>(25);
 
             Scp330Bag.AddSimpleRegeneration(ply.ReferenceHub, 5f, 50f);
@@ -101,11 +100,11 @@ namespace FoundationFortune.API.Perks
 				targetToRevive.Teleport(reviver.Position);
 				if (FoundationFortune.Singleton.Config.HuntReviver)
 				{
-					FoundationFortune.Singleton.serverEvents.AddBounty(reviver, FoundationFortune.Singleton.Config.RevivalBountyKillReward, TimeSpan.FromSeconds(FoundationFortune.Singleton.Config.RevivalBountyTimeSeconds));
+					FoundationFortune.Singleton.ServerEvents.AddBounty(reviver, FoundationFortune.Singleton.Config.RevivalBountyKillReward, TimeSpan.FromSeconds(FoundationFortune.Singleton.Config.RevivalBountyTimeSeconds));
 				}
 				foreach (var ply in Player.List.Where(p => !p.IsNPC))
 				{
-					FoundationFortune.Singleton.serverEvents.EnqueueHint(ply, FoundationFortune.Singleton.Translation.RevivalSuccess.Replace("%rolecolor%", reviver.Role.Color.ToHex())
+					FoundationFortune.Singleton.ServerEvents.EnqueueHint(ply, FoundationFortune.Singleton.Translation.RevivalSuccess.Replace("%rolecolor%", reviver.Role.Color.ToHex())
 					    .Replace("%nickname%", reviver.Nickname)
 					    .Replace("%target%", targetToRevive.Nickname), 3f);
 				}
@@ -113,7 +112,7 @@ namespace FoundationFortune.API.Perks
 			}
 			else
 			{
-				FoundationFortune.Singleton.serverEvents.EnqueueHint(reviver, FoundationFortune.Singleton.Translation.RevivalNoDeadPlayer.Replace("%targetName%", targetName), 3f);
+				FoundationFortune.Singleton.ServerEvents.EnqueueHint(reviver, FoundationFortune.Singleton.Translation.RevivalNoDeadPlayer.Replace("%targetName%", targetName), 3f);
 				return false;
 			}
 		}

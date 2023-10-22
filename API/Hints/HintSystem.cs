@@ -8,8 +8,7 @@ using System.Linq;
 using UnityEngine;
 using Exiled.API.Features.Items;
 using System.Text;
-using FoundationFortune.API.Items;
-using System;
+using FoundationFortune.API.Items.PerkItems;
 
 namespace FoundationFortune.API.HintSystem
 {
@@ -40,14 +39,13 @@ namespace FoundationFortune.API.HintSystem
                     int hintSize = PlayerDataRepository.GetHintSize(ply.UserId);
 
                     StringBuilder hintMessageBuilder = new();
+                    UpdatePerkIndicator(FoundationFortune.Singleton.ConsumedPerks, ref hintMessageBuilder);
 
                     if (!PlayerDataRepository.GetHintMinmode(ply.UserId))
                     {
                         string moneySavedString;
                         string moneyHoldString;
-
-                        UpdatePerkIndicator(FoundationFortune.Singleton.ConsumedPerks, ref hintMessageBuilder);
-
+                        
                         if (PlayerDataRepository.GetPluginAdmin(ply.UserId))
                         {
                             moneySavedString = FoundationFortune.Singleton.Translation.MoneyCounterSaved
@@ -72,7 +70,7 @@ namespace FoundationFortune.API.HintSystem
                     }
 
                     UpdateExtractionMessages(ply, ref hintMessageBuilder);
-                    UpdateNPCProximityMessages(ply, ref hintMessageBuilder);
+                    UpdateNpcProximityMessages(ply, ref hintMessageBuilder);
                     UpdateWorkstationMessages(ply, ref hintMessageBuilder);
                     UpdateBountyMessages(ply, ref hintMessageBuilder);
                     PerkBottle.GetHeldBottle(ply, ref hintMessageBuilder);
@@ -99,9 +97,9 @@ namespace FoundationFortune.API.HintSystem
 
         public string GetRecentHints(string userId)
 		{
-			if (recentHints.ContainsKey(userId))
+			if (recentHints.TryGetValue(userId, out var hint))
 			{
-				var currentHints = recentHints[userId]
+				var currentHints = hint
 				    .Where(entry => !entry.IsAnimated && (Time.time - entry.Timestamp) <= FoundationFortune.Singleton.Config.MaxHintAge)
 				    .Select(entry => entry.Text);
 
@@ -113,9 +111,9 @@ namespace FoundationFortune.API.HintSystem
 
 		public string GetAnimatedHints(string userId)
 		{
-			if (recentHints.ContainsKey(userId))
+			if (recentHints.TryGetValue(userId, out var hint))
 			{
-				var currentHints = recentHints[userId]
+				var currentHints = hint
 				    .Where(entry => entry.IsAnimated && (Time.time - entry.Timestamp) <= FoundationFortune.Singleton.Config.MaxHintAge)
 				    .Select(entry => entry.Text);
 

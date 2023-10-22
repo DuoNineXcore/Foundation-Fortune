@@ -3,6 +3,7 @@ using Exiled.Permissions.Extensions;
 using RemoteAdmin;
 using System;
 using Exiled.API.Features;
+using Exiled.API.Features.Doors;
 using FoundationFortune.API.Database;
 
 namespace FoundationFortune.Commands.FortuneCommands.DatabaseCommands
@@ -52,8 +53,8 @@ namespace FoundationFortune.Commands.FortuneCommands.DatabaseCommands
                         return false;
                     }
 
-                    string SelfAddMoney = pluginTranslations.AllAddMoney.Replace("%amount%", amount.ToString());
-                    FoundationFortune.Singleton.serverEvents.EnqueueHint(ply, $"{SelfAddMoney}", 5f);
+                    string SelfAddMoney = pluginTranslations.SelfAddMoney.Replace("%amount%", amount.ToString());
+                    FoundationFortune.Singleton.ServerEvents.EnqueueHint(ply, $"{SelfAddMoney}", 5f);
                     PlayerDataRepository.ModifyMoney(ply.UserId, amount, false, true, false);
                     response = $"Gave {amount} money to player '{ply}'.";
                     return true;
@@ -68,7 +69,7 @@ namespace FoundationFortune.Commands.FortuneCommands.DatabaseCommands
                     string AllAddMoney = pluginTranslations.AllAddMoney.Replace("%amount%", allAmount.ToString());
                     foreach (var player in Player.List)
                     {
-                        FoundationFortune.Singleton.serverEvents.EnqueueHint(player, $"{AllAddMoney}", 5f);
+                        FoundationFortune.Singleton.ServerEvents.EnqueueHint(player, $"{AllAddMoney}", 5f);
                         PlayerDataRepository.ModifyMoney(player.UserId, allAmount, true, true, false);
                     }
                     response = $"Gave {allAmount} money to all players.";
@@ -83,7 +84,7 @@ namespace FoundationFortune.Commands.FortuneCommands.DatabaseCommands
 
                     var targetPlayer = Player.Get(addmoneytarget);
                     string SteamIDAddMoney = pluginTranslations.SteamIDAddMoney.Replace("%amount%", steamIdAmount.ToString());
-                    if (targetPlayer != null) FoundationFortune.Singleton.serverEvents.EnqueueHint(targetPlayer, $"{SteamIDAddMoney}", 5f);
+                    if (targetPlayer != null) FoundationFortune.Singleton.ServerEvents.EnqueueHint(targetPlayer, $"{SteamIDAddMoney}", 5f);
                     PlayerDataRepository.ModifyMoney(SteamIDAddMoney, steamIdAmount, true, true, false);
                     response = $"Gave {steamIdAmount} money to player '{addmoneytarget}'.";
                     return true;

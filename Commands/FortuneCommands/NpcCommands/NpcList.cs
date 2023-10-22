@@ -35,12 +35,11 @@ namespace FoundationFortune.Commands.FortuneCommands.NpcCommands
             sb.AppendLine("Foundation Fortune NPCs:");
             AppendBotList(sb, "Buying Bots", FoundationFortune.Singleton.BuyingBots);
             AppendBotList(sb, "Selling Bots", FoundationFortune.Singleton.SellingBots);
-            AppendBotList(sb, "Music Bots", FoundationFortune.Singleton.MusicBots);
             response = sb.ToString();
             return true;
         }
 
-        private void AppendBotList(StringBuilder sb, string title, Dictionary<string, (Npc? bot, int indexation)> botIndexation)
+        private static void AppendBotList(StringBuilder sb, string title, Dictionary<string, (Npc bot, int indexation)> botIndexation)
         {
             sb.AppendLine(title + ":");
             foreach (var botInfo in botIndexation)

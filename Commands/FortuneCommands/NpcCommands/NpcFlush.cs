@@ -42,10 +42,6 @@ namespace FoundationFortune.Commands.FortuneCommands.NpcCommands
                         count = RemoveBots(FoundationFortune.Singleton.SellingBots, SellingBot.RemoveSellingBot);
                         response = $"Flushed {count} SellingBots from the server.";
                         return true;
-                    case BotType.Music:
-                        count = RemoveBots(FoundationFortune.Singleton.MusicBots, MusicBot.RemoveMusicBot);
-                        response = $"Flushed {count} MusicBots from the server.";
-                        return true;
                     default:
                         response = "Invalid bot type.";
                         return false;
@@ -58,17 +54,9 @@ namespace FoundationFortune.Commands.FortuneCommands.NpcCommands
             }
         }
 
-        private int RemoveBots(Dictionary<string, (Npc bot, int indexation)> bots, Func<string, bool> removeBotFunc)
+        private static int RemoveBots(Dictionary<string, (Npc bot, int indexation)> bots, Func<string, bool> removeBotFunc)
         {
-            int count = 0;
-            foreach (var botInfo in bots.Values.ToList())
-            {
-                if (removeBotFunc(botInfo.bot.Nickname))
-                {
-                    count++;
-                }
-            }
-            return count;
+            return bots.Values.Count(botInfo => removeBotFunc(botInfo.bot.Nickname));
         }
     }
 }

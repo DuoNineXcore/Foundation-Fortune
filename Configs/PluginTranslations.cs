@@ -36,7 +36,7 @@ namespace FoundationFortune.Configs
 		public string BuyItemSuccess { get; set; } = "<b><color=red>-$%itemPrice%</color> Bought %itemAlias%.</b>\\n";
 
 		[Description("Extraction Events")]
-		public string ExtractionEvent = "<b>A <color=green>Money</color> Extraction Zone has opened up. Room: %room% Time Left: %time%</b>\\n";
+		public string ExtractionEvent = "<b>A <color=green>Money</color> Extraction Zone has opened up. \\nRoom: %room% Time Left: %time%</b>\\n";
 		public string ExtractionTimer = "<b>You're in the extraction zone, extracting money in %time% seconds.</b>\\n";
 		public string ExtractionStart = "<b>Extracting Money.</b>\\n";
 		public string ExtractionNoMoney = "<b>You do not have any On Hold Money.</b>\\n";
@@ -44,9 +44,9 @@ namespace FoundationFortune.Configs
 		[Description("Death Coins")]
 		public string DeathCoinPickup { get; set; } = "<b><color=green>+%coinValue%</color> Picked up Death Coin.</b>\\n";
 
-		[Description("Item and Perk list return messages.")] //todo
-		public string ItemsList { get; set; } = "%buyableItemDisplayName% (%buyableItemAlias%): %buyableItemPrice%";
-		public string PerksList { get; set; } = "%perkItemDisplayName% (%perkItemAlias%) - %perkItemDescription%: %perkItemPrice%";
+		[Description("Item and Perk list return messages.")]
+		public string ItemsList { get; set; } = "\\nItems available for purchase:\\n%buyableItemDisplayName% (%buyableItemAlias%): $%buyableItemPrice%";
+		public string PerksList { get; set; } = "\\nPerks available for purchase:\\n%perkItemDisplayName% (%perkItemAlias%) - %perkItemDescription%: $%perkItemPrice%";
 
 		[Description("Revival System Hints")]
 		public string RevivalNoDeadPlayer { get; set; } = "<b>No dead player with Name: '%targetName%' found nearby to revive.</b>\\n";

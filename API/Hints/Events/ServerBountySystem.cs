@@ -19,6 +19,10 @@ namespace FoundationFortune.API.HintSystem
 			DateTime expirationTime = DateTime.Now.Add(duration);
 			BountiedPlayers.Add(new Bounty(player, true, bountyPrice, expirationTime));
 
+			PlayerVoiceChatSettings hunted = FoundationFortune.Singleton.Config.PlayerVoiceChatSettings
+				.FirstOrDefault(settings => settings.VoiceChatUsageType == PlayerVoiceChatUsageType.Hunted);
+			if (hunted != null) AudioPlayer.PlayTo(player, hunted.AudioFile, hunted.Volume, hunted.Loop, hunted.VoiceChat);
+			
 			Timing.CallDelayed((float)duration.TotalSeconds, () => StopBounty(player));
 		}
 

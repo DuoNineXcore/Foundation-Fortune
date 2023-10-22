@@ -45,22 +45,28 @@ namespace FoundationFortune.Commands.FortuneCommands.HintCommands.Global
                 else alignment = HintAnim.None;
             }
 
-            if (target == "self")
+            switch (target)
             {
-                Player player = Player.Get(sender);
-                FoundationFortune.Singleton.serverEvents.EnqueueHint(player, hint, duration, alignment);
-                response = "Hint broadcasted successfully.";
-            }
-            else if (target == "all")
-            {
-                foreach (Player ply in Player.List.Where(p => !p.IsNPC)) FoundationFortune.Singleton.serverEvents.EnqueueHint(ply, hint, duration, alignment);
-                response = "Hint broadcasted successfully.";
-            }
-            else
-            {
-                Player steamId = Player.Get(target);
-                FoundationFortune.Singleton.serverEvents.EnqueueHint(steamId, hint, duration, alignment);
-                response = $"Hint broadcasted successfully.";
+                case "self":
+                {
+                    Player player = Player.Get(sender);
+                    FoundationFortune.Singleton.ServerEvents.EnqueueHint(player, hint, duration, alignment);
+                    response = "Hint broadcasted successfully.";
+                    break;
+                }
+                case "all":
+                {
+                    foreach (Player ply in Player.List.Where(p => !p.IsNPC)) FoundationFortune.Singleton.ServerEvents.EnqueueHint(ply, hint, duration, alignment);
+                    response = "Hint broadcasted successfully.";
+                    break;
+                }
+                default:
+                {
+                    Player steamId = Player.Get(target);
+                    FoundationFortune.Singleton.ServerEvents.EnqueueHint(steamId, hint, duration, alignment);
+                    response = $"Hint broadcasted successfully.";
+                    break;
+                }
             }
             return true;
         }

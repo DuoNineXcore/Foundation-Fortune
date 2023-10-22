@@ -29,13 +29,14 @@ namespace FoundationFortune.Commands.FortuneCommands.ExtractionCommands
                 return false;
             }
 
-            if (FoundationFortune.Singleton.Config.MoneyExtractionSystem && !FoundationFortune.Singleton.serverEvents.limitReached)
+            switch (FoundationFortune.Singleton.Config.MoneyExtractionSystem)
             {
-                FoundationFortune.Singleton.serverEvents.DeactivateExtractionPoint(true);
-            }
-            else if (FoundationFortune.Singleton.Config.MoneyExtractionSystem)
-            {
-                FoundationFortune.Singleton.serverEvents.DeactivateExtractionPoint(false);
+                case true when !FoundationFortune.Singleton.ServerEvents.limitReached:
+                    FoundationFortune.Singleton.ServerEvents.DeactivateExtractionPoint(true);
+                    break;
+                case true:
+                    FoundationFortune.Singleton.ServerEvents.DeactivateExtractionPoint(false);
+                    break;
             }
 
             response = $"Extraction zone event deactivated";

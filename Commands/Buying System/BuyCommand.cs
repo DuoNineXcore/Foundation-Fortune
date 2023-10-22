@@ -8,6 +8,7 @@ using FoundationFortune.API.Models.Enums;
 using FoundationFortune.API.Models.Classes;
 using FoundationFortune.API.HintSystem;
 using FoundationFortune.API.Items;
+using FoundationFortune.API.Items.PerkItems;
 
 namespace FoundationFortune.Commands.BuyCommand
 {
@@ -23,7 +24,7 @@ namespace FoundationFortune.Commands.BuyCommand
 		{
 			Player player = Player.Get(sender);
 
-			if (!FoundationFortune.Singleton.serverEvents.IsPlayerOnSellingWorkstation(player) && !FoundationFortune.Singleton.serverEvents.IsPlayerNearBuyingBot(player))
+			if (!FoundationFortune.Singleton.ServerEvents.IsPlayerOnSellingWorkstation(player) && !ServerEvents.IsPlayerNearBuyingBot(player))
 			{
 				response = "You must be at a Selling Workstation / Buying Bot to buy an item.";
 				return false;
@@ -89,10 +90,10 @@ namespace FoundationFortune.Commands.BuyCommand
 
 			if (perkItem != null && CanPurchase(player, perkItem.Price) && !ExceedsPerkLimit(player, perkItem))
 			{
-				string BoughtHint = FoundationFortune.Singleton.Translation.BuyItemSuccess
+				string boughtHint = FoundationFortune.Singleton.Translation.BuyItemSuccess
 						    .Replace("%itemAlias%", perkItem.Alias)
 						    .Replace("%itemPrice%", perkItem.Price.ToString());
-				FoundationFortune.Singleton.serverEvents.EnqueueHint(player, BoughtHint, 3f);
+				FoundationFortune.Singleton.ServerEvents.EnqueueHint(player, boughtHint, 3f);
 				PlayerDataRepository.ModifyMoney(player.UserId, perkItem.Price, true, false, true);
 				PerkBottle.GivePerkBottle(player, perkItem.PerkType);
 				ServerEvents.AddToPlayerLimits(player, perkItem);
@@ -121,7 +122,7 @@ namespace FoundationFortune.Commands.BuyCommand
 				string BoughtHint = FoundationFortune.Singleton.Translation.BuyItemSuccess
 				    .Replace("%itemAlias%", buyItem.Alias)
 				    .Replace("%itemPrice%", buyItem.Price.ToString());
-				FoundationFortune.Singleton.serverEvents.EnqueueHint(player, $"{BoughtHint}", 3f);
+				FoundationFortune.Singleton.ServerEvents.EnqueueHint(player, $"{BoughtHint}", 3f);
 				PlayerDataRepository.ModifyMoney(player.UserId, buyItem.Price, true, false, true);
 				player.AddItem(buyItem.ItemType);
 				ServerEvents.AddToPlayerLimits(player, buyItem);
@@ -134,7 +135,7 @@ namespace FoundationFortune.Commands.BuyCommand
 				return true;
 			}
 
-			response = "That is not a purchaseable item or you don't have enough money!";
+			response = "That is not a purchasable item or you don't have enough money!";
 			return false;
 		}
 

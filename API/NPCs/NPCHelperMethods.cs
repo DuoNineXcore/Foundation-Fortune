@@ -23,9 +23,10 @@ namespace FoundationFortune.API.NPCs
     {
         public static bool IsFoundationFortuneNPC(ReferenceHub refHub)
         {
-            return FoundationFortune.Singleton.BuyingBots.Values.Any(botAndIndexation => botAndIndexation.bot == Player.Get(refHub))
-                || FoundationFortune.Singleton.SellingBots.Values.Any(botAndIndexation => botAndIndexation.bot == Player.Get(refHub))
-                || FoundationFortune.Singleton.MusicBots.Values.Any(botAndIndexation => botAndIndexation.bot == Player.Get(refHub));
+            Player targetPlayer = Player.Get(refHub);
+            return FoundationFortune.Singleton.BuyingBots.Values.Any(botAndIndexation => botAndIndexation.bot == targetPlayer)
+                   || FoundationFortune.Singleton.SellingBots.Values.Any(botAndIndexation => botAndIndexation.bot == targetPlayer)
+                   || FoundationFortune.Singleton.MusicBotPairs.Any(pair => pair.Player == targetPlayer);
         }
 
         public static bool IsFoundationFortuneNPC(ScpSubroutineBase targetTrack)

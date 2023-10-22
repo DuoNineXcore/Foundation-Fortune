@@ -1,23 +1,8 @@
 ﻿using HarmonyLib;
 using Exiled.API.Features;
+using FoundationFortune.API.Items.PerkItems;
 using PlayerRoles.PlayableScps.Scp079;
 using InventorySystem.Items.Usables;
-using FoundationFortune.API.Items;
-using PlayerRoles.PlayableScps.Scp939.Ripples;
-using UnityEngine;
-using PlayerRoles.Voice;
-using PlayerRoles;
-using System.Collections.Generic;
-using System.Reflection.Emit;
-using VoiceChat.Networking;
-using VoiceChat;
-using System.Text.RegularExpressions;
-using PlayerRoles.PlayableScps.Subroutines;
-using PlayerRoles.PlayableScps.Scp939;
-using MapGeneration.Distributors;
-using PlayerRoles.Spectating;
-using static HarmonyLib.MethodInvoker;
-using static PlayerList;
 
 namespace FoundationFortune.Patches
 {

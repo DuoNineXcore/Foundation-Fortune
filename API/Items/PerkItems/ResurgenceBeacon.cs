@@ -11,7 +11,7 @@ using InventorySystem.Items.Pickups;
 using System.Collections.Generic;
 using FoundationFortune.API.Perks;
 
-namespace FoundationFortune.API.Items
+namespace FoundationFortune.API.Items.PerkItems
 {
     [CustomItem(ItemType.Radio)]
     public class ResurgenceBeacon : CustomItem

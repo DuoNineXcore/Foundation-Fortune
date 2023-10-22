@@ -14,7 +14,7 @@ using FoundationFortune.API.Perks;
 using System.Text;
 using FoundationFortune.API.Models.Classes;
 
-namespace FoundationFortune.API.Items
+namespace FoundationFortune.API.Items.PerkItems
 {
 	/// <summary>
 	/// SODA!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -41,16 +41,34 @@ namespace FoundationFortune.API.Items
 			base.UnsubscribeEvents();
 		}
 
-        private void UsedPerkBottle(UsedItemEventArgs ev)
-        {
-            if (DroppedPerkBottles.TryGetValue(ev.Item.Serial, out var perkBottleData))
-            {
-                PerkType perkType = perkBottleData.perkType;
-                PerkSystem.GrantPerk(ev.Player, perkType);
-                FoundationFortune.Singleton.serverEvents.EnqueueHint(ev.Player, $"<b>You drank a <color=#FFC0CB>{perkType}</color> Perk bottle.</b>", 2f);
-                DroppedPerkBottles.Remove(ev.Item.Serial);
-            }
-        }
+		private void UsedPerkBottle(UsedItemEventArgs ev)
+		{
+			if (DroppedPerkBottles.TryGetValue(ev.Item.Serial, out var perkBottleData))
+			{
+				PerkType perkType = perkBottleData.perkType;
+				PerkSystem.GrantPerk(ev.Player, perkType);
+
+				// Add the consumed perk to the consumedPerks dictionary
+				if (!FoundationFortune.Singleton.ConsumedPerks.TryGetValue(ev.Player, out var playerPerks))
+				{
+					playerPerks = new Dictionary<PerkType, int>();
+					FoundationFortune.Singleton.ConsumedPerks[ev.Player] = playerPerks;
+				}
+
+				if (playerPerks.TryGetValue(perkType, out var count))
+				{
+					playerPerks[perkType] = count + 1;
+				}
+				else
+				{
+					playerPerks[perkType] = 1;
+				}
+
+				FoundationFortune.Singleton.ServerEvents.EnqueueHint(ev.Player, $"<b>You drank a <color=#FFC0CB>{perkType}</color> Perk bottle.</b>", 2f);
+				DroppedPerkBottles.Remove(ev.Item.Serial);
+			}
+		}
+
 
         public static void GivePerkBottle(Player player, PerkType perkType)
 		{
@@ -63,7 +81,12 @@ namespace FoundationFortune.API.Items
 
         protected override void OnChanging(ChangingItemEventArgs ev)
         {
-            base.OnChanging(ev);
+	        base.OnChanging(ev);
+        }
+        
+        protected override void OnAcquired(Player player, Item item, bool displayMessage)
+        {
+	        base.OnAcquired(player, item, false);
         }
 
         public static void GetHeldBottle(Player player, ref StringBuilder stringbuilder)

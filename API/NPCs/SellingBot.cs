@@ -47,31 +47,27 @@ namespace FoundationFortune.API.NPCs
             return nextAvailableIndex;
         }
 
-        public static Npc SpawnSellingBot(string target, string Badge, string Color, RoleTypeId Role, ItemType? HeldItem, Vector3 scale)
+        public static Npc SpawnSellingBot(string target, string badge, string color, RoleTypeId role, ItemType? helditem, Vector3 scale)
         {
             string botKey = $"SellingBot-{target}";
             int indexation = GetNextSellingBotIndexation(FoundationFortune.Singleton.SellingBots.Keys.ToString());
-            Npc spawnedSellingBot = NPCHelperMethods.SpawnFix(target, Role, indexation);
+            Npc spawnedSellingBot = NPCHelperMethods.SpawnFix(target, role, indexation);
 
             FoundationFortune.Singleton.SellingBots[botKey] = (spawnedSellingBot, indexation);
 
-            spawnedSellingBot.RankName = Badge;
-            spawnedSellingBot.RankColor = Color;
+            spawnedSellingBot.RankName = badge;
+            spawnedSellingBot.RankColor = color;
             spawnedSellingBot.Scale = scale;
             spawnedSellingBot.IsGodModeEnabled = true;
-            spawnedSellingBot.MaxHealth = 9999;
-            spawnedSellingBot.Health = 9999;
 
             Round.IgnoredPlayers.Add(spawnedSellingBot.ReferenceHub);
 
             Timing.CallDelayed(0.5f, () =>
             {
                 spawnedSellingBot.ClearInventory();
-                if (HeldItem.HasValue)
-                {
-                    spawnedSellingBot.ClearInventory();
-                    spawnedSellingBot.CurrentItem = Item.Create((ItemType)HeldItem, spawnedSellingBot);
-                }
+                if (!helditem.HasValue) return;
+                spawnedSellingBot.ClearInventory();
+                spawnedSellingBot.CurrentItem = Item.Create((ItemType)helditem, spawnedSellingBot);
             });
 
             return spawnedSellingBot;
@@ -80,22 +76,19 @@ namespace FoundationFortune.API.NPCs
         public static bool RemoveSellingBot(string target)
         {
             string botKey = $"SellingBot-{target}";
-            if (FoundationFortune.Singleton.SellingBots.TryGetValue(botKey, out var botData))
+            if (!FoundationFortune.Singleton.SellingBots.TryGetValue(botKey, out var botData)) return false;
+            var (bot, _) = botData;
+            if (bot != null)
             {
-                var (bot, _) = botData;
-                if (bot != null)
+                bot.ClearInventory();
+                Timing.CallDelayed(0.3f, () =>
                 {
-                    bot.ClearInventory();
-                    Timing.CallDelayed(0.3f, () =>
-                    {
-                        bot.Vaporize(bot);
-                        CustomNetworkManager.TypedSingleton.OnServerDisconnect(bot.NetworkIdentity.connectionToClient);
-                    });
-                }
-                FoundationFortune.Singleton.SellingBots.Remove(botKey);
-                return true;
+                    bot.Vaporize(bot);
+                    CustomNetworkManager.TypedSingleton.OnServerDisconnect(bot.NetworkIdentity.connectionToClient);
+                });
             }
-            return false;
+            FoundationFortune.Singleton.SellingBots.Remove(botKey);
+            return true;
         }
     }
 }
