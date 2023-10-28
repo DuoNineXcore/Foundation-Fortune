@@ -130,7 +130,7 @@ namespace FoundationFortune.API.Database
                 if (subtract) player.MoneyOnHold -= amount;
                 else player.MoneyOnHold += amount;
             }
-            else if (saved)
+            if (saved)
             {
                 if (subtract) player.MoneySaved -= amount;
                 else player.MoneySaved += amount;

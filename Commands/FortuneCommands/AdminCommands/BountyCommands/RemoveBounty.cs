@@ -26,13 +26,13 @@ namespace FoundationFortune.Commands.FortuneCommands.BountyCommands
                 return false;
             }
 
-            if (args.Count < 2)
+            if (args.Count < 1)
             {
                 response = "Usage: foundationfortune bounty removebounty <playerName>";
                 return false;
             }
 
-            string playerName = args.At(1);
+            string playerName = args.At(0);
             if (!Player.TryGet(playerName, out Player player))
             {
                 response = $"Player '{playerName}' not found.";

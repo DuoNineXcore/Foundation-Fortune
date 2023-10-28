@@ -33,20 +33,20 @@ namespace FoundationFortune.Commands.FortuneCommands.DatabaseCommands
                 return false;
             }
 
-            string target = args.At(1).ToLower();
+            string target = args.At(0).ToLower();
             bool subtractSaved = true;
             bool subtractOnHold = true;
 
             if (args.Count >= 3)
             {
-                if (!int.TryParse(args.At(2), out int amount))
+                if (!int.TryParse(args.At(1), out int amount))
                 {
                     response = "Invalid amount. Please provide a valid number.";
                     return false;
                 }
 
-                if (args.Count >= 4) bool.TryParse(args.At(3), out subtractSaved);
-                if (args.Count >= 5) bool.TryParse(args.At(4), out subtractOnHold);
+                if (args.Count >= 4) bool.TryParse(args.At(2), out subtractSaved);
+                if (args.Count >= 5) bool.TryParse(args.At(3), out subtractOnHold);
 
                 switch (target)
                 {
@@ -71,7 +71,7 @@ namespace FoundationFortune.Commands.FortuneCommands.DatabaseCommands
                     case "all":
                         if (subtractSaved)
                         {
-                            if (!int.TryParse(args.At(2), out int allAmount))
+                            if (!int.TryParse(args.At(1), out int allAmount))
                             {
                                 response = "Invalid amount. Please provide a valid number.";
                                 return false;
@@ -87,7 +87,7 @@ namespace FoundationFortune.Commands.FortuneCommands.DatabaseCommands
 
                         if (subtractOnHold)
                         {
-                            if (!int.TryParse(args.At(2), out int allAmount))
+                            if (!int.TryParse(args.At(1), out int allAmount))
                             {
                                 response = "Invalid amount. Please provide a valid number.";
                                 return false;
@@ -101,13 +101,13 @@ namespace FoundationFortune.Commands.FortuneCommands.DatabaseCommands
                             }
                         }
 
-                        response = $"Removed {args.At(2)} money from all players (Saved: {subtractSaved}, On-Hold: {subtractOnHold}).";
+                        response = $"Removed {args.At(1)} money from all players (Saved: {subtractSaved}, On-Hold: {subtractOnHold}).";
                         return true;
 
                     default:
                         if (target != null)
                         {
-                            if (!int.TryParse(args.At(2), out int steamIdAmount))
+                            if (!int.TryParse(args.At(1), out int steamIdAmount))
                             {
                                 response = "Invalid amount. Please provide a valid number.";
                                 return false;
@@ -124,7 +124,7 @@ namespace FoundationFortune.Commands.FortuneCommands.DatabaseCommands
                             }
                         }
 
-                        response = $"Removed {args.At(2)} money from player '{target}' (Saved: {subtractSaved}, On-Hold: {subtractOnHold}).";
+                        response = $"Removed {args.At(1)} money from player '{target}' (Saved: {subtractSaved}, On-Hold: {subtractOnHold}).";
                         return true;
                 }
             }

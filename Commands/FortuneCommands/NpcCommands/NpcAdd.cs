@@ -38,18 +38,18 @@ namespace FoundationFortune.Commands.FortuneCommands.NpcCommands
                 return false;
             }
 
-            string botTypeString = args.At(1);
+            string botTypeString = args.At(0);
             if (!Enum.TryParse(botTypeString, true, out BotType botType))
             {
                 response = "Invalid BotType specified.";
                 return false;
             }
 
-            string name = args.At(2);
-            string badge = args.At(3);
-            string color = args.At(4);
-            string roleString = args.At(5);
-            string heldItemString = args.At(6);
+            string name = args.At(1);
+            string badge = args.At(2);
+            string color = args.At(3);
+            string roleString = args.At(4);
+            string heldItemString = args.At(5);
 
             if (!Enum.TryParse(roleString, out RoleTypeId role) || !Enum.TryParse(heldItemString, out ItemType heldItem))
             {
@@ -57,7 +57,7 @@ namespace FoundationFortune.Commands.FortuneCommands.NpcCommands
                 return false;
             }
 
-            if (!float.TryParse(args.At(7), out float scaleX) || !float.TryParse(args.At(8), out float scaleY) || !float.TryParse(args.At(9), out float scaleZ))
+            if (!float.TryParse(args.At(6), out float scaleX) || !float.TryParse(args.At(7), out float scaleY) || !float.TryParse(args.At(8), out float scaleZ))
             {
                 response = "Invalid Scale specified. Please provide three float values for X, Y, and Z components.";
                 return false;

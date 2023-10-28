@@ -26,20 +26,20 @@ namespace FoundationFortune.Commands.FortuneCommands.NpcCommands
                 return false;
             }
 
-            if (args.Count < 3)
+            if (args.Count < 2)
             {
                 response = "Usage: ff_removenpc <BotType> <IndexationNumber>";
                 return false;
             }
 
-            string botTypeString = args.At(1);
+            string botTypeString = args.At(0);
             if (!Enum.TryParse(botTypeString, true, out BotType botType))
             {
                 response = "Invalid BotType specified.";
                 return false;
             }
 
-            if (!int.TryParse(args.At(2), out int indexationNumber))
+            if (!int.TryParse(args.At(1), out int indexationNumber))
             {
                 response = "Invalid Indexation Number. Please provide a valid number.";
                 return false;

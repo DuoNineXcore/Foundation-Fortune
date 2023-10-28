@@ -119,6 +119,9 @@ namespace FoundationFortune.API.HintSystem
 
 		public void KillingReward(DiedEventArgs ev)
 		{
+			AudioPlayer.StopAudio(ev.Player);
+			AudioPlayer.StopAudio(MusicBot.GetMusicBotByPlayer(ev.Player));
+			
 			var config = FoundationFortune.Singleton.Config;
 			var bountiedPlayer = BountiedPlayers.FirstOrDefault(bounty => bounty.Player == ev.Player && bounty.IsBountied);
 

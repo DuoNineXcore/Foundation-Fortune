@@ -23,7 +23,7 @@ namespace FoundationFortune.Commands.FortuneCommands.AdminCommands
                 return false;
             }
 
-            if (args.Count < 0)
+            if (args.Count < 1)
             {
                 response = "Usage: ff_removeadmin <userId>";
                 return false;

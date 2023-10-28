@@ -39,7 +39,6 @@ namespace FoundationFortune
 			RegisterEvents();
 			Startup.SetupDependencies();
 			CustomItem.RegisterItems();
-			if (harmony != null) return;
 			harmony = new("FoundationFortune");
 			harmony.PatchAll();
 		}
@@ -53,6 +52,7 @@ namespace FoundationFortune
 			Singleton = null;
 			CustomItem.UnregisterItems();
             harmony?.UnpatchAll(harmony.Id);
+            harmony = null!;
             ServerEvents = null;
         }
 

@@ -96,7 +96,7 @@ namespace FoundationFortune.API.HintSystem
 
         public string GetRecentHints(string userId)
 		{
-			if (!recentHints.TryGetValue(userId, out var hint)) return "";
+			if (!recentHints.TryGetValue(userId, out var hint)) return string.Empty;
 			var currentHints = hint
 				.Where(entry => !entry.IsAnimated && (Time.time - entry.Timestamp) <= FoundationFortune.Singleton.Config.MaxHintAge)
 				.Select(entry => entry.Text);
@@ -107,7 +107,7 @@ namespace FoundationFortune.API.HintSystem
 
 		public string GetAnimatedHints(string userId)
 		{
-			if (!recentHints.TryGetValue(userId, out var hint)) return "";
+			if (!recentHints.TryGetValue(userId, out var hint)) return string.Empty;
 			var currentHints = hint
 				.Where(entry => entry.IsAnimated && (Time.time - entry.Timestamp) <= FoundationFortune.Singleton.Config.MaxHintAge)
 				.Select(entry => entry.Text);

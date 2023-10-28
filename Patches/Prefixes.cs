@@ -11,8 +11,9 @@ namespace FoundationFortune.Patches
 	{
 		private static bool Prefix(AntiScp207 __instance)
 		{
-			if (PerkBottle.DroppedPerkBottles.ContainsKey(__instance.ItemSerial)) return false;
-			return true;
+			// if (PerkBottle.DroppedPerkBottles.ContainsKey(__instance.ItemSerial)) return false;
+			// return true;
+			return !PerkBottle.DroppedPerkBottles.ContainsKey(__instance.ItemSerial);
 		}
 	}
 
@@ -22,7 +23,8 @@ namespace FoundationFortune.Patches
 		private static bool Prefix(Scp079ScannerTracker __instance, ReferenceHub hub)
 		{
 			Player player = Player.Get(hub);
-			if (player is null || player is not null && player.IsNPC) return false;
+			if (player is null) return false;
+			if (player.IsNPC) return false;
 			return true;
 		}
 	}
