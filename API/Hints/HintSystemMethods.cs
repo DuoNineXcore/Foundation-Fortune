@@ -1,15 +1,10 @@
 ﻿using Exiled.API.Features;
-using MEC;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using InventorySystem.Items.Firearms.Attachments;
-using FoundationFortune.API.NPCs;
-using Exiled.API.Enums;
 using Random = UnityEngine.Random;
-using Exiled.API.Features.Doors;
 using FoundationFortune.API.Models.Classes;
-using FoundationFortune.API.Database;
 using FoundationFortune.API.Models.Enums;
 using System.Text;
 
@@ -22,7 +17,8 @@ namespace FoundationFortune.API.HintSystem
 		private static readonly Vector3 WorldPos = new(124f, 988f, 24f);
 		private const float RadiusSqr = 16f * 16f;
 		
-		public bool IsPlayerOnSellingWorkstation(Player player) => workstationPositions.Count != 0 && workstationPositions.Values.Select(workstationPosition => Vector3.Distance(player.Position, workstationPosition)).Any(distance => distance <= FoundationFortune.Singleton.Config.SellingWorkstationRadius);
+		public bool IsPlayerOnSellingWorkstation(Player player) => workstationPositions.Count != 0 && workstationPositions.Values.Select(workstationPosition => 
+			Vector3.Distance(player.Position, workstationPosition)).Any(distance => distance <= FoundationFortune.Singleton.Config.SellingWorkstationRadius);
 
 		private static void UpdatePerkIndicator(Dictionary<Player, Dictionary<PerkType, int>> consumedPerks, ref StringBuilder perkIndicator)
 		{
@@ -72,7 +68,8 @@ namespace FoundationFortune.API.HintSystem
 		        hintMessage.Append($"{FoundationFortune.Singleton.Translation.SellingWorkstation}");
 		        if (!itemsBeingSold.TryGetValue(ply.UserId, out var soldItemData)) return;
 		        int price = soldItemData.price;
-		        hintMessage.Append($"{FoundationFortune.Singleton.Translation.ItemConfirmation.Replace("%price%", price.ToString()).Replace("%time%", GetConfirmationTimeLeft(ply).ToString())}");
+		        hintMessage.Append($"{FoundationFortune.Singleton.Translation.ItemConfirmation
+			        .Replace("%price%", price.ToString()).Replace("%time%", GetConfirmationTimeLeft(ply))}");
 	        }
         }
 

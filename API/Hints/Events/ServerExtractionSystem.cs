@@ -79,10 +79,7 @@ namespace FoundationFortune.API.HintSystem
 	        {
 		        int totalMoneyOnHold = PlayerDataRepository.GetMoneyOnHold(ply.UserId);
 
-		        if (totalMoneyOnHold <= 0)
-		        {
-			        hintMessage.Append($"{FoundationFortune.Singleton.Translation.ExtractionNoMoney}");
-		        }
+		        if (totalMoneyOnHold <= 0) hintMessage.Append($"{FoundationFortune.Singleton.Translation.ExtractionNoMoney}");
 		        else
 		        {
 			        if (!extractionTimers.ContainsKey(ply)) StartExtractionTimer(ply);
@@ -111,25 +108,21 @@ namespace FoundationFortune.API.HintSystem
 	        }
         }
 
-        private IEnumerator<float> ExtractMoneyCoroutine(Player player)
+        private void ExtractMoney(Player player)
         {
 	        while (IsPlayerInExtractionRoom(player, activeExtractionRoom))
 	        {
 		        int totalMoneyOnHold = PlayerDataRepository.GetMoneyOnHold(player.UserId);
-
 		        if (totalMoneyOnHold > 0)
 		        {
-			        float transferAmount = Mathf.Max(totalMoneyOnHold * 0.1f, 1f);
-			        PlayerDataRepository.ModifyMoney(player.UserId, (int)transferAmount, true, true, false);
-			        PlayerDataRepository.ModifyMoney(player.UserId, (int)transferAmount, false, false, true);
-			        Log.Debug($"Transferred {transferAmount} money to player {player.UserId}");
+			        PlayerDataRepository.TransferMoney(player.UserId, true);
+			        Log.Debug($"Transferred {totalMoneyOnHold} money to player {player.UserId}");
 		        }
-		        yield return Timing.WaitForSeconds(1f);
 	        }
-	        Log.Debug($"Money extraction coroutine finished for player {player.UserId}");
+	        Log.Debug($"Money extraction finished for player {player.UserId}");
         }
 
-		private bool IsExtractionTimerFinished(Player player)
+        private bool IsExtractionTimerFinished(Player player)
 		{
 			Log.Debug($"Extraction timer finished for player {player.UserId}");
 			if (!extractionTimers.TryGetValue(player, out var timer)) return false;
@@ -165,20 +158,7 @@ namespace FoundationFortune.API.HintSystem
 			}
 
 			Log.Debug($"Initial extraction timer finished for player {player.UserId}");
-			CoroutineHandle moneyExtractionHandle = Timing.RunCoroutine(ExtractMoneyCoroutine(player));
-			ExtractionTimerData timerData = new()
-			{
-				CoroutineHandle = moneyExtractionHandle,
-				StartTime = Time.time
-			};
-			extractionTimers[player] = timerData;
-
-			while (IsPlayerInExtractionRoom(player, activeExtractionRoom))
-			{
-				yield return Timing.WaitForSeconds(1f);
-			}
-
-			CancelExtractionTimer(player);
+			ExtractMoney(player);
 		}
 
 		private void CancelExtractionTimer(Player player)

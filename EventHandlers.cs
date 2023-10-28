@@ -14,13 +14,8 @@ using FoundationFortune.API.Models.Enums;
 using PlayerRoles;
 using System.Collections.Generic;
 using FoundationFortune.API.Perks;
-using Utf8Json.Resolvers.Internal;
 using Exiled.API.Extensions;
-using InventorySystem;
 using Exiled.API.Enums;
-using PluginAPI.Roles;
-using Exiled.API.Features.Roles;
-using Exiled.API.Features.Doors;
 
 namespace FoundationFortune.API.HintSystem
 {
@@ -56,12 +51,13 @@ namespace FoundationFortune.API.HintSystem
 		{
 			IEnumerable<Player> players = Player.List.Where(p => !p.IsNPC);
 			IEnumerable<Player> alivePlayers = players.Where(p => p.IsAlive);
-			int chaos = alivePlayers.Count(p => p.IsCHI || p.Role.Type == RoleTypeId.ClassD);
-			int mtf = alivePlayers.Count(p => p.IsNTF || p.Role.Type == RoleTypeId.Scientist);
-			int scps = alivePlayers.Count(p => p.IsScp);
+			IEnumerable<Player> enumerable = alivePlayers.ToList();
+			int chaos = enumerable.Count(p => p.IsCHI || p.Role.Type == RoleTypeId.ClassD);
+			int mtf = enumerable.Count(p => p.IsNTF || p.Role.Type == RoleTypeId.Scientist);
+			int scps = enumerable.Count(p => p.IsScp);
 
 			if (Round.IsLocked || Round.IsEnded) return;
-			if (alivePlayers.Count() <= 1) ev.IsRoundEnded = true;
+			if (enumerable.Count() <= 1) ev.IsRoundEnded = true;
 			if (chaos >= 1 && mtf == 0 && scps == 0 || mtf >= 1 && chaos == 0 && scps == 0) ev.IsRoundEnded = true;
 		}
 
@@ -98,10 +94,6 @@ namespace FoundationFortune.API.HintSystem
 			ev.IsAllowed = false;
 			RoleTypeId role = ev.Player.Role.Type;
 			Room room = Room.List.Where(r => r.Zone == ev.Player.Zone & !FoundationFortune.Singleton.Config.ForbiddenRooms.Contains(r.Type)).GetRandomValue();
-			ev.ItemsToDrop = new List<Item>();
-
-			List<Item> items = ev.Player.Items.ToList();
-			Dictionary<AmmoType, ushort> ammos = ev.Player.Ammo.ToDictionary(kvp => kvp.Key.GetAmmoType(), kvp => kvp.Value);
 
 			Timing.CallDelayed(0.1f, delegate
 			{
@@ -117,7 +109,10 @@ namespace FoundationFortune.API.HintSystem
 			{
 				PlayerVoiceChatSettings EtherealInterventionAudio = FoundationFortune.Singleton.Config.PlayerVoiceChatSettings
 					.FirstOrDefault(settings => settings.VoiceChatUsageType == PlayerVoiceChatUsageType.EtherealIntervention);
-				AudioPlayer.PlaySpecialAudio(ev.Player, EtherealInterventionAudio.AudioFile, EtherealInterventionAudio.Volume, EtherealInterventionAudio.Loop, EtherealInterventionAudio.VoiceChat);
+				if (EtherealInterventionAudio != null)
+					AudioPlayer.PlaySpecialAudio(ev.Player, EtherealInterventionAudio.AudioFile,
+						EtherealInterventionAudio.Volume, EtherealInterventionAudio.Loop,
+						EtherealInterventionAudio.VoiceChat);
 			});
 			PerkSystem.EtherealInterventionPlayers.Remove(ev.Player);
 		}
@@ -178,7 +173,7 @@ namespace FoundationFortune.API.HintSystem
 			if (config.EscapeEvent)
 			{
 				EnqueueHint(ev.Player, $"{FoundationFortune.Singleton.Translation.Escape}", config.MaxHintAge, HintAnim.Right);
-				PlayerDataRepository.ModifyMoney(ev.Player.UserId, config.EscapeRewards, false, false, true);
+				PlayerDataRepository.ModifyMoney(ev.Player.UserId, config.EscapeRewards);
 			}
 		}
 
@@ -220,8 +215,11 @@ namespace FoundationFortune.API.HintSystem
 							if (soldItem == ev.Item)
 							{
 								NPCVoiceChatSettings buyVoiceChatSettings = FoundationFortune.Singleton.Config.FFNPCVoiceChatSettings.FirstOrDefault(settings => settings.VoiceChatUsageType == NPCVoiceChatUsageType.Buying);
-								AudioPlayer.PlayAudio(buyingbot, buyVoiceChatSettings.AudioFile, buyVoiceChatSettings.Volume, buyVoiceChatSettings.Loop, buyVoiceChatSettings.VoiceChat);
-								string str = FoundationFortune.Singleton.Translation.SellSuccess
+								if (buyVoiceChatSettings != null)
+									AudioPlayer.PlayAudio(buyingbot, buyVoiceChatSettings.AudioFile,
+										buyVoiceChatSettings.Volume, buyVoiceChatSettings.Loop,
+										buyVoiceChatSettings.VoiceChat);
+								var str = FoundationFortune.Singleton.Translation.SellSuccess
 									.Replace("%price%", price.ToString())
 									.Replace("%itemName%", FoundationFortune.Singleton.Config.SellableItems.Find(x => x.ItemType == ev.Item.Type).DisplayName);
 
@@ -241,7 +239,9 @@ namespace FoundationFortune.API.HintSystem
 			{
 				ev.IsAllowed = true;
 				NPCVoiceChatSettings wrongBotSettings = FoundationFortune.Singleton.Config.FFNPCVoiceChatSettings.FirstOrDefault(settings => settings.VoiceChatUsageType == NPCVoiceChatUsageType.WrongBuyingBot);
-				AudioPlayer.PlayAudio(buyingbot, wrongBotSettings.AudioFile, wrongBotSettings.Volume, wrongBotSettings.Loop, wrongBotSettings.VoiceChat);
+				if (wrongBotSettings != null)
+					AudioPlayer.PlayAudio(buyingbot, wrongBotSettings.AudioFile, wrongBotSettings.Volume,
+						wrongBotSettings.Loop, wrongBotSettings.VoiceChat);
 				EnqueueHint(ev.Player, FoundationFortune.Singleton.Translation.WrongBot, 3f);
 			}
 			ev.IsAllowed = true;
@@ -271,19 +271,19 @@ namespace FoundationFortune.API.HintSystem
 				switch (teamCondition)
 				{
 					case PlayerTeamConditions.Winning:
-						PlayerDataRepository.ModifyMoney(ply.UserId, winningAmount, false, false, true);
+						PlayerDataRepository.ModifyMoney(ply.UserId, winningAmount);
 						EnqueueHint(ply, FoundationFortune.Singleton.Translation.RoundEndWin
 							.Replace("%winningFactionColor%", teamColor)
 							.Replace("%winningAmount%", winningAmount.ToString()), config.MaxHintAge);
 						break;
 					case PlayerTeamConditions.Losing:
-						PlayerDataRepository.ModifyMoney(ply.UserId, losingAmount, false, false, true);
+						PlayerDataRepository.ModifyMoney(ply.UserId, losingAmount);
 						EnqueueHint(ply, FoundationFortune.Singleton.Translation.RoundEndLoss
 							.Replace("%losingFactionColor%", teamColor)
 							.Replace("%losingAmount%", losingAmount.ToString()), config.MaxHintAge);
 						break;
 					case PlayerTeamConditions.Draw:
-						PlayerDataRepository.ModifyMoney(ply.UserId, drawAmount, false, false, true);
+						PlayerDataRepository.ModifyMoney(ply.UserId, drawAmount);
 						EnqueueHint(ply, FoundationFortune.Singleton.Translation.RoundEndDraw
 							.Replace("%drawFactionColor%", teamColor)
 							.Replace("%drawAmount%", drawAmount.ToString()), config.MaxHintAge);

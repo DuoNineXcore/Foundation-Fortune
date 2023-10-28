@@ -47,21 +47,14 @@ namespace FoundationFortune.API.Items.PerkItems
 			PerkType perkType = perkBottleData.perkType;
 			PerkSystem.GrantPerk(ev.Player, perkType);
 
-			// Add the consumed perk to the consumedPerks dictionary
 			if (!FoundationFortune.Singleton.ConsumedPerks.TryGetValue(ev.Player, out var playerPerks))
 			{
 				playerPerks = new Dictionary<PerkType, int>();
 				FoundationFortune.Singleton.ConsumedPerks[ev.Player] = playerPerks;
 			}
 
-			if (playerPerks.TryGetValue(perkType, out var count))
-			{
-				playerPerks[perkType] = count + 1;
-			}
-			else
-			{
-				playerPerks[perkType] = 1;
-			}
+			if (playerPerks.TryGetValue(perkType, out var count)) playerPerks[perkType] = count + 1;
+			else playerPerks[perkType] = 1;
 
 			FoundationFortune.Singleton.ServerEvents.EnqueueHint(ev.Player, $"<b>You drank a <color=#FFC0CB>{perkType}</color> Perk bottle.</b>", 2f);
 			DroppedPerkBottles.Remove(ev.Item.Serial);
@@ -83,10 +76,8 @@ namespace FoundationFortune.API.Items.PerkItems
         public static void GetHeldBottle(Player player, ref StringBuilder stringbuilder)
 		{
 			if (player.CurrentItem == null) return;
-			if (DroppedPerkBottles.TryGetValue(player.CurrentItem.Serial, out var perkBottleData))
-			{
+			if (DroppedPerkBottles.TryGetValue(player.CurrentItem.Serial, out var perkBottleData)) 
 				stringbuilder.AppendLine($"<b>You are holding a <color=#FFC0CB>{perkBottleData.perkType}</color> perk bottle.</b>");
-			}
 		}
 	}
 }

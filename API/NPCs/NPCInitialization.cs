@@ -74,8 +74,6 @@ namespace FoundationFortune.API.HintSystem
             else
             {
                 Log.Debug($"Initializing Buying Bot NPCs.");
-                buyingBotPositions.Clear();
-
                 foreach (BuyingBotSpawn spawn in FoundationFortune.Singleton.Config.BuyingBotSpawnSettings)
                 {
                     Log.Debug($"Spawning Bot: {spawn.Name}");

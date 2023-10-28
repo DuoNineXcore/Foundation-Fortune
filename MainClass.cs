@@ -98,7 +98,7 @@ namespace FoundationFortune
 		{
 			try
 			{
-				string databaseDirectoryPath = Path.Combine(Paths.Configs, "Foundation Fortune");
+				string databaseDirectoryPath = Path.Combine(Paths.Configs, "Duo" ,"Foundation Fortune");
 				string databaseFilePath = Path.Combine(databaseDirectoryPath, "Foundation Fortune.db");
 
 				if (!File.Exists(databaseFilePath))

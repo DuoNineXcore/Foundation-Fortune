@@ -7,7 +7,6 @@ using Utils.NonAllocLINQ;
 using FoundationFortune.API.Models.Enums;
 using FoundationFortune.API.Models.Classes;
 using FoundationFortune.API.HintSystem;
-using FoundationFortune.API.Items;
 using FoundationFortune.API.Items.PerkItems;
 
 namespace FoundationFortune.Commands.BuyCommand
@@ -94,7 +93,7 @@ namespace FoundationFortune.Commands.BuyCommand
 						    .Replace("%itemAlias%", perkItem.Alias)
 						    .Replace("%itemPrice%", perkItem.Price.ToString());
 				FoundationFortune.Singleton.ServerEvents.EnqueueHint(player, boughtHint, 3f);
-				PlayerDataRepository.ModifyMoney(player.UserId, perkItem.Price, true, false, true);
+				PlayerDataRepository.ModifyMoney(player.UserId, perkItem.Price, true);
 				PerkBottle.GivePerkBottle(player, perkItem.PerkType);
 				ServerEvents.AddToPlayerLimits(player, perkItem);
 

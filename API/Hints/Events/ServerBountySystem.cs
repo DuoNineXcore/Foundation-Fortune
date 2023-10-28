@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using MEC;
 using FoundationFortune.API.Models.Classes;
-using FoundationFortune.API.Database;
 using FoundationFortune.API.Models.Enums;
 using System.Text;
 
@@ -16,17 +15,16 @@ namespace FoundationFortune.API.HintSystem
 
 		public void AddBounty(Player player, int bountyPrice, TimeSpan duration)
 		{
-			DateTime expirationTime = DateTime.Now.Add(duration);
-			BountiedPlayers.Add(new Bounty(player, true, bountyPrice, expirationTime));
-
 			PlayerVoiceChatSettings hunted = FoundationFortune.Singleton.Config.PlayerVoiceChatSettings
 				.FirstOrDefault(settings => settings.VoiceChatUsageType == PlayerVoiceChatUsageType.Hunted);
-			if (hunted != null) AudioPlayer.PlayTo(player, hunted.AudioFile, hunted.Volume, hunted.Loop, hunted.VoiceChat);
-			
 			PlayerVoiceChatSettings hunter = FoundationFortune.Singleton.Config.PlayerVoiceChatSettings
 				.FirstOrDefault(settings => settings.VoiceChatUsageType == PlayerVoiceChatUsageType.Hunter);
 			
-			foreach (Player ply in Player.List.Where(p => !p.IsNPC && p == player)) 
+			DateTime expirationTime = DateTime.Now.Add(duration);
+			BountiedPlayers.Add(new Bounty(player, true, bountyPrice, expirationTime));
+			
+			if (hunted != null) AudioPlayer.PlayTo(player, hunted.AudioFile, hunted.Volume, hunted.Loop, hunted.VoiceChat);
+			foreach (Player ply in Player.List.Where(p => !p.IsNPC && p != player)) 
 				if (hunter != null) AudioPlayer.PlayTo(ply, hunter.AudioFile, hunter.Volume, hunter.Loop, hunter.VoiceChat);
 
 			Timing.CallDelayed((float)duration.TotalSeconds, () => StopBounty(player));

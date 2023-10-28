@@ -47,8 +47,12 @@ namespace FoundationFortune.API.Items.PerkItems
             if (targetPlayer == null) return false;
 
             if (!TrySpawn(332, giver.Position, out Pickup resurgencebeacon)) return false;
-            Log.Debug($"Spawned Perk Bottle at Pos:{resurgencebeacon.Position} Serial: {resurgencebeacon.Serial}, Player to be revived: {targetPlayer}");
-            RevivalData[resurgencebeacon.Serial] = (giver, targetPlayer);
+            if (resurgencebeacon != null)
+            {
+                Log.Debug(
+                    $"Spawned Resurgence Beacon at Pos:{resurgencebeacon.Position} Serial: {resurgencebeacon.Serial}, Player to be revived: {targetPlayer}");
+                RevivalData[resurgencebeacon.Serial] = (giver, targetPlayer);
+            }
             return true;
         }
     }
