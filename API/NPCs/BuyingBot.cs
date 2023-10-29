@@ -54,7 +54,6 @@ namespace FoundationFortune.API.NPCs
             spawnedBuyingBot.RankName = Badge;
             spawnedBuyingBot.RankColor = Color;
             spawnedBuyingBot.Scale = scale;
-            spawnedBuyingBot.IsGodModeEnabled = true;
 
             Round.IgnoredPlayers.Add(spawnedBuyingBot.ReferenceHub);
 

@@ -11,6 +11,7 @@ using MEC;
 using System.Collections.Generic;
 using PlayerRoles.PlayableScps.Scp939.Ripples;
 using Exiled.API.Features.Roles;
+using PlayerStatsSystem;
 
 namespace FoundationFortune.API.Perks
 {
@@ -20,38 +21,31 @@ namespace FoundationFortune.API.Perks
 	public static class PerkSystem
 	{
 		public static readonly List<Player> EtherealInterventionPlayers = new();
+		public static readonly List<Player> ViolentImpulsesPlayers = new();
+		
         public static void ClearConsumedPerks(Player player) { if (FoundationFortune.Singleton.ConsumedPerks.TryGetValue(player, out var perk)) perk.Clear(); }
 
         public static void GrantPerk(Player ply, PerkType perk)
 		{
 			switch (perk)
 			{
-				case PerkType.OvershieldedProtection:
-					ply.AddAhp(50, decay: 0);
-					break;
-				case PerkType.BoostedResilience:
-					ply.Heal(50, true);
-					ply.MaxHealth += 50;
+				case PerkType.ViolentImpulses:
+					ply.ReferenceHub.playerStats.GetModule<AhpStat>().ServerAddProcess(10f).DecayRate = 0.0f;
+					if (!ViolentImpulsesPlayers.Contains(ply)) ViolentImpulsesPlayers.Add(ply);
 					break;
 				case PerkType.Hyperactivity:
 					ply.EnableEffect<MovementBoost>(60);
 					ply.ChangeEffectIntensity<MovementBoost>(30);
+					ply.Stamina = 300;
 					break;
 				case PerkType.EthericVitality:
 					Scp330Bag.AddSimpleRegeneration(ply.ReferenceHub, 4f, 75f);
 					break;
-				case PerkType.ConcealedPresence:
-					ply.EnableEffect<Invisible>(30);
-					break;
 				case PerkType.BlissfulUnawareness:
 					Timing.RunCoroutine(BlissfulUnawarenessCoroutine(ply).CancelWith(ply.GameObject));
 					break;
-				case PerkType.ExtrasensoryPerception:
-					//coming soon:tm:
-					break;
 				case PerkType.EtherealIntervention:
-					if (!EtherealInterventionPlayers.Contains(ply))
-						EtherealInterventionPlayers.Add(ply);
+					if (!EtherealInterventionPlayers.Contains(ply)) EtherealInterventionPlayers.Add(ply);
 					break;
 			}
 		}
@@ -66,13 +60,13 @@ namespace FoundationFortune.API.Perks
 
         private static IEnumerator<float> BlissfulUnawarenessCoroutine(Player ply)
 		{
-			/*Log.Debug("Blissful Unawareness 1st coroutine started.");
-
-            yield return Timing.WaitForSeconds(80f);*/
+			Log.Debug("Blissful Unawareness 1st coroutine started.");
+			ply.EnableEffect<MovementBoost>(120);
+			ply.ChangeEffectIntensity<MovementBoost>(10);
+			yield return Timing.WaitForSeconds(80f);
             ply.EnableEffect<Blinded>(1);
-            ply.EnableEffect<MovementBoost>(120);
-            ply.ChangeEffectIntensity<MovementBoost>(25);
-
+            
+            
             Scp330Bag.AddSimpleRegeneration(ply.ReferenceHub, 5f, 50f);
             Log.Debug("Blissful Unawareness 1st coroutine finished.");
 			Log.Debug("Blissful Unawareness 2nd coroutine started.");

@@ -113,7 +113,6 @@ namespace FoundationFortune.API.HintSystem
 				.Select(entry => entry.Text);
 
 			return string.Join("\n", currentHints);
-
 		}
 
 		public void EnqueueHint(Player player, string hint, float duration)
@@ -123,7 +122,7 @@ namespace FoundationFortune.API.HintSystem
 			float expirationTime = Time.time + duration;
 			if (!recentHints.ContainsKey(player.UserId)) recentHints[player.UserId] = new Queue<HintEntry>();
 			recentHints[player.UserId].Enqueue(new HintEntry(hint, expirationTime, false));
-			while (recentHints[player.UserId].Count > FoundationFortune.Singleton.Config.MaxHintsToShow) recentHints[player.UserId].Dequeue();
+			while (recentHints[player.UserId].Count > PlayerDataRepository.GetMaxHintsToShow(player.UserId)) recentHints[player.UserId].Dequeue();
 		}
 
 		public void EnqueueHint(Player player, string hint, float duration, HintAnim align)
@@ -137,7 +136,7 @@ namespace FoundationFortune.API.HintSystem
 			}
 
 			Timing.RunCoroutine(AnimateHintText(player.UserId, hint, duration, align));
-			while (hintQueue.Count > FoundationFortune.Singleton.Config.MaxHintsToShow) hintQueue.Dequeue();
+			while (hintQueue.Count > PlayerDataRepository.GetMaxHintsToShow(player.UserId)) hintQueue.Dequeue();
 		}
 
 		private IEnumerator<float> AnimateHintText(string userId, string hint, float duration, HintAnim animAlignment)

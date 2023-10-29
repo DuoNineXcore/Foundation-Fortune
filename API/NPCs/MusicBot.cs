@@ -10,6 +10,7 @@ using Mirror;
 using System;
 using System.Collections.Generic;
 using FoundationFortune.API.Models.Classes;
+using CentralAuth;
 
 namespace FoundationFortune.API.NPCs
 {
@@ -59,10 +60,8 @@ namespace FoundationFortune.API.NPCs
         private static Npc SpawnFix(string name, RoleTypeId role, int id = 0)
         {
             GameObject gameObject = UnityEngine.Object.Instantiate(NetworkManager.singleton.playerPrefab);
-            Npc npc = new(gameObject)
-            {
-                IsNPC = true
-            };
+            Npc npc = new(gameObject) { IsNPC = true };
+            
             try
             {
                 npc.ReferenceHub.roleManager.InitializeNewRole(RoleTypeId.None, RoleChangeReason.None, RoleSpawnFlags.None);
@@ -78,7 +77,7 @@ namespace FoundationFortune.API.NPCs
             NetworkServer.AddPlayerForConnection(new FakeConnection(id), gameObject);
             try
             {
-                npc.ReferenceHub.characterClassManager.InstanceMode = ClientInstanceMode.DedicatedServer;
+                npc.ReferenceHub.authManager.InstanceMode = ClientInstanceMode.DedicatedServer;
             }
             catch (Exception)
             {

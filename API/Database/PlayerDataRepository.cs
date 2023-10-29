@@ -18,6 +18,7 @@ namespace FoundationFortune.API.Database
         public static bool GetHintDisable(string userId) => PlayersCollection.FindOne(p => p.UserId == userId)?.HintSystem ?? false;
         public static bool GetPluginAdmin(string userId) => PlayersCollection.FindOne(p => p.UserId == userId)?.HintAdmin ?? false;
         public static int GetHintAlpha(string userId) => PlayersCollection.FindOne(p => p.UserId == userId)?.HintOpacity ?? 50;
+        public static int GetMaxHintsToShow(string userId) => PlayersCollection.FindOne(p => p.UserId == userId)?.MaxHintsToShow ?? 5;
         public static int GetHintSize(string userId) => PlayersCollection.FindOne(p => p.UserId == userId)?.HintSize ?? 25;
         public static HintAnim GetHintAnim(string userId) => PlayersCollection.FindOne(p => p.UserId == userId)?.HintAnim ?? HintAnim.None;
 

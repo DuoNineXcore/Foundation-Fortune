@@ -44,7 +44,7 @@ namespace FoundationFortune.API.HintSystem
 	        int numWorkstationsToConsider = allWorkstations.Count / 2;
 	        HashSet<WorkstationController> selectedWorkstations = new();
 
-	        foreach (var workstation in allWorkstations.OrderBy(x => Random.value).Take(numWorkstationsToConsider))
+	        foreach (var workstation in allWorkstations.OrderBy(_ => Random.value).Take(numWorkstationsToConsider))
 		        selectedWorkstations.Add(workstation);
 
 	        workstationPositions = selectedWorkstations.ToDictionary(workstation => workstation, workstation => workstation.transform.position);

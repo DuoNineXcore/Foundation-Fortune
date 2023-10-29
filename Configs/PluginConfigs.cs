@@ -17,16 +17,12 @@ namespace FoundationFortune.Configs
 		[Description("Plugin Settings")]
 		public bool IsEnabled { get; set; } = true;
 		public bool Debug { get; set; } = true;
-
-		[Description("Number of hints that can be shown")]
-		public int MaxHintsToShow { get; set; } = 3;
-
+		
 		[Description("Server Events with Rewards.")]
 		public bool KillEvent { get; set; } = true;
         public bool EscapeEvent { get; set; } = true;
 		public bool RoundEndEvent { get; set; } = true;
-
-        public bool KillEventRewardsOnlySCPS { get; set; } = false;
+		public bool KillEventRewardsOnlySCPS { get; set; } = false;
         public int KillEventRewards { get; set; } = 300;
 		public int EscapeRewards { get; set; } = 300;
         public Dictionary<PlayerTeamConditions, int> RoundEndRewards { get; set; } = new Dictionary<PlayerTeamConditions, int>
@@ -57,7 +53,7 @@ namespace FoundationFortune.Configs
 		public int MaxExtractionPointGenerationTime { get; set; } = 30;
 		public int ExtractionPointDuration { get; set; } = 120;
 
-		[Description("Hint System Update Rate Settings")]
+		[Description("Hint System Update Rate Settings")] 
 		public float HintSystemUpdateRate { get; set; } = 0.5f;
 		public float AnimatedHintUpdateRate { get; set; } = 0.5f;
 
@@ -71,6 +67,42 @@ namespace FoundationFortune.Configs
 		public bool UseSellingWorkstation { get; set; } = false;
 		public float SellingWorkstationRadius { get; set; } = 3f;
 
+		[Description("Perk System Settings")] 
+		public float ViolentImpulsesDamageMultiplier { get; set; } = 1.2f;
+
+		public float ViolentImpulsesRecoilMultiplier { get; set; } = 1.2f;
+		public Dictionary<PerkType, string> PerkEmojis { get; set; } = new Dictionary<PerkType, string>
+		{
+			{ PerkType.ViolentImpulses, "🔪" }, 
+			{ PerkType.EthericVitality, "❤️" },
+			{ PerkType.Hyperactivity, "🏃" },
+			{ PerkType.BlissfulUnawareness, "💞" },
+			{ PerkType.ExtrasensoryPerception, "◎" },
+			{ PerkType.EtherealIntervention, "✚" } 
+		};
+        
+		public List<PerkItem> PerkItems { get; set; } = new List<PerkItem>
+		{
+			new PerkItem { Limit = 1, Alias = "speed", PerkType = PerkType.Hyperactivity, Price = 2500, DisplayName = "Hyperactivity", Description = ""},
+			new PerkItem { Limit = 1, Alias = "regen", PerkType = PerkType.EthericVitality, Price = 2800, DisplayName = "Etheric Vitality", Description = ""},
+			new PerkItem { Limit = 1, Alias = "violence", PerkType = PerkType.ViolentImpulses, Price = 3000, DisplayName = "Violent Impulses", Description = ""},
+			new PerkItem { Limit = 1, Alias = "bliss", PerkType = PerkType.BlissfulUnawareness, Price = 3500, DisplayName = "Blissful Unawareness", Description = ""},
+			new PerkItem { Limit = 1, Alias = "revive", PerkType = PerkType.ResurgenceBeacon, Price = 3000, DisplayName = "Resurgence Beacon", Description = ""},
+			new PerkItem { Limit = 1, Alias = "selfres", PerkType = PerkType.EtherealIntervention, Price = 4200, DisplayName = "Ethereal Intervention", Description = ""},
+		};
+
+		[Description("A list of rooms that you cannot be teleported to at your revival")]
+		public List<RoomType> ForbiddenRooms { get; set; } = new()
+		{
+			RoomType.EzCollapsedTunnel,
+			RoomType.HczTestRoom,
+			RoomType.Hcz049,
+			RoomType.Lcz173,
+			RoomType.HczTesla,
+			RoomType.HczHid,
+			RoomType.Lcz330
+		};
+		
 		[Description("Foundation Fortune NPC Settings.")]
 		public bool FoundationFortuneNPCs { get; set; } = true;
 
@@ -155,45 +187,6 @@ namespace FoundationFortune.Configs
 		{
 			new BuyableItem { Limit = 1, Alias = "Micro", ItemType = ItemType.MicroHID, Price = 500, DisplayName = "Micro HID" },
 			new BuyableItem { Limit = 1, Alias = "500", ItemType = ItemType.SCP500, Price = 1000, DisplayName = "SCP-500" },
-		};
-
-		[Description("List of perks that can be bought.")]
-		public List<PerkItem> PerkItems { get; set; } = new List<PerkItem>
-	    {
-			new PerkItem { Limit = 1, Alias = "extrahp", PerkType = PerkType.BoostedResilience, Price = 1800, DisplayName = "Boosted Resilience", Description = ""},
-			new PerkItem { Limit = 1, Alias = "invis", PerkType = PerkType.ConcealedPresence, Price = 2000, DisplayName = "Concealed Presence", Description = ""},
-            new PerkItem { Limit = 1, Alias = "ahp", PerkType = PerkType.OvershieldedProtection, Price = 2500, DisplayName = "Over-Shielded Protection", Description = ""},
-            new PerkItem { Limit = 1, Alias = "regen", PerkType = PerkType.EthericVitality, Price = 2800, DisplayName = "Etheric Vitality", Description = ""},
-			new PerkItem { Limit = 1, Alias = "revive", PerkType = PerkType.ResurgenceBeacon, Price = 3000, DisplayName = "Resurgence Beacon", Description = ""},
-            new PerkItem { Limit = 1, Alias = "speed", PerkType = PerkType.Hyperactivity, Price = 3200, DisplayName = "Hyperactivity", Description = ""},
-            new PerkItem { Limit = 1, Alias = "bliss", PerkType = PerkType.BlissfulUnawareness, Price = 3500, DisplayName = "Blissful Unawareness", Description = ""},
-            new PerkItem { Limit = 1, Alias = "selfres", PerkType = PerkType.EtherealIntervention, Price = 4200, DisplayName = "Ethereal Intervention", Description = ""},
-		};
-
-        [Description("Perk System Icons")]
-        public Dictionary<PerkType, string> PerkEmojis { get; set; } = new Dictionary<PerkType, string>
-        {
-            { PerkType.OvershieldedProtection, "🔰" },
-            { PerkType.BoostedResilience, "🔰" },
-            { PerkType.ConcealedPresence, "🕵️" },
-            { PerkType.EthericVitality, "❤️" },
-            { PerkType.Hyperactivity, "🏃" },
-            { PerkType.BlissfulUnawareness, "💞" },
-            { PerkType.ExtrasensoryPerception, "◎" },
-            { PerkType.ResurgenceBeacon, "🚑" }, //the beacon is a radio item so this doesnt serve any purpose bc you dont actually drink it
-            { PerkType.EtherealIntervention, "✚" } 
-        };
-
-        [Description("A list of rooms that you cannot be teleported to at your revival")]
-		public List<RoomType> ForbiddenRooms { get; set; } = new()
-		{
-			RoomType.EzCollapsedTunnel,
-			RoomType.HczTestRoom,
-			RoomType.Hcz049,
-			RoomType.Lcz173,
-			RoomType.HczTesla,
-			RoomType.HczHid,
-			RoomType.Lcz330
 		};
 	}
 }

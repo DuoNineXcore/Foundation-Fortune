@@ -13,6 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using CentralAuth;
 using UnityEngine;
 using VoiceChat;
 using FoundationFortune.API.Models.Classes;
@@ -57,7 +58,7 @@ namespace FoundationFortune.API.NPCs
             NetworkServer.AddPlayerForConnection(new FakeConnection(id), gameObject);
             try
             {
-                npc.ReferenceHub.characterClassManager.InstanceMode = ClientInstanceMode.DedicatedServer;
+                npc.ReferenceHub.authManager.InstanceMode = ClientInstanceMode.DedicatedServer;
             }
             catch (Exception)
             {

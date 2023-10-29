@@ -68,11 +68,11 @@ namespace FoundationFortune
 			Exiled.Events.Handlers.Scp049.ActivatingSense += ServerEvents.FuckYourAbility;
 			Exiled.Events.Handlers.Scp0492.TriggeringBloodlust += ServerEvents.FuckYourOtherAbility;
 			Exiled.Events.Handlers.Player.Spawning += ServerEvents.SpawningNpc;
-			Exiled.Events.Handlers.Server.EndingRound += ServerEvents.RoundEnding;
 			Exiled.Events.Handlers.Server.RestartingRound += ServerEvents.RoundRestart;
 			Exiled.Events.Handlers.Server.RoundEnded += ServerEvents.RoundEnded;
-			Exiled.Events.Handlers.Server.RespawningTeam += ServerEvents.PreventBotsFromSpawning;
+			Exiled.Events.Handlers.Server.RespawningTeam += ServerEvents.PreventBotsFromSpawningInWaves;
 			Exiled.Events.Handlers.Player.Left += ServerEvents.DestroyMusicBots;
+			Exiled.Events.Handlers.Player.Hurting += ServerEvents.HurtingPlayer;
 		}
 
 		private void UnregisterEvents()
@@ -87,11 +87,11 @@ namespace FoundationFortune
 			Exiled.Events.Handlers.Scp049.ActivatingSense -= ServerEvents.FuckYourAbility;
 			Exiled.Events.Handlers.Scp0492.TriggeringBloodlust -= ServerEvents.FuckYourOtherAbility;
 			Exiled.Events.Handlers.Player.Spawning -= ServerEvents.SpawningNpc;
-			Exiled.Events.Handlers.Server.EndingRound -= ServerEvents.RoundEnding;
 			Exiled.Events.Handlers.Server.RestartingRound -= ServerEvents.RoundRestart;
             Exiled.Events.Handlers.Server.RoundEnded -= ServerEvents.RoundEnded;
-            Exiled.Events.Handlers.Server.RespawningTeam -= ServerEvents.PreventBotsFromSpawning;
+            Exiled.Events.Handlers.Server.RespawningTeam -= ServerEvents.PreventBotsFromSpawningInWaves;
             Exiled.Events.Handlers.Player.Left -= ServerEvents.DestroyMusicBots;
+            Exiled.Events.Handlers.Player.Hurting -= ServerEvents.HurtingPlayer;
 		}
 
 		private void CreateDatabase()

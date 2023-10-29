@@ -19,7 +19,7 @@ namespace FoundationFortune.Configs
 		public string SellingBot { get; set; } = "<b>You're around a Selling bot. Drop Items twice to sell them.</b>\\n";
 
 		[Description("Hint System Counters")]
-		public string MoneyCounterSaved { get; set; } = "\\n<b>Money Saved: <color=%rolecolor%>$%moneySaved%</color></b>\\n";
+		public string MoneyCounterSaved { get; set; } = "<b>Money Saved: <color=%rolecolor%>$%moneySaved%</color></b>\\n";
 		public string MoneyCounterOnHold { get; set; } = "<b>Money On Hold: <color=%rolecolor%>$%moneyOnHold%</color></b>\\n";
 
 		[Description("Hint System Events")]
@@ -32,7 +32,6 @@ namespace FoundationFortune.Configs
 		[Description("Extraction Events")]
 		public string ExtractionEvent = "<b>A <color=green>Money</color> Extraction Zone has opened up. \\nRoom: %room% Time Left: %time%</b>\\n";
 		public string ExtractionTimer = "<b>You're in the extraction zone, extracting money in %time% seconds.</b>\\n";
-		public string ExtractionStart = "<b>Extracting Money.</b>\\n";
 		public string ExtractionNoMoney = "<b>You do not have any On Hold Money.</b>\\n";
 
 		[Description("Death Coins")]

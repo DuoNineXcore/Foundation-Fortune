@@ -39,12 +39,12 @@
 		<Reference Include="0Harmony">
       <HintPath>..\..\Documents\C# References\0Harmony.dll</HintPath>
     </Reference>
-    <Reference Include="Assembly-CSharp">
-      <HintPath>..\..\Documents\C# References\Assembly-CSharp.dll</HintPath>
-    </Reference>
-    <Reference Include="Assembly-CSharp-firstpass">
-      <HintPath>..\..\Documents\C# References\Assembly-CSharp-firstpass.dll</HintPath>
-    </Reference>
+		<Reference Include="Assembly-CSharp">
+		  <HintPath>..\..\Documents\C# References\Assembly-CSharp-Publicized.dll</HintPath>
+		</Reference>
+		<Reference Include="Assembly-CSharp-firstpass">
+		  <HintPath>..\..\Documents\C# References\Assembly-CSharp-firstpass.dll</HintPath>
+		</Reference>
     <Reference Include="CommandSystem.Core">
       <HintPath>..\..\Documents\C# References\CommandSystem.Core.dll</HintPath>
     </Reference>
@@ -65,9 +65,6 @@
     </Reference>
     <Reference Include="Exiled.Permissions">
       <HintPath>..\..\Documents\C# References\Exiled.Permissions.dll</HintPath>
-    </Reference>
-    <Reference Include="Exiled.Updater">
-      <HintPath>..\..\Documents\C# References\Exiled.Updater.dll</HintPath>
     </Reference>
     <Reference Include="LiteDB">
       <HintPath>..\..\Documents\C# References\LiteDB.dll</HintPath>
@@ -175,7 +172,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="EXILED">
-      <Version>8.2.1</Version>
+      <Version>8.3.5</Version>
     </PackageReference>
     <PackageReference Include="Lib.Harmony">
       <Version>2.2.2</Version>

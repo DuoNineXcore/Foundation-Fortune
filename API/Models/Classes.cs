@@ -173,6 +173,7 @@ namespace FoundationFortune.API.Models.Classes
         public int MoneySaved { get; set; }
         public int HintOpacity { get; set; }
         public int HintSize { get; set; }
+        public int MaxHintsToShow { get; set; }
         public bool HintMinmode { get; set; }
         public bool HintSystem { get; set; }
         public bool HintAdmin { get; set; }

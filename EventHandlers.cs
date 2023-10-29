@@ -13,9 +13,11 @@ using FoundationFortune.API.Models.Classes;
 using FoundationFortune.API.Models.Enums;
 using PlayerRoles;
 using System.Collections.Generic;
+using CameraShaking;
 using FoundationFortune.API.Perks;
 using Exiled.API.Extensions;
 using Exiled.API.Enums;
+using PlayerStatsSystem;
 
 namespace FoundationFortune.API.HintSystem
 {
@@ -47,20 +49,6 @@ namespace FoundationFortune.API.HintSystem
 			InitializeFoundationFortuneNPCs();
 		}
 
-		public void RoundEnding(EndingRoundEventArgs ev) //what is this
-		{
-			IEnumerable<Player> players = Player.List.Where(p => !p.IsNPC);
-			IEnumerable<Player> alivePlayers = players.Where(p => p.IsAlive);
-			IEnumerable<Player> enumerable = alivePlayers.ToList();
-			int chaos = enumerable.Count(p => p.IsCHI || p.Role.Type == RoleTypeId.ClassD);
-			int mtf = enumerable.Count(p => p.IsNTF || p.Role.Type == RoleTypeId.Scientist);
-			int scps = enumerable.Count(p => p.IsScp);
-
-			if (Round.IsLocked || Round.IsEnded) return;
-			if (enumerable.Count() <= 1) ev.IsRoundEnded = true;
-			if (chaos >= 1 && mtf == 0 && scps == 0 || mtf >= 1 && chaos == 0 && scps == 0) ev.IsRoundEnded = true;
-		}
-
 		public void RegisterInDatabase(VerifiedEventArgs ev)
 		{
 			if (FoundationFortune.Singleton.MusicBotPairs.All(pair => pair.Player.UserId != ev.Player.UserId) && !ev.Player.IsNPC) MusicBot.SpawnMusicBot(ev.Player);
@@ -74,6 +62,7 @@ namespace FoundationFortune.API.HintSystem
 					UserId = ev.Player.UserId,
 					MoneyOnHold = 0,
 					MoneySaved = 0,
+					MaxHintsToShow = 5,
 					HintMinmode = true,
 					HintSystem = true,
 					HintAdmin = false,
@@ -119,13 +108,12 @@ namespace FoundationFortune.API.HintSystem
 
 		public void KillingReward(DiedEventArgs ev)
 		{
-			AudioPlayer.StopAudio(ev.Player);
-			AudioPlayer.StopAudio(MusicBot.GetMusicBotByPlayer(ev.Player));
-			
 			var config = FoundationFortune.Singleton.Config;
 			var bountiedPlayer = BountiedPlayers.FirstOrDefault(bounty => bounty.Player == ev.Player && bounty.IsBountied);
 
 			PerkSystem.ClearConsumedPerks(ev.Player);
+
+			if (PerkSystem.ViolentImpulsesPlayers.Contains(ev.Attacker)) ev.Attacker.ReferenceHub.playerStats.GetModule<AhpStat>().ServerAddProcess(15f).DecayRate = 2.0f;
 
 			if (bountiedPlayer != null && ev.Attacker != null)
 			{
@@ -180,6 +168,11 @@ namespace FoundationFortune.API.HintSystem
 			}
 		}
 
+		public void HurtingPlayer(HurtingEventArgs ev)
+		{
+			if (PerkSystem.ViolentImpulsesPlayers.Contains(ev.Attacker)) ev.Amount *= FoundationFortune.Singleton.Config.ViolentImpulsesDamageMultiplier;
+		}
+		
 		public void SellingItem(DroppingItemEventArgs ev)
 		{
 			var translation = FoundationFortune.Singleton.Translation;
@@ -295,11 +288,12 @@ namespace FoundationFortune.API.HintSystem
 			}
 		}
 
-        public void DestroyMusicBots(LeftEventArgs ev) { if (FoundationFortune.Singleton.MusicBotPairs.Find(pair => pair.Player.Nickname == ev.Player.Nickname) != null) MusicBot.RemoveMusicBot(ev.Player.Nickname); }
+		public void ShootingWeapon(ShootingEventArgs ev) { if (PerkSystem.ViolentImpulsesPlayers.Contains(ev.Player)) ev.Firearm.Recoil = new(animationTime: 1.0f, zAxis: 2f, fovKick: 2f, upKick: 2f, sideKick: 2f); }
+		public void DestroyMusicBots(LeftEventArgs ev) { if (FoundationFortune.Singleton.MusicBotPairs.Find(pair => pair.Player.Nickname == ev.Player.Nickname) != null) MusicBot.RemoveMusicBot(ev.Player.Nickname); }
         public void SpawningNpc(SpawningEventArgs ev) { if (ev.Player.IsNPC) RoundSummary.singleton.Network_chaosTargetCount -= 1; }
         public void RoundRestart() => ClearIndexations();
         public void FuckYourAbility(ActivatingSenseEventArgs ev) { if (ev.Target != null && ev.Target.IsNPC) ev.IsAllowed = false; }
 		public void FuckYourOtherAbility(TriggeringBloodlustEventArgs ev) { if (ev.Target != null && ev.Target.IsNPC) ev.IsAllowed = false; }
-        public void PreventBotsFromSpawning(RespawningTeamEventArgs ev) { foreach (Player player in ev.Players.Where(p => p.IsNPC)) ev.Players.Remove(player); }
+        public void PreventBotsFromSpawningInWaves(RespawningTeamEventArgs ev) { foreach (Player player in ev.Players.Where(p => p.IsNPC)) ev.Players.Remove(player); }
     }
 }

@@ -32,6 +32,6 @@
 
     public enum PerkType
     {
-        OvershieldedProtection, BoostedResilience, ConcealedPresence, EthericVitality, Hyperactivity, BlissfulUnawareness, ExtrasensoryPerception, ResurgenceBeacon, EtherealIntervention,
+        EthericVitality, Hyperactivity, ViolentImpulses, BlissfulUnawareness, ExtrasensoryPerception, ResurgenceBeacon, EtherealIntervention,
     }
 }

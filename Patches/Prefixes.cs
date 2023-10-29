@@ -9,12 +9,7 @@ namespace FoundationFortune.Patches
 	[HarmonyPatch(typeof(AntiScp207), nameof(AntiScp207.OnEffectsActivated))]
 	internal static class Anti207Patch
 	{
-		private static bool Prefix(AntiScp207 __instance)
-		{
-			// if (PerkBottle.DroppedPerkBottles.ContainsKey(__instance.ItemSerial)) return false;
-			// return true;
-			return !PerkBottle.DroppedPerkBottles.ContainsKey(__instance.ItemSerial);
-		}
+		private static bool Prefix(AntiScp207 __instance) => !PerkBottle.DroppedPerkBottles.ContainsKey(__instance.ItemSerial);
 	}
 
     [HarmonyPatch(typeof(Scp079ScannerTracker), nameof(Scp079ScannerTracker.AddTarget))]
@@ -41,7 +36,7 @@ namespace FoundationFortune.Patches
 			return true;
 		}
 	}
-
+	
     [HarmonyPatch(typeof(NineTailedFoxAnnouncer), nameof(NineTailedFoxAnnouncer.AnnounceScpTermination))]
 	internal static class TerminationPatch
 	{

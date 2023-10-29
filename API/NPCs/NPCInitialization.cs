@@ -292,6 +292,8 @@ namespace FoundationFortune.API.HintSystem
             foreach (var botData in FoundationFortune.Singleton.MusicBotPairs.ToList()) MusicBot.RemoveMusicBot(botData.MusicBot.Nickname);
             buyingBotPositions.Clear();
             workstationPositions.Clear();
+            PerkSystem.EtherealInterventionPlayers.Clear();
+            PerkSystem.ViolentImpulsesPlayers.Clear();
             FoundationFortune.Singleton.ConsumedPerks.Clear();
             FoundationFortune.PlayerPurchaseLimits.Clear();
         }
