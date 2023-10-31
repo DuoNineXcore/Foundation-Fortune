@@ -1,0 +1,45 @@
+﻿## TODO 
+the server crashes when moving money on the extraction event after the 10 second countdown
+bots still count towards the chaos target counter
+save all perks except ethereal intervention when using it at the player's death, dont save blissful unawareness however.
+fix ff_hintopacity only getting the first string of the hint, so like "this is a hint", the opacity command would only affect "this" not the rest
+fix sell success hints not displaying as well, along with their audio, nor are they giving any sort of money.
+ff_togglehintsystem always disables
+
+
+## Audio player stuff (FUCK YOU AUDIO PLAYER)
+the audio player feature of blissful unawareness nor ethereal intervention do not work, not sure why, might be a music bot issue
+play an audio for when a player is within a buying bot or selling bot's radius, something intended a long time ago
+fix buy success hints not displaying along with their audio, odd..
+
+
+## Idk mate
+fix newlines with the buy list command
+-> I don't see the issue? Might be stupid though
+
+fix the bots not working for players that have their hint system toggled off using ff_togglehintsystem
+-> Works for me..? Or am I stupid
+
+perk bottles still display the picked up item thing from exiled even if i clearly turned it off
+-> Exiled.CustomItems issues 
+
+
+## FINISHED:
+make an auto downloader that gets audio assets from a github repo so server owners dont have to download the audio files themselves, should be easy enough
+-> Done but can be improved a LOT
+
+temporarily remove ff_hintanim
+-> Literally just commented it out
+
+ff_addmoney should have saved and on hold options like ff_removemoney
+-> uhhhh yes
+
+add a different coroutine for npcs when looking at a player, as of right now, they look at the player using the update hints method. which is slow
+-> Done
+
+add "not enough money" response when the player doesnt have enough money when buying, instead of returning the list
+add "invalid item" response when the player didnt input anything that matches the perktypes or itemtypes in the buy list 
+-> This *mostly* works.. 
+
+add translations for perk bottles 
+-> yessss!
