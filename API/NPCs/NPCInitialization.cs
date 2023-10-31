@@ -9,8 +9,6 @@ using Exiled.Events.EventArgs.Scp0492;
 using FoundationFortune.API.NPCs;
 using System.Linq;
 using Exiled.Events.EventArgs.Server;
-using FoundationFortune.API.Models.Classes;
-using FoundationFortune.API.Models.Enums;
 using PlayerRoles;
 using System.Collections.Generic;
 using FoundationFortune.API.Perks;
@@ -22,6 +20,7 @@ using PluginAPI.Roles;
 using Exiled.API.Features.Roles;
 using Exiled.API.Features.Doors;
 using System.Text;
+using FoundationFortune.API.Models;
 
 namespace FoundationFortune.API.HintSystem
 {
@@ -106,6 +105,7 @@ namespace FoundationFortune.API.HintSystem
                             {
                                 bot.Teleport(Position);
                                 buyingBotPositions[bot] = bot.Position;
+                                bot.IsGodModeEnabled = true;
                                 Log.Debug($"Teleported Buying Bot with indexation {indexation} to room {roomType}, Pos: {bot.Position}, Rot: {bot.Rotation}");
                             });
                         }
@@ -137,6 +137,7 @@ namespace FoundationFortune.API.HintSystem
                             {
                                 bot.Teleport(position);
                                 buyingBotPositions[bot] = bot.Position;
+                                bot.IsGodModeEnabled = true;
                                 Log.Debug($"Teleported Buying Bot to room {roomType}, Pos: {bot.Position}, Rot: {bot.Rotation}");
                             });
                         }

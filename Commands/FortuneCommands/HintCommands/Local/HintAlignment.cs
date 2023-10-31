@@ -1,9 +1,9 @@
 ﻿using CommandSystem;
 using FoundationFortune.API.Database;
-using FoundationFortune.API.Models.Enums;
 using RemoteAdmin;
 using System;
 using Exiled.API.Features;
+using FoundationFortune.API.Models;
 
 namespace FoundationFortune.Commands.FortuneCommands.HintCommands.Local
 {

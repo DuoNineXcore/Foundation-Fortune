@@ -3,7 +3,6 @@ using FoundationFortune.API.NPCs;
 using SCPSLAudioApi.AudioCore;
 using System.IO;
 using Exiled.API.Enums;
-using Exiled.API.Features.Roles;
 using MEC;
 using PlayerRoles;
 using VoiceChat;
@@ -19,7 +18,7 @@ namespace FoundationFortune.API
         {
             if (FoundationFortune.Singleton.Config.MusicBots)
             {
-                var path = Path.Combine(Path.Combine(Paths.Configs, "Duo", "Foundation Fortune"), audioFile);
+                var path = Path.Combine(FoundationFortune.audioFilesPath, audioFile);
                 var audioPlayer = AudioPlayerBase.Get(ply.ReferenceHub);
                 audioPlayer.Enqueue(path, -1);
                 audioPlayer.LogDebug = false;
@@ -35,7 +34,7 @@ namespace FoundationFortune.API
         {
             if (FoundationFortune.Singleton.Config.MusicBots)
             {
-                var path = Path.Combine(Path.Combine(Paths.Configs, "Duo", "Foundation Fortune"), audioFile);
+                var path = Path.Combine(FoundationFortune.audioFilesPath, audioFile);
                 var audioPlayer = AudioPlayerBase.Get(ply.ReferenceHub);
                 audioPlayer.Enqueue(path, -1);
                 audioPlayer.LogDebug = false;
@@ -51,7 +50,7 @@ namespace FoundationFortune.API
         {
             if (FoundationFortune.Singleton.Config.MusicBots)
             {
-                var path = Path.Combine(Path.Combine(Paths.Configs, "Duo", "Foundation Fortune"), audioFile);
+                var path = Path.Combine(FoundationFortune.audioFilesPath, audioFile);
                 PlayAudio(ply, audioFile, volume, loop, channel);
                 Npc spawnedMusicBot = MusicBot.GetMusicBotByPlayer(ply);
                 var ap2 = AudioPlayerBase.Get(spawnedMusicBot.ReferenceHub);
@@ -76,7 +75,7 @@ namespace FoundationFortune.API
         {
             if (FoundationFortune.Singleton.Config.MusicBots)
             {
-                var path = Path.Combine(Path.Combine(Paths.Configs, "Duo", "Foundation Fortune"), audioFile);
+                var path = Path.Combine(FoundationFortune.audioFilesPath, audioFile);
                 Npc spawnedMusicBot = MusicBot.GetMusicBotByPlayer(ply);
                 var ap2 = AudioPlayerBase.Get(spawnedMusicBot.ReferenceHub);
                 Timing.CallDelayed(0.20f, delegate

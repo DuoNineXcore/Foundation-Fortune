@@ -1,7 +1,5 @@
 ﻿using Exiled.API.Features;
 using FoundationFortune.API.Database;
-using FoundationFortune.API.Models.Classes;
-using FoundationFortune.API.Models.Enums;
 using MEC;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +7,7 @@ using UnityEngine;
 using Exiled.API.Features.Items;
 using System.Text;
 using FoundationFortune.API.Items.PerkItems;
+using FoundationFortune.API.Models;
 
 namespace FoundationFortune.API.HintSystem
 {
@@ -34,7 +33,7 @@ namespace FoundationFortune.API.HintSystem
                     int moneyOnHold = PlayerDataRepository.GetMoneyOnHold(ply.UserId);
                     int moneySaved = PlayerDataRepository.GetMoneySaved(ply.UserId);
 
-                    HintAlign? hintAlignment = PlayerDataRepository.GetUserHintAlign(ply.UserId);
+                    HintAlign hintAlignment = PlayerDataRepository.GetHintAlign(ply.UserId);
                     int hintAlpha = PlayerDataRepository.GetHintAlpha(ply.UserId);
                     int hintSize = PlayerDataRepository.GetHintSize(ply.UserId);
 
@@ -102,7 +101,6 @@ namespace FoundationFortune.API.HintSystem
 				.Select(entry => entry.Text);
 
 			return string.Join("\n", currentHints);
-
 		}
 
 		public string GetAnimatedHints(string userId)
@@ -122,7 +120,7 @@ namespace FoundationFortune.API.HintSystem
 			float expirationTime = Time.time + duration;
 			if (!recentHints.ContainsKey(player.UserId)) recentHints[player.UserId] = new Queue<HintEntry>();
 			recentHints[player.UserId].Enqueue(new HintEntry(hint, expirationTime, false));
-			while (recentHints[player.UserId].Count > PlayerDataRepository.GetMaxHintsToShow(player.UserId)) recentHints[player.UserId].Dequeue();
+			while (recentHints[player.UserId].Count > PlayerDataRepository.GetHintLimit(player.UserId)) recentHints[player.UserId].Dequeue();
 		}
 
 		public void EnqueueHint(Player player, string hint, float duration, HintAnim align)
@@ -136,7 +134,7 @@ namespace FoundationFortune.API.HintSystem
 			}
 
 			Timing.RunCoroutine(AnimateHintText(player.UserId, hint, duration, align));
-			while (hintQueue.Count > PlayerDataRepository.GetMaxHintsToShow(player.UserId)) hintQueue.Dequeue();
+			while (hintQueue.Count > PlayerDataRepository.GetHintLimit(player.UserId)) hintQueue.Dequeue();
 		}
 
 		private IEnumerator<float> AnimateHintText(string userId, string hint, float duration, HintAnim animAlignment)

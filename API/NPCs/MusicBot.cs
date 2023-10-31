@@ -3,14 +3,13 @@ using UnityEngine;
 using MEC;
 using PlayerRoles;
 using System.Linq;
-using Exiled.API.Enums;
 using Exiled.API.Extensions;
 using Exiled.API.Features.Components;
 using Mirror;
 using System;
 using System.Collections.Generic;
-using FoundationFortune.API.Models.Classes;
 using CentralAuth;
+using FoundationFortune.API.Models;
 
 namespace FoundationFortune.API.NPCs
 {
@@ -29,11 +28,10 @@ namespace FoundationFortune.API.NPCs
         public static Npc SpawnMusicBot(Player target)
         {
             Npc spawnedBuyingBot = SpawnFix(target.Nickname, RoleTypeId.Spectator);
-            spawnedBuyingBot.IsGodModeEnabled = true;
 
             PlayerMusicBotPair pair = new PlayerMusicBotPair(target, spawnedBuyingBot);
             FoundationFortune.Singleton.MusicBotPairs.Add(pair);
-            Log.Debug($"Generated Music Bot for player {target.Nickname} / Bot: {spawnedBuyingBot.Nickname ?? "Null"} - {pair}");
+            Log.Debug($"Generated Music Bot for player {target.Nickname} / Bot: {spawnedBuyingBot.Nickname ?? "Null"}");
 
             Round.IgnoredPlayers.Add(spawnedBuyingBot.ReferenceHub);
             return spawnedBuyingBot;

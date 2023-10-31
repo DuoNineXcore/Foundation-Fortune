@@ -1,17 +1,14 @@
 ﻿using CustomPlayerEffects;
 using Exiled.API.Features;
-using FoundationFortune.API.NPCs;
 using InventorySystem.Items.Usables.Scp330;
 using PlayerRoles;
-using FoundationFortune.API.Models.Enums;
-using FoundationFortune.API.Models.Classes;
 using System.Linq;
 using System;
 using MEC;
 using System.Collections.Generic;
-using PlayerRoles.PlayableScps.Scp939.Ripples;
-using Exiled.API.Features.Roles;
+using FoundationFortune.API.Models;
 using PlayerStatsSystem;
+using UnityEngine;
 
 namespace FoundationFortune.API.Perks
 {
@@ -22,24 +19,25 @@ namespace FoundationFortune.API.Perks
 	{
 		public static readonly List<Player> EtherealInterventionPlayers = new();
 		public static readonly List<Player> ViolentImpulsesPlayers = new();
-		
-        public static void ClearConsumedPerks(Player player) { if (FoundationFortune.Singleton.ConsumedPerks.TryGetValue(player, out var perk)) perk.Clear(); }
+		public static readonly List<Player> EthericVitalityPlayers = new();
+
+		public static void ClearConsumedPerks(Player player) { if (FoundationFortune.Singleton.ConsumedPerks.TryGetValue(player, out var perk)) perk.Clear(); }
 
         public static void GrantPerk(Player ply, PerkType perk)
 		{
 			switch (perk)
 			{
 				case PerkType.ViolentImpulses:
-					ply.ReferenceHub.playerStats.GetModule<AhpStat>().ServerAddProcess(10f).DecayRate = 0.0f;
 					if (!ViolentImpulsesPlayers.Contains(ply)) ViolentImpulsesPlayers.Add(ply);
 					break;
-				case PerkType.Hyperactivity:
+				case PerkType.HyperactiveBehavior:
 					ply.EnableEffect<MovementBoost>(60);
 					ply.ChangeEffectIntensity<MovementBoost>(30);
 					ply.Stamina = 300;
 					break;
 				case PerkType.EthericVitality:
-					Scp330Bag.AddSimpleRegeneration(ply.ReferenceHub, 4f, 75f);
+					if (!EthericVitalityPlayers.Contains(ply)) EthericVitalityPlayers.Add(ply);
+					Scp330Bag.AddSimpleRegeneration(ply.ReferenceHub, 1f, 75f);
 					break;
 				case PerkType.BlissfulUnawareness:
 					Timing.RunCoroutine(BlissfulUnawarenessCoroutine(ply).CancelWith(ply.GameObject));
@@ -73,9 +71,12 @@ namespace FoundationFortune.API.Perks
 			PlayerVoiceChatSettings BlissfulUnawarenessSettings = FoundationFortune.Singleton.Config.PlayerVoiceChatSettings
 			    .FirstOrDefault(settings => settings.VoiceChatUsageType == PlayerVoiceChatUsageType.BlissfulUnawareness);
 			ply.EnableEffect<SoundtrackMute>(50f);
-			AudioPlayer.PlaySpecialAudio(ply, BlissfulUnawarenessSettings.AudioFile, BlissfulUnawarenessSettings.Volume, BlissfulUnawarenessSettings.Loop, BlissfulUnawarenessSettings.VoiceChat);
+			if (BlissfulUnawarenessSettings != null)
+				AudioPlayer.PlaySpecialAudio(ply, BlissfulUnawarenessSettings.AudioFile,
+					BlissfulUnawarenessSettings.Volume, BlissfulUnawarenessSettings.Loop,
+					BlissfulUnawarenessSettings.VoiceChat);
 
-            yield return Timing.WaitForSeconds(41f);
+			yield return Timing.WaitForSeconds(41f);
 
 			Log.Debug("Blissful Unawareness 2nd coroutine finished.");
 			Map.Explode(ply.Position, Exiled.API.Enums.ProjectileType.Flashbang, ply);

@@ -35,16 +35,30 @@ namespace FoundationFortune.Commands.FortuneCommands.NpcCommands
             sb.AppendLine("Foundation Fortune NPCs:");
             AppendBotList(sb, "Buying Bots", FoundationFortune.Singleton.BuyingBots);
             AppendBotList(sb, "Selling Bots", FoundationFortune.Singleton.SellingBots);
+            AppendBotList(sb, "Music Bots", FoundationFortune.Singleton.MusicBotPairs);
             response = sb.ToString();
             return true;
         }
 
-        private static void AppendBotList(StringBuilder sb, string title, Dictionary<string, (Npc bot, int indexation)> botIndexation)
+        private static void AppendBotList<T>(StringBuilder sb, string title, IEnumerable<T> collection)
         {
             sb.AppendLine(title + ":");
-            foreach (var botInfo in botIndexation)
+            foreach (var item in collection)
             {
-                sb.AppendLine($"Name: {botInfo.Value.bot?.Nickname ?? "Null Nickname"}, Indexation: {botInfo.Value.indexation}");
+                var botProperty = item.GetType().GetProperty("bot");
+                var indexationProperty = item.GetType().GetProperty("indexation");
+
+                if (botProperty != null && indexationProperty != null)
+                {
+                    var bot = botProperty.GetValue(item);
+                    var indexation = indexationProperty.GetValue(item);
+
+                    sb.AppendLine($"Name: {(bot?.GetType().GetProperty("Nickname")?.GetValue(bot) ?? "Null Nickname")}, Indexation: {indexation}");
+                }
+                else
+                {
+                    sb.AppendLine("Invalid item format.");
+                }
             }
         }
     }

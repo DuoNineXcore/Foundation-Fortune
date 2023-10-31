@@ -5,9 +5,11 @@ using MEC;
 using UnityEngine;
 using System.Collections.Generic;
 using FoundationFortune.API.Database;
-using FoundationFortune.API.Models.Classes;
 using System.Text;
+using FoundationFortune.API.Models;
 
+// ReSharper disable once CheckNamespace
+// STFU!!!!!!!!!!!!!!!!
 namespace FoundationFortune.API.HintSystem
 {
 	public partial class ServerEvents
@@ -106,16 +108,24 @@ namespace FoundationFortune.API.HintSystem
 
 		private void ExtractMoney(Player player)
         {
-	        while (IsPlayerInExtractionRoom(player, activeExtractionRoom))
+	        try
 	        {
-		        int totalMoneyOnHold = PlayerDataRepository.GetMoneyOnHold(player.UserId);
-		        if (totalMoneyOnHold > 0)
+		        while (IsPlayerInExtractionRoom(player, activeExtractionRoom))
 		        {
-			        PlayerDataRepository.TransferMoney(player.UserId, true);
-			        Log.Debug($"Transferred {totalMoneyOnHold} money to player {player.UserId}");
+			        int totalMoneyOnHold = PlayerDataRepository.GetMoneyOnHold(player.UserId);
+			        if (totalMoneyOnHold > 0)
+			        {
+				        PlayerDataRepository.TransferMoney(player.UserId, true);
+				        Log.Debug($"Transferred {totalMoneyOnHold} money to player {player.UserId}");
+			        }
 		        }
+
+		        Log.Debug($"Money extraction finished for player {player.UserId}");
 	        }
-	        Log.Debug($"Money extraction finished for player {player.UserId}");
+	        catch (Exception ex)
+	        {
+		        Log.Debug(ex);
+	        }
         }
 
         private bool IsExtractionTimerFinished(Player player)

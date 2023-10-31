@@ -9,21 +9,20 @@ using Exiled.Events.EventArgs.Scp0492;
 using FoundationFortune.API.NPCs;
 using System.Linq;
 using Exiled.Events.EventArgs.Server;
-using FoundationFortune.API.Models.Classes;
-using FoundationFortune.API.Models.Enums;
 using PlayerRoles;
 using System.Collections.Generic;
-using CameraShaking;
 using FoundationFortune.API.Perks;
 using Exiled.API.Extensions;
 using Exiled.API.Enums;
+using FoundationFortune.API.Models;
 using PlayerStatsSystem;
 
+// ReSharper disable once CheckNamespace
+// STFU!!!!!!!!!!!!!!!!
 namespace FoundationFortune.API.HintSystem
 {
 	public partial class ServerEvents
 	{
-		private CoroutineHandle moneyHintCoroutine;
 		private readonly Dictionary<(LeadingTeam, Team?), (PlayerTeamConditions, string)> teamConditionsMap = new()
 	   {
 			{(LeadingTeam.FacilityForces, Team.FoundationForces), (PlayerTeamConditions.Winning, "#0080FF")},
@@ -36,7 +35,7 @@ namespace FoundationFortune.API.HintSystem
 
 		public void RoundStart()
 		{
-			moneyHintCoroutine = Timing.RunCoroutine(UpdateMoneyAndHints());
+			Timing.RunCoroutine(UpdateMoneyAndHints());
 
 			if (FoundationFortune.Singleton.Config.MoneyExtractionSystem)
 			{
@@ -46,7 +45,9 @@ namespace FoundationFortune.API.HintSystem
 			}
 
 			InitializeWorkstationPositions();
-			InitializeFoundationFortuneNPCs();
+			
+			if (FoundationFortune.Singleton.Config.FoundationFortuneNPCs) InitializeFoundationFortuneNPCs();
+			else Log.Debug("Foundation Fortune NPCs have been disabled. Not spawning any.");
 		}
 
 		public void RegisterInDatabase(VerifiedEventArgs ev)
@@ -62,7 +63,7 @@ namespace FoundationFortune.API.HintSystem
 					UserId = ev.Player.UserId,
 					MoneyOnHold = 0,
 					MoneySaved = 0,
-					MaxHintsToShow = 5,
+					HintLimit = 5,
 					HintMinmode = true,
 					HintSystem = true,
 					HintAdmin = false,
@@ -82,7 +83,7 @@ namespace FoundationFortune.API.HintSystem
 			if (!PerkSystem.EtherealInterventionPlayers.Contains(ev.Player)) return;
 			ev.IsAllowed = false;
 			RoleTypeId role = ev.Player.Role.Type;
-			Room room = Room.List.Where(r => r.Zone == ev.Player.Zone & !FoundationFortune.Singleton.Config.ForbiddenRooms.Contains(r.Type)).GetRandomValue();
+			Room room = Room.List.Where(r => r.Zone == ev.Player.Zone & !FoundationFortune.Singleton.Config.ForbiddenEtherealInterventionRoomTypes.Contains(r.Type)).GetRandomValue();
 
 			Timing.CallDelayed(0.1f, delegate
 			{
@@ -104,6 +105,8 @@ namespace FoundationFortune.API.HintSystem
 						EtherealInterventionAudio.VoiceChat);
 			});
 			PerkSystem.EtherealInterventionPlayers.Remove(ev.Player);
+
+			if (NPCHelperMethods.IsFoundationFortuneNPC(ev.Player.ReferenceHub)) Round.ChaosTargetCount -= 1;
 		}
 
 		public void KillingReward(DiedEventArgs ev)
@@ -154,7 +157,7 @@ namespace FoundationFortune.API.HintSystem
 				EnqueueHint(ev.Attacker, killHint, config.MaxHintAge);
 			}
 
-			if (ev.Player?.IsNPC == true) RoundSummary.singleton.Network_chaosTargetCount += 2;
+			if (ev.Player.IsNPC) Round.ChaosTargetCount += 1;
 		}
 
 		public void EscapingReward(EscapingEventArgs ev)
@@ -163,14 +166,9 @@ namespace FoundationFortune.API.HintSystem
 			var config = FoundationFortune.Singleton.Config;
 			if (config.EscapeEvent)
 			{
-				EnqueueHint(ev.Player, $"{FoundationFortune.Singleton.Translation.Escape}", config.MaxHintAge, HintAnim.Right);
+				EnqueueHint(ev.Player, $"{FoundationFortune.Singleton.Translation.Escape}", config.MaxHintAge);
 				PlayerDataRepository.ModifyMoney(ev.Player.UserId, config.EscapeRewards);
 			}
-		}
-
-		public void HurtingPlayer(HurtingEventArgs ev)
-		{
-			if (PerkSystem.ViolentImpulsesPlayers.Contains(ev.Attacker)) ev.Amount *= FoundationFortune.Singleton.Config.ViolentImpulsesDamageMultiplier;
 		}
 		
 		public void SellingItem(DroppingItemEventArgs ev)
@@ -288,9 +286,9 @@ namespace FoundationFortune.API.HintSystem
 			}
 		}
 
-		public void ShootingWeapon(ShootingEventArgs ev) { if (PerkSystem.ViolentImpulsesPlayers.Contains(ev.Player)) ev.Firearm.Recoil = new(animationTime: 1.0f, zAxis: 2f, fovKick: 2f, upKick: 2f, sideKick: 2f); }
+		public void ShootingWeapon(ShootingEventArgs ev) { if (PerkSystem.ViolentImpulsesPlayers.Contains(ev.Player)) ev.Firearm.Recoil = new(FoundationFortune.Singleton.Config.ViolentImpulsesRecoilAnimationTime, FoundationFortune.Singleton.Config.ViolentImpulsesRecoilZAxis, FoundationFortune.Singleton.Config.ViolentImpulsesRecoilFovKick, FoundationFortune.Singleton.Config.ViolentImpulsesRecoilUpKick, FoundationFortune.Singleton.Config.ViolentImpulsesRecoilSideKick); }
 		public void DestroyMusicBots(LeftEventArgs ev) { if (FoundationFortune.Singleton.MusicBotPairs.Find(pair => pair.Player.Nickname == ev.Player.Nickname) != null) MusicBot.RemoveMusicBot(ev.Player.Nickname); }
-        public void SpawningNpc(SpawningEventArgs ev) { if (ev.Player.IsNPC) RoundSummary.singleton.Network_chaosTargetCount -= 1; }
+        public void HurtingPlayer(HurtingEventArgs ev) { if (PerkSystem.ViolentImpulsesPlayers.Contains(ev.Attacker)) ev.Amount *= FoundationFortune.Singleton.Config.ViolentImpulsesDamageMultiplier; }
         public void RoundRestart() => ClearIndexations();
         public void FuckYourAbility(ActivatingSenseEventArgs ev) { if (ev.Target != null && ev.Target.IsNPC) ev.IsAllowed = false; }
 		public void FuckYourOtherAbility(TriggeringBloodlustEventArgs ev) { if (ev.Target != null && ev.Target.IsNPC) ev.IsAllowed = false; }

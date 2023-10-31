@@ -4,9 +4,8 @@ using System.Linq;
 using UnityEngine;
 using InventorySystem.Items.Firearms.Attachments;
 using Random = UnityEngine.Random;
-using FoundationFortune.API.Models.Classes;
-using FoundationFortune.API.Models.Enums;
 using System.Text;
+using FoundationFortune.API.Models;
 
 namespace FoundationFortune.API.HintSystem
 {
@@ -25,7 +24,7 @@ namespace FoundationFortune.API.HintSystem
 			foreach (var perkEntry in consumedPerks.SelectMany(playerPerks => playerPerks.Value))
 			{
 				var (perkType, count) = (perkEntry.Key, perkEntry.Value);
-				if (!FoundationFortune.Singleton.Config.PerkEmojis.TryGetValue(perkType, out var emoji)) continue;
+				if (!FoundationFortune.Singleton.Translation.PerkCounterEmojis.TryGetValue(perkType, out var emoji)) continue;
 				perkIndicator.Append(count > 1 ? $"{emoji}x{count} " : $"{emoji} "); 
 			}
 			perkIndicator.AppendLine();

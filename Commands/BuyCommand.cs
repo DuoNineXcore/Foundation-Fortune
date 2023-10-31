@@ -1,15 +1,14 @@
-﻿using CommandSystem;
+﻿using System;
+using System.Linq;
+using CommandSystem;
 using Exiled.API.Features;
 using FoundationFortune.API.Database;
-using System;
-using System.Linq;
-using Utils.NonAllocLINQ;
-using FoundationFortune.API.Models.Enums;
-using FoundationFortune.API.Models.Classes;
 using FoundationFortune.API.HintSystem;
 using FoundationFortune.API.Items.PerkItems;
+using FoundationFortune.API.Models;
+using Utils.NonAllocLINQ;
 
-namespace FoundationFortune.Commands.BuyCommand
+namespace FoundationFortune.Commands
 {
 	[CommandHandler(typeof(ClientCommandHandler))]
 	[CommandHandler(typeof(RemoteAdminCommandHandler))]
@@ -166,7 +165,7 @@ namespace FoundationFortune.Commands.BuyCommand
 				   .Replace("%perkItemPrice%", perkItem.Price.ToString())
 				   .Replace("%perkItemDescription%", perkItem.Description)));
 
-			return $"{itemsList}\n{perksList}";
+			return $"\nItems available for purchase: {itemsList} \nPerks available for purchase:{perksList}";
 		}
 
 		private static bool ExceedsPerkLimit(Player player, PerkItem perkItem)

@@ -1,21 +1,16 @@
-﻿using CommandSystem;
-using Exiled.API.Enums;
+﻿using System;
+using CommandSystem;
 using Exiled.API.Features;
 using Exiled.Permissions.Extensions;
 using FoundationFortune.API.Database;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace FoundationFortune.Commands.FortuneCommands.ExtractionCommands
+namespace FoundationFortune.Commands.FortuneCommands.AdminCommands.ExtractionCommands
 {
     [CommandHandler(typeof(ClientCommandHandler))]
     [CommandHandler(typeof(RemoteAdminCommandHandler))]
     internal class RemoveExtraction : ICommand
     {
-        public string Command { get; } = "ff_deactivateextractionpoint";
+        public string Command { get; } = "ff_removeextraction";
         public string Description { get; } = "Deactivate an extraction zone event";
         public string[] Aliases { get; } = new string[] { };
 

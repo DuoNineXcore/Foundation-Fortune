@@ -1,15 +1,14 @@
-﻿using Exiled.API.Enums;
+﻿using System;
+using System.Collections.Generic;
+using Exiled.API.Enums;
+using Exiled.API.Features;
 using LiteDB;
+using MEC;
 using PlayerRoles;
 using UnityEngine;
 using VoiceChat;
-using Exiled.API.Features;
-using FoundationFortune.API.Models.Enums;
-using System;
-using System.Collections.Generic;
-using MEC;
 
-namespace FoundationFortune.API.Models.Classes
+namespace FoundationFortune.API.Models
 {
     public class HintEntry
     {
@@ -38,6 +37,12 @@ namespace FoundationFortune.API.Models.Classes
         public Asset[] assets;
     }
 
+    public class BotData
+    {
+        public Npc Bot { get; set; }
+        public int Indexation { get; set; }
+    }
+    
     public class ExtractionTimerData
     {
         public CoroutineHandle CoroutineHandle { get; set; }
@@ -173,7 +178,7 @@ namespace FoundationFortune.API.Models.Classes
         public int MoneySaved { get; set; }
         public int HintOpacity { get; set; }
         public int HintSize { get; set; }
-        public int MaxHintsToShow { get; set; }
+        public int HintLimit { get; set; }
         public bool HintMinmode { get; set; }
         public bool HintSystem { get; set; }
         public bool HintAdmin { get; set; }

@@ -25,49 +25,34 @@ namespace FoundationFortune.API.NPCs
             allowedSellingBotNameColors = allowedColors;
         }
 
-        public static int GetNextSellingBotIndexation(string target)
+        public static Npc SpawnSellingBot(string target, string Badge, string Color, RoleTypeId Role, ItemType? HeldItem, Vector3 scale)
         {
-            if (FoundationFortune.Singleton.SellingBots.TryGetValue(target, out var botData))
+            int indexation = 0;
+            while (FoundationFortune.Singleton.SellingBots.Values.Any(data => data.indexation == indexation))
             {
-                int currentIndexationNumber = botData.indexation;
-                int newIndexationNumber = currentIndexationNumber + 1;
-
-                while (FoundationFortune.Singleton.SellingBots.Values.Any(data => data.indexation == newIndexationNumber)) newIndexationNumber++;
-                FoundationFortune.Singleton.SellingBots[target] = (botData.bot, newIndexationNumber);
-                return newIndexationNumber;
+                indexation++;
             }
 
-            int nextAvailableIndex = 0;
-            while (FoundationFortune.Singleton.SellingBots.Values.Any(data => data.indexation == nextAvailableIndex)) nextAvailableIndex++;
-            FoundationFortune.Singleton.SellingBots[target] = (null, nextAvailableIndex);
-            return nextAvailableIndex;
-        }
-
-        public static Npc SpawnSellingBot(string target, string badge, string color, RoleTypeId role, ItemType? helditem, Vector3 scale)
-        {
+            Npc spawnedSellingBot = NPCHelperMethods.SpawnFix(target, Role, indexation);
             string botKey = $"SellingBot-{target}";
-            int indexation = GetNextSellingBotIndexation(FoundationFortune.Singleton.SellingBots.Keys.ToString());
-            Npc spawnedSellingBot = NPCHelperMethods.SpawnFix(target, role, indexation);
-
             FoundationFortune.Singleton.SellingBots[botKey] = (spawnedSellingBot, indexation);
 
-            spawnedSellingBot.RankName = badge;
-            spawnedSellingBot.RankColor = color;
+            spawnedSellingBot.RankName = Badge;
+            spawnedSellingBot.RankColor = Color;
             spawnedSellingBot.Scale = scale;
 
             Round.IgnoredPlayers.Add(spawnedSellingBot.ReferenceHub);
-
             Timing.CallDelayed(0.5f, () =>
             {
-                spawnedSellingBot.ClearInventory();
-                if (!helditem.HasValue) return;
-                spawnedSellingBot.ClearInventory();
-                spawnedSellingBot.CurrentItem = Item.Create((ItemType)helditem, spawnedSellingBot);
+                if (HeldItem.HasValue)
+                {
+                    spawnedSellingBot.ClearInventory();
+                    spawnedSellingBot.CurrentItem = Item.Create((ItemType)HeldItem, spawnedSellingBot);
+                }
             });
-
             return spawnedSellingBot;
         }
-
+        
         public static bool RemoveSellingBot(string target)
         {
             string botKey = $"SellingBot-{target}";

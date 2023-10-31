@@ -1,5 +1,7 @@
-﻿using Exiled.API.Interfaces;
+﻿using System.Collections.Generic;
+using Exiled.API.Interfaces;
 using System.ComponentModel;
+using FoundationFortune.API.Models;
 
 namespace FoundationFortune.Configs
 {
@@ -21,6 +23,15 @@ namespace FoundationFortune.Configs
 		[Description("Hint System Counters")]
 		public string MoneyCounterSaved { get; set; } = "<b>Money Saved: <color=%rolecolor%>$%moneySaved%</color></b>\\n";
 		public string MoneyCounterOnHold { get; set; } = "<b>Money On Hold: <color=%rolecolor%>$%moneyOnHold%</color></b>\\n";
+		public Dictionary<PerkType, string> PerkCounterEmojis { get; set; } = new Dictionary<PerkType, string>
+		{
+			{ PerkType.ViolentImpulses, "🔪" }, 
+			{ PerkType.EthericVitality, "❤️" },
+			{ PerkType.HyperactiveBehavior, "🏃" },
+			{ PerkType.BlissfulUnawareness, "💞" },
+			{ PerkType.ExtrasensoryPerception, "◎" },
+			{ PerkType.EtherealIntervention, "✚" } 
+		};
 
 		[Description("Hint System Events")]
 		public string WrongBot { get; set; } = "<b><color=red>This is not a selling bot.</color></b>\\n";
@@ -38,8 +49,8 @@ namespace FoundationFortune.Configs
 		public string DeathCoinPickup { get; set; } = "<b><color=green>+%coinValue%</color> Picked up Death Coin.</b>\\n";
 
 		[Description("Item and Perk list return messages.")]
-		public string ItemsList { get; set; } = "\\nItems available for purchase:\\n%buyableItemDisplayName% (%buyableItemAlias%): $%buyableItemPrice%";
-		public string PerksList { get; set; } = "\\nPerks available for purchase:\\n%perkItemDisplayName% (%perkItemAlias%) - %perkItemDescription%: $%perkItemPrice%";
+		public string ItemsList { get; set; } = "\\n%buyableItemDisplayName% (%buyableItemAlias%): $%buyableItemPrice%";
+		public string PerksList { get; set; } = "\\n%perkItemDisplayName% (%perkItemAlias%) - %perkItemDescription%: $%perkItemPrice%";
 
 		[Description("Revival System Hints")]
 		public string RevivalNoDeadPlayer { get; set; } = "<b>No dead player with Name: '%targetName%' found nearby to revive.</b>\\n";

@@ -1,11 +1,11 @@
-﻿using Exiled.Permissions.Extensions;
-using System;
+﻿using System;
 using CommandSystem;
 using Exiled.API.Enums;
-using FoundationFortune.API.Database;
 using Exiled.API.Features;
+using Exiled.Permissions.Extensions;
+using FoundationFortune.API.Database;
 
-namespace FoundationFortune.Commands
+namespace FoundationFortune.Commands.FortuneCommands.AdminCommands.ExtractionCommands
 {
     [CommandHandler(typeof(ClientCommandHandler))]
     [CommandHandler(typeof(RemoteAdminCommandHandler))]

@@ -16,7 +16,6 @@ using System.Linq;
 using CentralAuth;
 using UnityEngine;
 using VoiceChat;
-using FoundationFortune.API.Models.Classes;
 
 namespace FoundationFortune.API.NPCs
 {
@@ -75,6 +74,7 @@ namespace FoundationFortune.API.NPCs
                 Timing.CallDelayed(0.5f, delegate
                 {
                     npc.Position = position.Value;
+                    npc.IsGodModeEnabled = true;
                 });
             }
             return npc;

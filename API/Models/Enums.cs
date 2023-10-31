@@ -1,4 +1,4 @@
-﻿namespace FoundationFortune.API.Models.Enums
+﻿namespace FoundationFortune.API.Models
 {
     public enum HintAlign
     {
@@ -32,6 +32,6 @@
 
     public enum PerkType
     {
-        EthericVitality, Hyperactivity, ViolentImpulses, BlissfulUnawareness, ExtrasensoryPerception, ResurgenceBeacon, EtherealIntervention,
+        EthericVitality, HyperactiveBehavior, ViolentImpulses, BlissfulUnawareness, ExtrasensoryPerception, ResurgenceBeacon, EtherealIntervention,
     }
 }

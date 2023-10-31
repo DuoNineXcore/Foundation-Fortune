@@ -122,6 +122,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="API\AudioPlayer.cs" />
+    <Compile Include="API\HintSystem\ServerEvents\ServerBountySystem.cs" />
+    <Compile Include="API\HintSystem\ServerEvents\ServerExtractionSystem.cs" />
     <Compile Include="API\Items\CustomItems\DeathCoin.cs" />
     <Compile Include="API\Items\PerkItems\PerkBottle.cs" />
     <Compile Include="API\Items\PerkItems\ResurgenceBeacon.cs" />
@@ -133,6 +135,7 @@
     <Compile Include="API\NPCs\MusicBot.cs" />
     <Compile Include="API\NPCs\SellingBot.cs" />
     <Compile Include="API\Updater.cs" />
+    <Compile Include="Commands\BuyCommand.cs" />
     <Compile Include="Commands\FortuneCommands\AdminCommands\AddAdmin.cs" />
     <Compile Include="Commands\FortuneCommands\AdminCommands\RemoveAdmin.cs" />
     <Compile Include="Commands\FortuneCommands\AdminCommands\BountyCommands\AddBounty.cs" />
@@ -147,6 +150,7 @@
     <Compile Include="Commands\FortuneCommands\HintCommands\Local\HintAnimation.cs" />
     <Compile Include="Commands\FortuneCommands\HintCommands\Local\HintDisable.cs" />
     <Compile Include="Commands\FortuneCommands\HintCommands\Global\HintEnqueue.cs" />
+    <Compile Include="Commands\FortuneCommands\HintCommands\Local\HintLimit.cs" />
     <Compile Include="Commands\FortuneCommands\HintCommands\Local\HintMinmode.cs" />
     <Compile Include="Commands\FortuneCommands\HintCommands\Local\HintOpacity.cs" />
     <Compile Include="Commands\FortuneCommands\HintCommands\Local\HintSize.cs" />
@@ -155,24 +159,21 @@
     <Compile Include="Commands\FortuneCommands\NpcCommands\NpcList.cs" />
     <Compile Include="Commands\FortuneCommands\NpcCommands\NpcRemove.cs" />
     <Compile Include="API\Perks\PerkSystem.cs" />
-    <Compile Include="Commands\Buying System\BuyCommand.cs" />
     <Compile Include="Configs\PluginConfigs.cs" />
-    <Compile Include="API\Hints\HintSystem.cs" />
-    <Compile Include="API\Hints\Events\ServerExtractionSystem.cs" />
+    <Compile Include="API\HintSystem\HintSystem.cs" />
     <Compile Include="API\NPCs\NPCInitialization.cs" />
-    <Compile Include="Patches\Transpilers.cs" />
-    <Compile Include="API\Hints\HintSystemMethods.cs" />
     <Compile Include="EventHandlers.cs" />
+    <Compile Include="Patches\Transpilers.cs" />
+    <Compile Include="API\HintSystem\HintSystemMethods.cs" />
     <Compile Include="MainClass.cs" />
     <Compile Include="Configs\PluginTranslations.cs" />
     <Compile Include="Patches\Postfixes.cs" />
     <Compile Include="Patches\Prefixes.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="API\Hints\Events\ServerBountySystem.cs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="EXILED">
-      <Version>8.3.5</Version>
+      <Version>8.3.6</Version>
     </PackageReference>
     <PackageReference Include="Lib.Harmony">
       <Version>2.2.2</Version>

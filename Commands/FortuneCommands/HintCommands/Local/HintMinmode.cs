@@ -12,7 +12,7 @@ namespace FoundationFortune.Commands.FortuneCommands.HintCommands.Local
     {
         public string Command { get; } = "ff_hintminmode";
         public string Description { get; } = "Toggle hint minmode.";
-        public string[] Aliases { get; } = new string[] {};
+        public string[] Aliases { get; } = new string[] { "what do you think this does" };
 
         public bool Execute(ArraySegment<string> args, ICommandSender sender, out string response)
         {

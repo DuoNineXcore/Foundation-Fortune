@@ -7,12 +7,10 @@ using Exiled.API.Features.Spawn;
 using Exiled.CustomItems.API.EventArgs;
 using Exiled.CustomItems.API.Features;
 using Exiled.Events.EventArgs.Player;
-using FoundationFortune.API.Models.Enums;
-using FoundationFortune.Commands.BuyCommand;
 using System.Collections.Generic;
 using FoundationFortune.API.Perks;
 using System.Text;
-using FoundationFortune.API.Models.Classes;
+using FoundationFortune.API.Models;
 
 namespace FoundationFortune.API.Items.PerkItems
 {
@@ -59,18 +57,26 @@ namespace FoundationFortune.API.Items.PerkItems
 			FoundationFortune.Singleton.ServerEvents.EnqueueHint(ev.Player, $"<b>You drank a <color=#FFC0CB>{perkType}</color> Perk bottle.</b>", 2f);
 			DroppedPerkBottles.Remove(ev.Item.Serial);
 		}
-
-
+		
         public static void GivePerkBottle(Player player, PerkType perkType)
         {
 	        if (!TrySpawn(331, player.Position, out Pickup perkBottle)) return;
-	        Log.Debug($"Spawned Perk Bottle at Pos:{perkBottle.Position} Serial: {perkBottle.Serial}, PerkType: {perkType}");
-	        DroppedPerkBottles[perkBottle.Serial] = (perkType, player);
+	        if (perkBottle != null)
+	        {
+		        Log.Debug(
+			        $"Spawned Perk Bottle at Pos:{perkBottle.Position} Serial: {perkBottle.Serial}, PerkType: {perkType}");
+		        DroppedPerkBottles[perkBottle.Serial] = (perkType, player);
+	        }
         }
 
         protected override void OnAcquired(Player player, Item item, bool displayMessage)
         {
 	        base.OnAcquired(player, item, false);
+        }
+
+        protected override void OnChanging(ChangingItemEventArgs ev)
+        {
+	        base.OnChanging(ev);
         }
 
         public static void GetHeldBottle(Player player, ref StringBuilder stringbuilder)

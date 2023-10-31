@@ -3,10 +3,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using MEC;
-using FoundationFortune.API.Models.Classes;
-using FoundationFortune.API.Models.Enums;
 using System.Text;
+using Exiled.API.Enums;
+using FoundationFortune.API.Models;
 
+// ReSharper disable once CheckNamespace
+// STFU!!!!!!!!!!!!!!!!
 namespace FoundationFortune.API.HintSystem
 {
 	public partial class ServerEvents
@@ -39,12 +41,16 @@ namespace FoundationFortune.API.HintSystem
         private void UpdateBountyMessages(Player ply, ref StringBuilder hintMessage)
         {
             Bounty bounty = BountiedPlayers.FirstOrDefault(b => b.Player == ply);
-
             if (bounty == null) return;
             TimeSpan timeLeft = bounty.ExpirationTime - DateTime.Now;
+            ZoneType zone = bounty.Player.Zone;
             string bountyMessage = ply.UserId == bounty.Player.UserId
-	            ? FoundationFortune.Singleton.Translation.SelfBounty.Replace("%duration%", timeLeft.ToString(@"hh\:mm\:ss"))
-	            : FoundationFortune.Singleton.Translation.OtherBounty.Replace("%player%", bounty.Player.Nickname).Replace("%duration%", timeLeft.ToString(@"hh\:mm\:ss"));
+	            ? FoundationFortune.Singleton.Translation.SelfBounty.Replace("%duration%", timeLeft.ToString(@"mm\:ss"))
+	            : FoundationFortune.Singleton.Translation.OtherBounty.Replace("%player%", bounty.Player.Nickname)
+		            .Replace("%duration%", timeLeft.ToString(@"mm\:ss"))
+		            .Replace("%price%", bounty.Value.ToString())
+					.Replace("%zone%", zone.ToString());
+            
             hintMessage.Append($"{bountyMessage}");
         }
     }

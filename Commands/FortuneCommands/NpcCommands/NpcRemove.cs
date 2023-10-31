@@ -1,16 +1,18 @@
 ﻿using CommandSystem;
 using Exiled.API.Features;
 using Exiled.Permissions.Extensions;
-using FoundationFortune.API.Models.Enums;
 using FoundationFortune.API.NPCs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using FoundationFortune.API.Models;
 
 namespace FoundationFortune.Commands.FortuneCommands.NpcCommands
 {
+    [CommandHandler(typeof(ClientCommandHandler))]
+    [CommandHandler(typeof(RemoteAdminCommandHandler))]
     internal class NpcRemove : ICommand, IUsageProvider
     {
         public string Command { get; } = "ff_removenpc";

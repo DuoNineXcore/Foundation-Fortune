@@ -8,9 +8,8 @@ using SCPSLAudioApi;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using FoundationFortune.API.Models.Classes;
 using FoundationFortune.API.HintSystem;
-using FoundationFortune.API.Models.Enums;
+using FoundationFortune.API.Models;
 
 namespace FoundationFortune
 {
@@ -20,6 +19,9 @@ namespace FoundationFortune
 		public override string Name => "Foundation Fortune";
 		public override string Prefix => "this plugin is a performance issue";
 		public override Version Version => new(1, 0, 0);
+
+		public static readonly string commonDirectoryPath = Path.Combine(Paths.IndividualConfigs, "this plugin is a performance issue", "Foundation Fortune Assets");
+		public static readonly string audioFilesPath = Path.Combine(Path.Combine(commonDirectoryPath, "Sound Files"));
 
 		private Harmony harmony;
 
@@ -32,10 +34,11 @@ namespace FoundationFortune
         public Dictionary<string, (Npc bot, int indexation)> BuyingBots  = new();
 		public Dictionary<string, (Npc bot, int indexation)> SellingBots = new();
 		public List<PlayerMusicBotPair> MusicBotPairs { get; private set; } = new();
+		
 		public override void OnEnabled()
 		{
 			Singleton = this;
-			CreateDatabase();
+			CreateDirectories();
 			RegisterEvents();
 			Startup.SetupDependencies();
 			CustomItem.RegisterItems();
@@ -58,58 +61,64 @@ namespace FoundationFortune
 
         private void RegisterEvents()
 		{
-			Exiled.Events.Handlers.Server.RoundStarted += ServerEvents.RoundStart;
 			Exiled.Events.Handlers.Player.Verified += ServerEvents.RegisterInDatabase;
 			Exiled.Events.Handlers.Player.Dying += ServerEvents.EtherealInterventionHandler;
 			Exiled.Events.Handlers.Player.Spawned += ServerEvents.EtherealInterventionSpawn;
 			Exiled.Events.Handlers.Player.Died += ServerEvents.KillingReward;
 			Exiled.Events.Handlers.Player.Escaping += ServerEvents.EscapingReward;
 			Exiled.Events.Handlers.Player.DroppingItem += ServerEvents.SellingItem;
-			Exiled.Events.Handlers.Scp049.ActivatingSense += ServerEvents.FuckYourAbility;
-			Exiled.Events.Handlers.Scp0492.TriggeringBloodlust += ServerEvents.FuckYourOtherAbility;
-			Exiled.Events.Handlers.Player.Spawning += ServerEvents.SpawningNpc;
+			Exiled.Events.Handlers.Player.Left += ServerEvents.DestroyMusicBots; 
+			Exiled.Events.Handlers.Player.Hurting += ServerEvents.HurtingPlayer;
+			Exiled.Events.Handlers.Player.Shooting += ServerEvents.ShootingWeapon;
+
+			Exiled.Events.Handlers.Server.RoundStarted += ServerEvents.RoundStart;
 			Exiled.Events.Handlers.Server.RestartingRound += ServerEvents.RoundRestart;
 			Exiled.Events.Handlers.Server.RoundEnded += ServerEvents.RoundEnded;
 			Exiled.Events.Handlers.Server.RespawningTeam += ServerEvents.PreventBotsFromSpawningInWaves;
-			Exiled.Events.Handlers.Player.Left += ServerEvents.DestroyMusicBots;
-			Exiled.Events.Handlers.Player.Hurting += ServerEvents.HurtingPlayer;
+            
+			Exiled.Events.Handlers.Scp049.ActivatingSense += ServerEvents.FuckYourAbility;
+			Exiled.Events.Handlers.Scp0492.TriggeringBloodlust += ServerEvents.FuckYourOtherAbility;
 		}
 
 		private void UnregisterEvents()
 		{
-			Exiled.Events.Handlers.Server.RoundStarted -= ServerEvents.RoundStart;
 			Exiled.Events.Handlers.Player.Verified -= ServerEvents.RegisterInDatabase;
 			Exiled.Events.Handlers.Player.Dying -= ServerEvents.EtherealInterventionHandler;
-            Exiled.Events.Handlers.Player.Spawned -= ServerEvents.EtherealInterventionSpawn;
-            Exiled.Events.Handlers.Player.Died -= ServerEvents.KillingReward;
+			Exiled.Events.Handlers.Player.Spawned -= ServerEvents.EtherealInterventionSpawn;
+			Exiled.Events.Handlers.Player.Died -= ServerEvents.KillingReward;
 			Exiled.Events.Handlers.Player.Escaping -= ServerEvents.EscapingReward;
 			Exiled.Events.Handlers.Player.DroppingItem -= ServerEvents.SellingItem;
-			Exiled.Events.Handlers.Scp049.ActivatingSense -= ServerEvents.FuckYourAbility;
-			Exiled.Events.Handlers.Scp0492.TriggeringBloodlust -= ServerEvents.FuckYourOtherAbility;
-			Exiled.Events.Handlers.Player.Spawning -= ServerEvents.SpawningNpc;
+			Exiled.Events.Handlers.Player.Left -= ServerEvents.DestroyMusicBots;
+			Exiled.Events.Handlers.Player.Hurting -= ServerEvents.HurtingPlayer;
+			Exiled.Events.Handlers.Player.Shooting -= ServerEvents.ShootingWeapon;
+
+			Exiled.Events.Handlers.Server.RoundStarted -= ServerEvents.RoundStart;
 			Exiled.Events.Handlers.Server.RestartingRound -= ServerEvents.RoundRestart;
             Exiled.Events.Handlers.Server.RoundEnded -= ServerEvents.RoundEnded;
             Exiled.Events.Handlers.Server.RespawningTeam -= ServerEvents.PreventBotsFromSpawningInWaves;
-            Exiled.Events.Handlers.Player.Left -= ServerEvents.DestroyMusicBots;
-            Exiled.Events.Handlers.Player.Hurting -= ServerEvents.HurtingPlayer;
+            
+            Exiled.Events.Handlers.Scp049.ActivatingSense -= ServerEvents.FuckYourAbility;
+            Exiled.Events.Handlers.Scp0492.TriggeringBloodlust -= ServerEvents.FuckYourOtherAbility;
 		}
 
-		private void CreateDatabase()
+		private void CreateDirectories()
 		{
 			try
 			{
-				string databaseDirectoryPath = Path.Combine(Paths.Configs, "Duo" ,"Foundation Fortune");
-				string databaseFilePath = Path.Combine(databaseDirectoryPath, "Foundation Fortune.db");
+				string databaseFilePath = Path.Combine(commonDirectoryPath, "Foundation Fortune.db");
 
 				if (!File.Exists(databaseFilePath))
 				{
-					if (!Directory.Exists(databaseDirectoryPath))
-						Directory.CreateDirectory(databaseDirectoryPath);
+					if (!Directory.Exists(commonDirectoryPath))
+						Directory.CreateDirectory(commonDirectoryPath);
 
+					if (!Directory.Exists(audioFilesPath))
+						Directory.CreateDirectory(audioFilesPath);
+					
 					db = new LiteDatabase(databaseFilePath);
 
 					var collection = db.GetCollection<PlayerData>();
-					collection.EnsureIndex(x => x.UserId, false);
+					collection.EnsureIndex(x => x.UserId);
 
 					Log.Info($"Database created successfully at {databaseFilePath}");
 				}

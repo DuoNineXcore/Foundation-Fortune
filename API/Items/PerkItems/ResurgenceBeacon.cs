@@ -1,13 +1,9 @@
 ﻿using Exiled.API.Features;
 using Exiled.API.Features.Attributes;
-using Exiled.API.Features.Items;
 using Exiled.API.Features.Pickups;
 using Exiled.API.Features.Spawn;
 using Exiled.CustomItems.API.Features;
 using Exiled.Events.EventArgs.Player;
-using FoundationFortune.Commands.BuyCommand;
-using InventorySystem.Items;
-using InventorySystem.Items.Pickups;
 using System.Collections.Generic;
 using FoundationFortune.API.Perks;
 
@@ -49,8 +45,7 @@ namespace FoundationFortune.API.Items.PerkItems
             if (!TrySpawn(332, giver.Position, out Pickup resurgencebeacon)) return false;
             if (resurgencebeacon != null)
             {
-                Log.Debug(
-                    $"Spawned Resurgence Beacon at Pos:{resurgencebeacon.Position} Serial: {resurgencebeacon.Serial}, Player to be revived: {targetPlayer}");
+                Log.Debug($"Spawned Resurgence Beacon at Pos:{resurgencebeacon.Position} Serial: {resurgencebeacon.Serial}, Player to be revived: {targetPlayer}");
                 RevivalData[resurgencebeacon.Serial] = (giver, targetPlayer);
             }
             return true;

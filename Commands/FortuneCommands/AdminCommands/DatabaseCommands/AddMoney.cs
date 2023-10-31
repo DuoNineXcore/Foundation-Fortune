@@ -1,12 +1,11 @@
-﻿using CommandSystem;
-using Exiled.Permissions.Extensions;
-using RemoteAdmin;
-using System;
+﻿using System;
+using CommandSystem;
 using Exiled.API.Features;
-using Exiled.API.Features.Doors;
+using Exiled.Permissions.Extensions;
 using FoundationFortune.API.Database;
+using RemoteAdmin;
 
-namespace FoundationFortune.Commands.FortuneCommands.DatabaseCommands
+namespace FoundationFortune.Commands.FortuneCommands.AdminCommands.DatabaseCommands
 {
     [CommandHandler(typeof(ClientCommandHandler))]
     [CommandHandler(typeof(RemoteAdminCommandHandler))]

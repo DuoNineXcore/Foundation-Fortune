@@ -1,7 +1,6 @@
 ﻿using CommandSystem;
 using Exiled.API.Features;
 using FoundationFortune.API.Database;
-using FoundationFortune.API.Models.Enums;
 using RemoteAdmin;
 using System;
 using System.Collections.Generic;
@@ -46,5 +45,4 @@ namespace FoundationFortune.Commands.FortuneCommands.HintCommands.Local
             return true;
         }
     }
-
 }
