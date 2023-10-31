@@ -27,9 +27,9 @@ namespace FoundationFortune.Commands.FortuneCommands.AdminCommands.DatabaseComma
                 return false;
             }
 
-            if (args.Count < 2)
+            if (args.Count < 4 || !bool.TryParse(args.At(2), out bool addToHold) || !bool.TryParse(args.At(3), out bool addToSaved))
             {
-                response = "Usage: foundationfortune database addmoney <self/steamid/all> [amount]";
+                response = "Usage: foundationfortune database addmoney <self/steamid/all> [amount] [addToHold] [addToSaved]";
                 return false;
             }
 
@@ -54,7 +54,7 @@ namespace FoundationFortune.Commands.FortuneCommands.AdminCommands.DatabaseComma
 
                     string SelfAddMoney = pluginTranslations.SelfAddMoney.Replace("%amount%", amount.ToString());
                     FoundationFortune.Singleton.ServerEvents.EnqueueHint(ply, $"{SelfAddMoney}", 5f);
-                    PlayerDataRepository.ModifyMoney(ply.UserId, amount, false, true, false);
+                    PlayerDataRepository.ModifyMoney(ply.UserId, amount, false, addToHold, addToSaved);
                     response = $"Gave {amount} money to player '{ply}'.";
                     return true;
 
@@ -69,7 +69,7 @@ namespace FoundationFortune.Commands.FortuneCommands.AdminCommands.DatabaseComma
                     foreach (var player in Player.List)
                     {
                         FoundationFortune.Singleton.ServerEvents.EnqueueHint(player, $"{AllAddMoney}", 5f);
-                        PlayerDataRepository.ModifyMoney(player.UserId, allAmount, true, true, false);
+                        PlayerDataRepository.ModifyMoney(player.UserId, allAmount, true, addToHold, addToSaved);
                     }
                     response = $"Gave {allAmount} money to all players.";
                     return true;

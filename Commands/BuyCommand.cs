@@ -52,7 +52,7 @@ namespace FoundationFortune.Commands
 				return true;
 			}
 
-			response = GetList();
+			if(response == string.Empty) response = GetList();
 			return false;
 		}
 
@@ -100,14 +100,24 @@ namespace FoundationFortune.Commands
 				return true;
 			}
 
-			if (perkItem != null && ExceedsPerkLimit(player, perkItem))
-			{
-				response = $"You have exceeded the Perk Limit for the Perk '{perkItem.DisplayName}'";
-				return true;
-			}
+			if(perkItem == null) 
+				response = "That is not a valid perk to buy!";
+			else if(ExceedsPerkLimit(player, perkItem)) 
+				response = $"You have exceeded the Item Limit for the Perk '{perkItem.DisplayName}'";
+			else
+				response = "You do not have enough money to buy that!";
 
 			response = "That is not a purchasable perk or you do not have enough money";
 			return false;
+			
+			// if(buyItem == null) 
+			// 	response = "That is not a valid item to buy!";
+			// else if(ExceedsItemLimit(player, buyItem)) 
+			// 	response = $"You have exceeded the Item Limit for the Item '{buyItem.DisplayName}'";
+			// else
+			// 	response = "You do not have enough money to buy that!";
+			//
+			// return false;
 		}
 
 		private static bool TryPurchaseItem(Player player, string aliasOrEnum, out string response)
@@ -128,14 +138,14 @@ namespace FoundationFortune.Commands
 				response = $"You have successfully bought {buyItem.DisplayName} for ${buyItem.Price}";
 				return true;
 			}
-
-			if (buyItem != null && ExceedsItemLimit(player, buyItem))
-			{
+			
+			if(buyItem == null) 
+				response = "That is not a valid item to buy!";
+			else if(ExceedsItemLimit(player, buyItem)) 
 				response = $"You have exceeded the Item Limit for the Item '{buyItem.DisplayName}'";
-				return true;
-			}
-
-			response = "That is not a purchasable item or you don't have enough money!";
+			else
+				response = "You do not have enough money to buy that!";
+			
 			return false;
 		}
 
@@ -165,7 +175,7 @@ namespace FoundationFortune.Commands
 				   .Replace("%perkItemPrice%", perkItem.Price.ToString())
 				   .Replace("%perkItemDescription%", perkItem.Description)));
 
-			return $"\nItems available for purchase: {itemsList} \nPerks available for purchase:{perksList}";
+			return $"That is not a valid item to purchase!\nItems available for purchase: {itemsList} \nPerks available for purchase:{perksList}";
 		}
 
 		private static bool ExceedsPerkLimit(Player player, PerkItem perkItem)

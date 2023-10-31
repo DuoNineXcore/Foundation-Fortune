@@ -53,8 +53,8 @@ namespace FoundationFortune.API.Items.PerkItems
 
 			if (playerPerks.TryGetValue(perkType, out var count)) playerPerks[perkType] = count + 1;
 			else playerPerks[perkType] = 1;
-
-			FoundationFortune.Singleton.ServerEvents.EnqueueHint(ev.Player, $"<b>You drank a <color=#FFC0CB>{perkType}</color> Perk bottle.</b>", 2f);
+			
+			FoundationFortune.Singleton.ServerEvents.EnqueueHint(ev.Player, FoundationFortune.Singleton.Translation.DrankPerkBottle.Replace("%type%", perkType.ToString()), 2);
 			DroppedPerkBottles.Remove(ev.Item.Serial);
 		}
 		
@@ -83,7 +83,7 @@ namespace FoundationFortune.API.Items.PerkItems
 		{
 			if (player.CurrentItem == null) return;
 			if (DroppedPerkBottles.TryGetValue(player.CurrentItem.Serial, out var perkBottleData)) 
-				stringbuilder.AppendLine($"<b>You are holding a <color=#FFC0CB>{perkBottleData.perkType}</color> perk bottle.</b>");
+				stringbuilder.AppendLine(FoundationFortune.Singleton.Translation.HoldingPerkBottle.Replace("%type%", perkBottleData.perkType.ToString()));
 		}
 	}
 }

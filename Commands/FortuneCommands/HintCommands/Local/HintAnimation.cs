@@ -1,4 +1,5 @@
-﻿using CommandSystem;
+﻿/*
+using CommandSystem;
 using Exiled.API.Features;
 using FoundationFortune.API.Database;
 using RemoteAdmin;
@@ -38,3 +39,4 @@ namespace FoundationFortune.Commands.FortuneCommands.HintCommands.Local
         }
     }
 }
+*/

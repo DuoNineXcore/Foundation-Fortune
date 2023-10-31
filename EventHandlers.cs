@@ -35,7 +35,9 @@ namespace FoundationFortune.API.HintSystem
 
 		public void RoundStart()
 		{
-			Timing.RunCoroutine(UpdateMoneyAndHints());
+			CoroutineManager.KillCoroutines();
+			CoroutineManager.Coroutines.Add(Timing.RunCoroutine(UpdateMoneyAndHints()));
+			CoroutineManager.Coroutines.Add(Timing.RunCoroutine(NPCHelperMethods.UpdateNpcDirection()));
 
 			if (FoundationFortune.Singleton.Config.MoneyExtractionSystem)
 			{
@@ -284,6 +286,7 @@ namespace FoundationFortune.API.HintSystem
 						break;
 				}
 			}
+			CoroutineManager.KillCoroutines();
 		}
 
 		public void ShootingWeapon(ShootingEventArgs ev) { if (PerkSystem.ViolentImpulsesPlayers.Contains(ev.Player)) ev.Firearm.Recoil = new(FoundationFortune.Singleton.Config.ViolentImpulsesRecoilAnimationTime, FoundationFortune.Singleton.Config.ViolentImpulsesRecoilZAxis, FoundationFortune.Singleton.Config.ViolentImpulsesRecoilFovKick, FoundationFortune.Singleton.Config.ViolentImpulsesRecoilUpKick, FoundationFortune.Singleton.Config.ViolentImpulsesRecoilSideKick); }

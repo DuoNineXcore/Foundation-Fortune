@@ -44,7 +44,7 @@ namespace FoundationFortune.API.HintSystem
 			Log.Debug($"Extraction point activated in room: {activeExtractionRoom}. It will be active for {FoundationFortune.Singleton.Config.ExtractionPointDuration} seconds.");
 
 			extractionCount++;
-			Timing.CallDelayed(FoundationFortune.Singleton.Config.ExtractionPointDuration, () => DeactivateExtractionPoint(true));
+			CoroutineManager.Coroutines.Add(Timing.CallDelayed(FoundationFortune.Singleton.Config.ExtractionPointDuration, () => DeactivateExtractionPoint(true)));
 		}
 
 		public void StartExtractionEvent(RoomType room, float duration)
@@ -55,7 +55,7 @@ namespace FoundationFortune.API.HintSystem
 			isExtractionPointActive = true;
 			Log.Debug($"Extraction point activated in room: {activeExtractionRoom}. It will be active for T-{duration} seconds.");
 
-			Timing.CallDelayed(duration, () => DeactivateExtractionPoint(false));
+			CoroutineManager.Coroutines.Add(Timing.CallDelayed(duration, () => DeactivateExtractionPoint(false)));
 		}
 
 		public void DeactivateExtractionPoint(bool restart)
@@ -68,7 +68,7 @@ namespace FoundationFortune.API.HintSystem
 				if (extractionCount >= FoundationFortune.Singleton.Config.ExtractionLimit) return;
 				nextExtractionTime = UnityEngine.Random.Range(FoundationFortune.Singleton.Config.MinExtractionPointGenerationTime, FoundationFortune.Singleton.Config.MaxExtractionPointGenerationTime + 1);
 				Log.Debug($"Extraction point in room {activeExtractionRoom} deactivated. Next extraction in T-{nextExtractionTime} Seconds.");
-				Timing.CallDelayed(nextExtractionTime, StartExtractionEvent);
+				CoroutineManager.Coroutines.Add(Timing.CallDelayed(nextExtractionTime, StartExtractionEvent));
 			}
             else isExtractionPointActive = false;
         }
@@ -141,6 +141,7 @@ namespace FoundationFortune.API.HintSystem
 		private void StartExtractionTimer(Player player)
 		{
 			CoroutineHandle timerHandle = Timing.RunCoroutine(ExtractionTimerCoroutine(player));
+			CoroutineManager.Coroutines.Add(timerHandle);
 			ExtractionTimerData timerData = new()
 			{
 				CoroutineHandle = timerHandle,

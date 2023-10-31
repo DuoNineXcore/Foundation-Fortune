@@ -23,7 +23,7 @@ namespace FoundationFortune.Commands.FortuneCommands.HintCommands.Local
             }
 
             Player playersender = Player.Get(playerSender);
-            var isMinmodeEnabled = PlayerDataRepository.GetHintMinmode(playersender.UserId);
+            bool isMinmodeEnabled = PlayerDataRepository.GetHintMinmode(playersender.UserId);
 
             if (isMinmodeEnabled)
             {

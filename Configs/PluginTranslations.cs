@@ -71,5 +71,9 @@ namespace FoundationFortune.Configs
 		public string SelfRemoveMoney { get; set; } = "<b><color=red>-$%amount%.</color> Admin Command.</b>\\n";
 		public string AllRemoveMoney { get; set; } = "<b><color=red>-$%amount%.</color> Admin Command.</b>\\n";
 		public string SteamIDRemoveMoney { get; set; } = "<b><color=red>-$%amount%.</color> Admin Command.</b>\\n";
+
+		[Description("Perk bottles")]
+		public string DrankPerkBottle { get; set; } = "<b>You drank a <color=#FFC0CB>%type%</color> Perk bottle.</b>";
+		public string HoldingPerkBottle { get; set; } = "<b>You are holding a <color=#FFC0CB>%type%</color> perk bottle.</b>";
 	}
 }

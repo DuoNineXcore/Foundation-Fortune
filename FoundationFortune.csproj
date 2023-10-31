@@ -36,92 +36,27 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
-		<Reference Include="0Harmony">
-      <HintPath>..\..\Documents\C# References\0Harmony.dll</HintPath>
-    </Reference>
-		<Reference Include="Assembly-CSharp">
-		  <HintPath>..\..\Documents\C# References\Assembly-CSharp-Publicized.dll</HintPath>
-		</Reference>
-		<Reference Include="Assembly-CSharp-firstpass">
-		  <HintPath>..\..\Documents\C# References\Assembly-CSharp-firstpass.dll</HintPath>
-		</Reference>
-    <Reference Include="CommandSystem.Core">
-      <HintPath>..\..\Documents\C# References\CommandSystem.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="Exiled.API">
-      <HintPath>..\..\Documents\C# References\Exiled.API.dll</HintPath>
-    </Reference>
-    <Reference Include="Exiled.CreditTags">
-      <HintPath>..\..\Documents\C# References\Exiled.CreditTags.dll</HintPath>
-    </Reference>
-    <Reference Include="Exiled.CustomItems">
-      <HintPath>..\..\Documents\C# References\Exiled.CustomItems.dll</HintPath>
-    </Reference>
-    <Reference Include="Exiled.CustomRoles">
-      <HintPath>..\..\Documents\C# References\Exiled.CustomRoles.dll</HintPath>
-    </Reference>
-    <Reference Include="Exiled.Events">
-      <HintPath>..\..\Documents\C# References\Exiled.Events.dll</HintPath>
-    </Reference>
-    <Reference Include="Exiled.Permissions">
-      <HintPath>..\..\Documents\C# References\Exiled.Permissions.dll</HintPath>
-    </Reference>
-    <Reference Include="LiteDB">
-      <HintPath>..\..\Documents\C# References\LiteDB.dll</HintPath>
-    </Reference>
-    <Reference Include="Mirror, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Documents\C# References\Mirror.dll</HintPath>
-    </Reference>
-    <Reference Include="NorthwoodLib">
-      <HintPath>..\..\Documents\C# References\NorthwoodLib.dll</HintPath>
-    </Reference>
-    <Reference Include="PluginAPI">
-      <HintPath>..\..\Documents\C# References\PluginAPI.dll</HintPath>
-    </Reference>
-    <Reference Include="Pooling, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Documents\C# References\Pooling.dll</HintPath>
-    </Reference>
-    <Reference Include="SCPSLAudioApi">
-      <HintPath>..\..\AppData\Roaming\EXILED\Plugins\dependencies\SCPSLAudioApi.dll</HintPath>
-    </Reference>
-    <Reference Include="System">
-      <HintPath>..\..\Documents\C# References\System.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Core">
-      <HintPath>..\..\Documents\C# References\System.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="System.IO.Compression">
-      <HintPath>..\..\Documents\C# References\System.IO.Compression.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Net.Http">
-      <HintPath>..\..\Documents\C# References\System.Net.Http.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine">
-      <HintPath>..\..\Documents\C# References\UnityEngine.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.CoreModule">
-      <HintPath>D:\SteamLibrary\steamapps\common\ULTRAKILL\ULTRAKILL_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.PhysicsModule">
-      <HintPath>..\..\Documents\C# References\UnityEngine.PhysicsModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.UnityWebRequestModule">
-      <HintPath>..\..\Documents\C# References\UnityEngine.UnityWebRequestModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.UnityWebRequestWWWModule">
-      <HintPath>..\..\Documents\C# References\UnityEngine.UnityWebRequestWWWModule.dll</HintPath>
-    </Reference>
-    <Reference Include="YamlDotNet">
-      <HintPath>..\..\Documents\C# References\YamlDotNet.dll</HintPath>
-    </Reference>
+		<Reference Include="Assembly-CSharp" HintPath="$(EXILED_REFERENCES)\Assembly-CSharp-Publicized.dll" Private="false" />
+		<Reference Include="Assembly-CSharp-firstpass" HintPath="$(EXILED_REFERENCES)\Assembly-CSharp-firstpass.dll" Private="false" />
+		<Reference Include="CommandSystem.Core" HintPath="$(EXILED_REFERENCES)\CommandSystem.Core.dll" Private="false" />
+		<Reference Include="Mirror" HintPath="$(EXILED_REFERENCES)\Mirror.dll" Private="false" />
+		<Reference Include="NorthwoodLib" HintPath="$(EXILED_REFERENCES)\NorthwoodLib.dll" Private="false" />
+		<Reference Include="PluginAPI" HintPath="$(EXILED_REFERENCES)\PluginAPI.dll" Private="false" />
+		<Reference Include="System.IO.Compression.FileSystem" />
+		<Reference Include="UnityEngine" HintPath="$(EXILED_REFERENCES)\UnityEngine.dll" Private="false" />
+		<Reference Include="UnityEngine.CoreModule" HintPath="$(EXILED_REFERENCES)\UnityEngine.CoreModule.dll" Private="false" />
+		<Reference Include="UnityEngine.PhysicsModule" HintPath="$(EXILED_REFERENCES)\UnityEngine.PhysicsModule.dll" Private="false" />
+		<Reference Include="SCPSLAudioApi" HintPath="$(EXILED_REFERENCES)\SCPSLAudioApi.dll" Private="false" />
+		<Reference Include="LiteDB" HintPath="$(EXILED_REFERENCES)\LiteDB.dll" Private="false" />
+		<Reference Include="Pooling" HintPath="$(EXILED_REFERENCES)\Pooling.dll" Private="false" />
+		<Reference Include="System" />
 	</ItemGroup>
   <ItemGroup>
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="API\AudioPlayer.cs" />
+    <Compile Include="API\CoroutineManager.cs" />
     <Compile Include="API\HintSystem\ServerEvents\ServerBountySystem.cs" />
     <Compile Include="API\HintSystem\ServerEvents\ServerExtractionSystem.cs" />
     <Compile Include="API\Items\CustomItems\DeathCoin.cs" />
@@ -187,6 +122,9 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="API\Items\CustomItems\Weapons\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Todo.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

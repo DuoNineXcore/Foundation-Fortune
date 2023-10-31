@@ -16,6 +16,7 @@ using System.Linq;
 using CentralAuth;
 using UnityEngine;
 using VoiceChat;
+using FoundationFortune.API.HintSystem;
 
 namespace FoundationFortune.API.NPCs
 {
@@ -120,6 +121,25 @@ namespace FoundationFortune.API.NPCs
             var mouseLook = ((IFpcRole)npc.ReferenceHub.roleManager.CurrentRole).FpcModule.MouseLook;
             (ushort horizontal, ushort vertical) = ToClientUShorts(quat);
             mouseLook.ApplySyncValues(horizontal, vertical);
+        }
+
+        public static IEnumerator<float> UpdateNpcDirection()
+        {
+            while (true)
+            {
+                foreach (Player player in Player.List)
+                {
+                    if (!player.IsAlive) continue;
+                    
+                    Npc buyingBot = ServerEvents.GetNearestBuyingBot(player);
+                    Npc sellingBot = ServerEvents.GetNearestSellingBot(player);
+                    
+                    if(buyingBot != null) LookAt(buyingBot, player.Position);
+                    else if(sellingBot != null) LookAt(sellingBot, player.Position);
+                }
+
+                yield return Timing.WaitForSeconds(0.01f);
+            }
         }
     }
 }

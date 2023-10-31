@@ -30,7 +30,7 @@ namespace FoundationFortune.API.HintSystem
         public Dictionary<Npc, Vector3> sellingBotPositions = new();
         public Dictionary<Npc, Vector3> musicBotPositions = new();
 
-        private static Npc GetNearestBuyingBot(Player player)
+        public static Npc GetNearestBuyingBot(Player player)
         {
             var botPositions = FoundationFortune.Singleton.BuyingBots
                 .Where(kvp => kvp.Value.bot != null)
@@ -39,7 +39,7 @@ namespace FoundationFortune.API.HintSystem
             return GetNearestFoundationFortuneBot(player, botPositions, BotType.Buying);
         }
 
-        private static Npc GetNearestSellingBot(Player player)
+        public static Npc GetNearestSellingBot(Player player)
         {
             var botPositions = FoundationFortune.Singleton.SellingBots
                 .Where(kvp => kvp.Value.bot != null)
@@ -57,7 +57,7 @@ namespace FoundationFortune.API.HintSystem
             return IsPlayerNearFoundationFortuneBot(player, botPositions, BotType.Buying);
         }
 
-        private static bool IsPlayerNearSellingBot(Player player)
+        public static bool IsPlayerNearSellingBot(Player player)
         {
             var botPositions = FoundationFortune.Singleton.SellingBots
                 .Where(kvp => kvp.Value.bot != null)
@@ -232,12 +232,12 @@ namespace FoundationFortune.API.HintSystem
 
             if (IsPlayerNearBuyingBot(ply))
             {
-                NPCHelperMethods.LookAt(buyingBot, ply.Position);
+                // NPCHelperMethods.LookAt(buyingBot, ply.Position);
                 hintMessage.Append($"{FoundationFortune.Singleton.Translation.BuyingBot}");
             }
             else if (IsPlayerNearSellingBot(ply))
             {
-                NPCHelperMethods.LookAt(sellingBot, ply.Position);
+                // NPCHelperMethods.LookAt(sellingBot, ply.Position);
                 if (!confirmSell.ContainsKey(ply.UserId)) hintMessage.Append($"{FoundationFortune.Singleton.Translation.SellingBot}");
                 else if (confirmSell[ply.UserId])
                 {
