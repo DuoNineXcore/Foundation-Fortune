@@ -230,14 +230,9 @@ namespace FoundationFortune.API.HintSystem
             Npc buyingBot = GetNearestBuyingBot(ply);
             Npc sellingBot = GetNearestSellingBot(ply);
 
-            if (IsPlayerNearBuyingBot(ply))
-            {
-                // NPCHelperMethods.LookAt(buyingBot, ply.Position);
-                hintMessage.Append($"{FoundationFortune.Singleton.Translation.BuyingBot}");
-            }
+            if (IsPlayerNearBuyingBot(ply)) hintMessage.Append($"{FoundationFortune.Singleton.Translation.BuyingBot}");
             else if (IsPlayerNearSellingBot(ply))
             {
-                // NPCHelperMethods.LookAt(sellingBot, ply.Position);
                 if (!confirmSell.ContainsKey(ply.UserId)) hintMessage.Append($"{FoundationFortune.Singleton.Translation.SellingBot}");
                 else if (confirmSell[ply.UserId])
                 {

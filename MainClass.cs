@@ -16,6 +16,9 @@ using FoundationFortune.API;
 
 namespace FoundationFortune
 {
+	/// <summary>
+	/// underhang
+	/// </summary>
     public class FoundationFortune : Plugin<PluginConfigs, PluginTranslations>
 	{
 		public override string Author => "DuoNineXcore & Misfiy";
@@ -23,8 +26,10 @@ namespace FoundationFortune
 		public override string Prefix => "this plugin is a performance issue";
 		public override Version Version => new(1, 0, 0);
 
-		public static readonly string commonDirectoryPath = Path.Combine(Paths.Configs, "this plugin is a performance issue", "Foundation Fortune Assets");
+		public static readonly string commonDirectoryPath = Path.Combine(Paths.IndividualConfigs, "this plugin is a performance issue", "Foundation Fortune Assets");
 		public static readonly string audioFilesPath = Path.Combine(commonDirectoryPath, "Sound Files");
+		public static readonly string playerAudioFilesPath = Path.Combine(audioFilesPath, "PlayerVoiceChatUsageType");
+		public static readonly string npcAudioFilesPath = Path.Combine(audioFilesPath, "FFNPCVoiceChatUsageType");
 
 		private Harmony harmony;
 
@@ -41,8 +46,8 @@ namespace FoundationFortune
 		public override void OnEnabled()
 		{
 			Singleton = this;
-			CreateDirectories();
 			RegisterEvents();
+			DirectoryIterator.SetupDirectories();
 			Startup.SetupDependencies();
 			CustomItem.RegisterItems();
 			harmony = new("FoundationFortune");
@@ -103,58 +108,6 @@ namespace FoundationFortune
             
             Exiled.Events.Handlers.Scp049.ActivatingSense -= ServerEvents.FuckYourAbility;
             Exiled.Events.Handlers.Scp0492.TriggeringBloodlust -= ServerEvents.FuckYourOtherAbility;
-		}
-
-		private void CreateDirectories()
-		{
-			if (!Directory.Exists(commonDirectoryPath))
-				Directory.CreateDirectory(commonDirectoryPath);
-			
-			if (!Directory.Exists(audioFilesPath))
-				DownloadAudioFiles();
-			
-			try
-			{
-				string databaseFilePath = Path.Combine(commonDirectoryPath, "Foundation Fortune.db");
-
-				if (!File.Exists(databaseFilePath))
-				{
-					db = new LiteDatabase(databaseFilePath);
-
-					var collection = db.GetCollection<PlayerData>();
-					collection.EnsureIndex(x => x.UserId);
-
-					Log.Info($"Database created successfully at {databaseFilePath}");
-				}
-				else
-				{
-					db = new LiteDatabase(databaseFilePath);
-					Log.Info($"Database loaded successfully at {databaseFilePath}.");
-				}
-			}
-			catch (Exception ex)
-			{
-				Log.Error($"Failed to create/open database: {ex}");
-				Timing.CallDelayed(1f, OnDisabled);
-			}
-		}
-
-		private void DownloadAudioFiles()
-		{
-			string zipFile = audioFilesPath + ".zip";
-			string tempDirectory = audioFilesPath + "_Temp";
-			
-			using WebClient client = new();
-			
-			Log.Warn("Downloading AudoFiles");
-			client.DownloadFile($"https://github.com/Misfiy/FF-AudoFiles/releases/latest/download/Audios.zip", zipFile);
-			
-			Log.Warn("File downloaded.. Beginning Extract");
-			ZipFile.ExtractToDirectory(zipFile, tempDirectory);
-			Directory.Move(tempDirectory, audioFilesPath);
-			
-			File.Delete(zipFile);
-			Log.Warn("Successfully extracted audiofiles!");
 		}
 	}
 }

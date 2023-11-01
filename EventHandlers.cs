@@ -21,6 +21,9 @@ using PlayerStatsSystem;
 // STFU!!!!!!!!!!!!!!!!
 namespace FoundationFortune.API.HintSystem
 {
+	/// <summary>
+	/// the leg
+	/// </summary>
 	public partial class ServerEvents
 	{
 		private readonly Dictionary<(LeadingTeam, Team?), (PlayerTeamConditions, string)> teamConditionsMap = new()

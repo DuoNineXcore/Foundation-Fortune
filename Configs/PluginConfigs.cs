@@ -16,6 +16,10 @@ namespace FoundationFortune.Configs
 		[Description("Plugin Settings")]
 		public bool IsEnabled { get; set; } = true;
 		public bool Debug { get; set; } = true;
+		
+		public bool DirectoryIterator { get; set; } = true;
+		public bool DirectoryIteratorCheckDatabase { get; set; } = true;
+		public bool DirectoryIteratorCheckAudio { get; set; } = true;
 
 		[Description("Server Events")]
 		public bool KillEvent { get; set; } = true;
