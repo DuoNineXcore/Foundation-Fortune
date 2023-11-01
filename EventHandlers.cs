@@ -73,7 +73,6 @@ namespace FoundationFortune.API.HintSystem
 					HintSystem = true,
 					HintAdmin = false,
 					HintSize = 25,
-					HintOpacity = 100,
 					HintAnim = HintAnim.None,
 					HintAlign = HintAlign.Center
 				};
@@ -81,9 +80,13 @@ namespace FoundationFortune.API.HintSystem
 			}
 		}
 
-        public void EtherealInterventionHandler(DyingEventArgs ev)
+		public void EtherealInterventionHandler(DyingEventArgs ev)
 		{
-			if (FoundationFortune.Singleton.ConsumedPerks.TryGetValue(ev.Player, out var perk)) perk.Clear();
+			if (FoundationFortune.Singleton.ConsumedPerks.TryGetValue(ev.Player, out var perks))
+			{
+				if (perks.ContainsKey(PerkType.BlissfulUnawareness)) perks.Remove(PerkType.BlissfulUnawareness);
+				if (perks.ContainsKey(PerkType.EtherealIntervention)) perks.Remove(PerkType.EtherealIntervention);
+			}
 
 			if (!PerkSystem.EtherealInterventionPlayers.Contains(ev.Player)) return;
 			ev.IsAllowed = false;
@@ -96,6 +99,7 @@ namespace FoundationFortune.API.HintSystem
 				ev.Player.Teleport(room);
 			});
 		}
+
 
 		public void EtherealInterventionSpawn(SpawnedEventArgs ev)
 		{
@@ -185,7 +189,7 @@ namespace FoundationFortune.API.HintSystem
 				return;
 			}
 
-			Npc buyingbot = GetNearestSellingBot(ev.Player);
+			Npc sellingBot = GetNearestSellingBot(ev.Player);
 
 			if (IsPlayerNearSellingBot(ev.Player))
 			{
@@ -213,15 +217,16 @@ namespace FoundationFortune.API.HintSystem
 
 							if (soldItem == ev.Item)
 							{
-								NPCVoiceChatSettings buyVoiceChatSettings = FoundationFortune.Singleton.Config.FFNPCVoiceChatSettings.FirstOrDefault(settings => settings.VoiceChatUsageType == NPCVoiceChatUsageType.Buying);
-								if (buyVoiceChatSettings != null)
-									AudioPlayer.PlayAudio(buyingbot, buyVoiceChatSettings.AudioFile,
-										buyVoiceChatSettings.Volume, buyVoiceChatSettings.Loop,
-										buyVoiceChatSettings.VoiceChat);
+								NPCVoiceChatSettings sellVoiceChatSettings = FoundationFortune.Singleton.Config.FFNPCVoiceChatSettings.FirstOrDefault(settings => settings.VoiceChatUsageType == NPCVoiceChatUsageType.Selling);
+								if (sellVoiceChatSettings != null)
+									AudioPlayer.PlayAudio(sellingBot, sellVoiceChatSettings.AudioFile,
+										sellVoiceChatSettings.Volume, sellVoiceChatSettings.Loop,
+										sellVoiceChatSettings.VoiceChat);
 								var str = FoundationFortune.Singleton.Translation.SellSuccess
 									.Replace("%price%", price.ToString())
 									.Replace("%itemName%", FoundationFortune.Singleton.Config.SellableItems.Find(x => x.ItemType == ev.Item.Type).DisplayName);
 
+								PlayerDataRepository.ModifyMoney(ev.Player.UserId, price, false, true, false);
 								EnqueueHint(ev.Player, str, 3f);
 								ev.Player.RemoveItem(ev.Item);
 							}
@@ -239,7 +244,7 @@ namespace FoundationFortune.API.HintSystem
 				ev.IsAllowed = true;
 				NPCVoiceChatSettings wrongBotSettings = FoundationFortune.Singleton.Config.FFNPCVoiceChatSettings.FirstOrDefault(settings => settings.VoiceChatUsageType == NPCVoiceChatUsageType.WrongBuyingBot);
 				if (wrongBotSettings != null)
-					AudioPlayer.PlayAudio(buyingbot, wrongBotSettings.AudioFile, wrongBotSettings.Volume,
+					AudioPlayer.PlayAudio(sellingBot, wrongBotSettings.AudioFile, wrongBotSettings.Volume,
 						wrongBotSettings.Loop, wrongBotSettings.VoiceChat);
 				EnqueueHint(ev.Player, FoundationFortune.Singleton.Translation.WrongBot, 3f);
 			}

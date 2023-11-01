@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using System.Net;
 using Exiled.API.Features;
 using FoundationFortune.API.Models;
@@ -16,7 +17,7 @@ namespace FoundationFortune
     /// </summary>
     public static class DirectoryIterator
     {
-        public static string tempZipFile;
+        private static string tempZipFile;
         public static void SetupDirectories()
         {
             if (!FoundationFortune.Singleton.Config.DirectoryIterator) return;
@@ -29,13 +30,10 @@ namespace FoundationFortune
                 FoundationFortune.playerAudioFilesPath
             };
 
-            foreach (string directoryPath in directoriesToCreate)
+            foreach (var directoryPath in directoriesToCreate.Where(directoryPath => !Directory.Exists(directoryPath)))
             {
-                if (!Directory.Exists(directoryPath))
-                {
-                    Directory.CreateDirectory(directoryPath);
-                    Log.SendRaw($"[Foundation Fortune's DirectoryIterator] Missing Directory detected. Directory created: {directoryPath}", ConsoleColor.DarkCyan);
-                }
+                Directory.CreateDirectory(directoryPath);
+                Log.SendRaw($"[Foundation Fortune's DirectoryIterator] Missing Directory detected. Directory created: {directoryPath}", ConsoleColor.DarkCyan);
             }
             
             InitializeAudioFileDirectories();
@@ -46,16 +44,14 @@ namespace FoundationFortune
         {
             if (!FoundationFortune.Singleton.Config.DirectoryIteratorCheckAudio) return;
 
-            string zipFileUrl = "https://github.com/DuoNineXcore/Foundation-Fortune-Assets/releases/latest/download/AudioFiles.zip";
+            const string zipFileUrl = "https://github.com/DuoNineXcore/Foundation-Fortune-Assets/releases/latest/download/AudioFiles.zip";
             tempZipFile = Path.Combine(FoundationFortune.commonDirectoryPath, "AudioFiles.zip");
 
-            using (WebClient client = new WebClient())
-            {
-                Log.SendRaw("[Foundation Fortune's DirectoryIterator] Checking Foundation Fortune Audio Files...", ConsoleColor.DarkCyan);
+            using WebClient client = new WebClient();
+            Log.SendRaw("[Foundation Fortune's DirectoryIterator] Checking Foundation Fortune Audio Files...", ConsoleColor.DarkCyan);
 
-                client.DownloadFileCompleted += DownloadCompletedHandler;
-                client.DownloadFileAsync(new Uri(zipFileUrl), tempZipFile);
-            }
+            client.DownloadFileCompleted += DownloadCompletedHandler;
+            client.DownloadFileAsync(new Uri(zipFileUrl), tempZipFile);
         }
 
         private static void DownloadCompletedHandler(object sender, AsyncCompletedEventArgs ev)
@@ -110,8 +106,9 @@ namespace FoundationFortune
                 Log.SendRaw($"[Foundation Fortune's DirectoryIterator] The following files are missing: {missingFilesMessage}.", ConsoleColor.DarkBlue);
             }
 
-            if (filesReplaced) Log.SendRaw("[Foundation Fortune's DirectoryIterator] Successfully extracted audio files and replaced missing files!", ConsoleColor.DarkCyan);
-            else Log.SendRaw("[Foundation Fortune's DirectoryIterator] All files already exist, no files need to be replaced.", ConsoleColor.DarkCyan);
+            Log.SendRaw(filesReplaced ? "[Foundation Fortune's DirectoryIterator] Successfully extracted audio files and replaced missing files!" 
+                    : "[Foundation Fortune's DirectoryIterator] All files already exist, no files need to be replaced.",
+                ConsoleColor.DarkCyan);
         }
 
         private static void InitializeDatabase()
@@ -141,6 +138,6 @@ namespace FoundationFortune
                  Log.SendRaw($"[Foundation Fortune's DirectoryIterator] Failed to create/open database: {ex}", ConsoleColor.DarkMagenta);
                  Timing.CallDelayed(1f, FoundationFortune.Singleton.OnDisabled);
              }
-         }
+        }
     }
 }

@@ -13,9 +13,6 @@ namespace FoundationFortune.API.HintSystem
 	{
 		private Dictionary<WorkstationController, Vector3> workstationPositions = new();
 
-		private static readonly Vector3 WorldPos = new(124f, 988f, 24f);
-		private const float RadiusSqr = 16f * 16f;
-		
 		public bool IsPlayerOnSellingWorkstation(Player player) => workstationPositions.Count != 0 && workstationPositions.Values.Select(workstationPosition => 
 			Vector3.Distance(player.Position, workstationPosition)).Any(distance => distance <= FoundationFortune.Singleton.Config.SellingWorkstationRadius);
 
@@ -70,21 +67,6 @@ namespace FoundationFortune.API.HintSystem
 		        hintMessage.Append($"{FoundationFortune.Singleton.Translation.ItemConfirmation
 			        .Replace("%price%", price.ToString()).Replace("%time%", GetConfirmationTimeLeft(ply))}");
 	        }
-        }
-
-        public bool IsPlayerInSafeZone(Player player)
-		{
-			float distanceSqr = (player.Position - WorldPos).sqrMagnitude;
-			return distanceSqr <= RadiusSqr;
-		}
-
-        private static string IntToHexAlpha(int value)
-        {
-            int clampedValue = Mathf.Clamp(value, 0, 100);
-            int alphaValue = Mathf.RoundToInt(clampedValue * 255 / 100);
-            string hexValue = alphaValue.ToString("X2");
-            string alphaTag = $"<alpha=#{hexValue}>";
-            return alphaTag;
         }
 
         public static void AddToPlayerLimits(Player player, PerkItem perkItem)

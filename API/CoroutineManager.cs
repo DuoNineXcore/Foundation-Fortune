@@ -9,11 +9,7 @@ public static class CoroutineManager
 
     public static void KillCoroutines()
     {
-        foreach (CoroutineHandle coroutine in Coroutines)
-        {
-            Timing.KillCoroutines(coroutine);
-        }
-
+        foreach (CoroutineHandle coroutine in Coroutines) Timing.KillCoroutines(coroutine);
         Coroutines.Clear();
     }
 }

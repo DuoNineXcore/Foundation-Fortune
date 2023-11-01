@@ -1,26 +1,16 @@
-﻿using FoundationFortune.API.Database;
+﻿using System;
 using MEC;
 using UnityEngine;
-using Exiled.Events.EventArgs.Player;
 using Exiled.API.Features;
-using Exiled.API.Features.Items;
-using Exiled.Events.EventArgs.Scp049;
-using Exiled.Events.EventArgs.Scp0492;
 using FoundationFortune.API.NPCs;
 using System.Linq;
-using Exiled.Events.EventArgs.Server;
-using PlayerRoles;
 using System.Collections.Generic;
 using FoundationFortune.API.Perks;
-using Utf8Json.Resolvers.Internal;
-using Exiled.API.Extensions;
-using InventorySystem;
 using Exiled.API.Enums;
-using PluginAPI.Roles;
-using Exiled.API.Features.Roles;
 using Exiled.API.Features.Doors;
 using System.Text;
 using FoundationFortune.API.Models;
+using Random = UnityEngine.Random;
 
 namespace FoundationFortune.API.HintSystem
 {
@@ -46,24 +36,6 @@ namespace FoundationFortune.API.HintSystem
                 .ToDictionary(kvp => kvp.Value.bot, kvp => kvp.Value.bot.Position);
 
             return GetNearestFoundationFortuneBot(player, botPositions, BotType.Selling);
-        }
-
-        public static bool IsPlayerNearBuyingBot(Player player)
-        {
-            var botPositions = FoundationFortune.Singleton.BuyingBots
-                .Where(kvp => kvp.Value.bot != null)
-                .ToDictionary(kvp => kvp.Value.bot, kvp => kvp.Value.bot.Position);
-
-            return IsPlayerNearFoundationFortuneBot(player, botPositions, BotType.Buying);
-        }
-
-        public static bool IsPlayerNearSellingBot(Player player)
-        {
-            var botPositions = FoundationFortune.Singleton.SellingBots
-                .Where(kvp => kvp.Value.bot != null)
-                .ToDictionary(kvp => kvp.Value.bot, kvp => kvp.Value.bot.Position);
-
-            return IsPlayerNearFoundationFortuneBot(player, botPositions, BotType.Selling);
         }
 
         private void InitializeFoundationFortuneNPCs()
@@ -250,21 +222,79 @@ namespace FoundationFortune.API.HintSystem
             }
         }
 
-        private static bool IsPlayerNearFoundationFortuneBot(Player player, Dictionary<Npc, Vector3> botPositions, BotType botType)
+        private static Dictionary<Player, DateTime> LastAudioPlayTimes = new Dictionary<Player, DateTime>();
+        private static TimeSpan CooldownDuration = TimeSpan.FromMinutes(2);
+
+        public static bool IsPlayerNearBuyingBot(Player player)
+        {
+            var botPositions = FoundationFortune.Singleton.BuyingBots
+                .Where(kvp => kvp.Value.bot != null)
+                .ToDictionary(kvp => kvp.Value.bot, kvp => kvp.Value.bot.Position);
+
+            return IsPlayerNearFoundationFortuneBot(player, botPositions, BotType.Buying);
+        }
+
+        public static bool IsPlayerNearSellingBot(Player player)
+        {
+            var botPositions = FoundationFortune.Singleton.SellingBots
+                .Where(kvp => kvp.Value.bot != null)
+                .ToDictionary(kvp => kvp.Value.bot, kvp => kvp.Value.bot.Position);
+
+            return IsPlayerNearFoundationFortuneBot(player, botPositions, BotType.Selling);
+        }
+
+        private static bool CanPlayAudio(Player player)
+        {
+            if (LastAudioPlayTimes.TryGetValue(player, out DateTime lastPlayTime))
+            {
+                TimeSpan timeSinceLastPlay = DateTime.Now - lastPlayTime;
+                return timeSinceLastPlay >= CooldownDuration;
+            }
+
+            return true;
+        }
+
+        private static void UpdateLastAudioPlayTime(Player player) => LastAudioPlayTimes[player] = DateTime.Now;
+
+        private static bool IsPlayerNearFoundationFortuneBot(Player player, Dictionary<Npc, Vector3> botPositions,
+            BotType botType)
         {
             float botRadius = FoundationFortune.Singleton.Config.BuyingBotRadius;
-            foreach (var bot in from kvp in botPositions let bot = kvp.Key let botPosition = kvp.Value let distance = Vector3.Distance(player.Position, botPosition) where distance <= botRadius select bot)
+
+            foreach (var kvp in botPositions)
             {
-                switch (botType)
+                Npc bot = kvp.Key;
+                Vector3 botPosition = kvp.Value;
+                float distance = Vector3.Distance(player.Position, botPosition);
+
+                if (distance <= botRadius)
                 {
-                    case BotType.Buying when FoundationFortune.Singleton.BuyingBots.Any(x => x.Value.bot == bot):
-                    case BotType.Selling when FoundationFortune.Singleton.SellingBots.Any(x => x.Value.bot == bot):
-                        return true;
+                    switch (botType)
+                    {
+                        case BotType.Buying when FoundationFortune.Singleton.BuyingBots.Any(x => x.Value.bot == bot):
+                            var buyingSettings = FoundationFortune.Singleton.Config.FFNPCVoiceChatSettings
+                                .FirstOrDefault(x => x.VoiceChatUsageType == NPCVoiceChatUsageType.Buying);
+                            if (buyingSettings != null && CanPlayAudio(player))
+                            {
+                                AudioPlayer.PlayAudio(bot, buyingSettings.AudioFile, buyingSettings.Volume,buyingSettings.Loop, buyingSettings.VoiceChat);
+                                UpdateLastAudioPlayTime(bot); 
+                            }
+                            return true;
+                        case BotType.Selling when FoundationFortune.Singleton.SellingBots.Any(x => x.Value.bot == bot):
+                            var sellingSettings = FoundationFortune.Singleton.Config.FFNPCVoiceChatSettings
+                                .FirstOrDefault(x => x.VoiceChatUsageType == NPCVoiceChatUsageType.Selling);
+                            if (sellingSettings != null && CanPlayAudio(player))
+                            {
+                                AudioPlayer.PlayAudio(bot, sellingSettings.AudioFile, sellingSettings.Volume, loop: sellingSettings.Loop, sellingSettings.VoiceChat);
+                                UpdateLastAudioPlayTime(bot);
+                            }
+                            return true;
+                    }
                 }
             }
             return false;
         }
-
+        
         private static Npc GetNearestFoundationFortuneBot(Player player, Dictionary<Npc, Vector3> botPositions, BotType botType)
         {
             float botRadius = FoundationFortune.Singleton.Config.BuyingBotRadius;

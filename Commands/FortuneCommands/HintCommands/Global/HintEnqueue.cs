@@ -39,10 +39,13 @@ namespace FoundationFortune.Commands.FortuneCommands.HintCommands.Global
             if (args.Count > 3)
             {
                 string alignmentStr = args.At(3).ToLower();
-                if (alignmentStr == "left") alignment = HintAnim.Left;
-                else if (alignmentStr == "right") alignment = HintAnim.Right;
-                else if (alignmentStr == "center") alignment = HintAnim.Center;
-                else alignment = HintAnim.None;
+                alignment = alignmentStr switch
+                {
+                    "left" => HintAnim.Left,
+                    "right" => HintAnim.Right,
+                    "center" => HintAnim.Center,
+                    _ => HintAnim.None
+                };
             }
 
             switch (target)

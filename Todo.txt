@@ -1,32 +1,28 @@
 ﻿## TODO 
 the server crashes when moving money on the extraction event after the 10 second countdown
 bots still count towards the chaos target counter
-save all perks except ethereal intervention when using it at the player's death, dont save blissful unawareness however.
-fix ff_hintopacity only getting the first string of the hint, so like "this is a hint", the opacity command would only affect "this" not the rest
-fix sell success hints not displaying as well, along with their audio, nor are they giving any sort of money.
 ff_togglehintsystem always disables
+ok so now it plays the audios when in proximity of a buying bot or selling bot, but the cooldown doesnt like, work.
+for blissful unawareness make the hp and ahp counter go up and increase exponentially when the second coroutine starts playing, just a little funny thing.
 
-
-## Audio player stuff (FUCK YOU AUDIO PLAYER)
+## FINISHED:
 the audio player feature of blissful unawareness nor ethereal intervention do not work, not sure why, might be a music bot issue
 play an audio for when a player is within a buying bot or selling bot's radius, something intended a long time ago
 fix buy success hints not displaying along with their audio, odd..
+=> fixed by literally UPDATING THE DLL!!!!!!!!!
 
+save all perks except ethereal intervention when using it at the player's death, dont save blissful unawareness however.
+=> done
 
-## Idk mate
-fix newlines with the buy list command
--> I don't see the issue? Might be stupid though
+fix sell success hints not displaying as well, along with their audio, nor are they giving any sort of money.
+=> fixed the hints and money
 
-fix the bots not working for players that have their hint system toggled off using ff_togglehintsystem
--> Works for me..? Or am I stupid
+fix ff_hintopacity only getting the first string of the hint, so like "this is a hint", the opacity command would only affect "this" not the rest
+=> removed it
 
-perk bottles still display the picked up item thing from exiled even if i clearly turned it off
--> Exiled.CustomItems issues 
-
-
-## FINISHED:
 make an auto downloader that gets audio assets from a github repo so server owners dont have to download the audio files themselves, should be easy enough
 -> Done but can be improved a LOT
+=> just did it 
 
 temporarily remove ff_hintanim
 -> Literally just commented it out
@@ -43,3 +39,12 @@ add "invalid item" response when the player didnt input anything that matches th
 
 add translations for perk bottles 
 -> yessss!
+
+fix newlines with the buy list command
+-> I don't see the issue? Might be stupid though
+
+fix the bots not working for players that have their hint system toggled off using ff_togglehintsystem
+-> Works for me..? Or am I stupid
+
+perk bottles still display the picked up item thing from exiled even if i clearly turned it off
+-> Exiled.CustomItems issues 

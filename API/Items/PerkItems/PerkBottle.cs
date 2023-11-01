@@ -61,22 +61,15 @@ namespace FoundationFortune.API.Items.PerkItems
         public static void GivePerkBottle(Player player, PerkType perkType)
         {
 	        if (!TrySpawn(331, player.Position, out Pickup perkBottle)) return;
-	        if (perkBottle != null)
-	        {
-		        Log.Debug(
-			        $"Spawned Perk Bottle at Pos:{perkBottle.Position} Serial: {perkBottle.Serial}, PerkType: {perkType}");
-		        DroppedPerkBottles[perkBottle.Serial] = (perkType, player);
-	        }
+	        if (perkBottle == null) return;
+	        
+	        Log.Debug($"Spawned Perk Bottle at Pos:{perkBottle.Position} Serial: {perkBottle.Serial}, PerkType: {perkType}");
+	        DroppedPerkBottles[perkBottle.Serial] = (perkType, player);
         }
 
         protected override void OnAcquired(Player player, Item item, bool displayMessage)
         {
 	        base.OnAcquired(player, item, false);
-        }
-
-        protected override void OnChanging(ChangingItemEventArgs ev)
-        {
-	        base.OnChanging(ev);
         }
 
         public static void GetHeldBottle(Player player, ref StringBuilder stringbuilder)

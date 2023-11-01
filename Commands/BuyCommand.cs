@@ -15,7 +15,7 @@ namespace FoundationFortune.Commands
 	public sealed class BuyCommand : ICommand
 	{
 		public string Command { get; } = "buy";
-		public string[] Aliases { get; } = new string[] { "b" };
+		public string[] Aliases { get; } = new string[] { string.Empty };
 		public string Description { get; } = "Buy items, wow.";
 
 		public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
@@ -33,30 +33,20 @@ namespace FoundationFortune.Commands
 				response = GetList();
 				return false;
 			}
-
-			Log.Debug($"Input argument: {arguments.At(0)}");
-
+			
 			if (Enum.TryParse(arguments.At(0), ignoreCase: true, out PerkType perkType) && perkType == PerkType.ResurgenceBeacon || FoundationFortune.Singleton.Config.PerkItems.Any(p => p.PerkType == PerkType.ResurgenceBeacon && arguments.At(0).ToLower() == p.Alias.ToLower()))
 			{
-				if (arguments.Count < 2)
-				{
-					response = "You must specify a valid player to revive!";
-					return false;
-				}
-				if (TryPurchaseRevivalPerk(player, string.Join(" ", arguments.Skip(0).Skip(1)), out response)) return true;
-				else return false;
-			}
-			else if (TryPurchasePerk(player, arguments.At(0), out response) || TryPurchaseItem(player, arguments.At(0), out response))
-			{
-				Log.Debug("Successfully bought perk: " + arguments.At(0));
-				return true;
+				if (arguments.Count >= 2) return TryPurchaseRevivalPerk(player, string.Join(" ", arguments.Skip(0).Skip(1)), out response);
+				response = "You must specify a valid player to revive!";
+				return false;
 			}
 
+			if (TryPurchasePerk(player, arguments.At(0), out response) || TryPurchaseItem(player, arguments.At(0), out response)) return true;
 			if(response == string.Empty) response = GetList();
 			return false;
 		}
 
-		private bool TryPurchaseRevivalPerk(Player player, string targetName, out string response)
+		private static bool TryPurchaseRevivalPerk(Player player, string targetName, out string response)
 		{
 			int revivalPerkPrice = FoundationFortune.Singleton.Config.PerkItems
 				.Where(perk => perk.PerkType == PerkType.ResurgenceBeacon)
@@ -100,24 +90,12 @@ namespace FoundationFortune.Commands
 				return true;
 			}
 
-			if(perkItem == null) 
-				response = "That is not a valid perk to buy!";
-			else if(ExceedsPerkLimit(player, perkItem)) 
-				response = $"You have exceeded the Item Limit for the Perk '{perkItem.DisplayName}'";
-			else
-				response = "You do not have enough money to buy that!";
+			if (perkItem == null) response = "That is not a valid perk to buy!";
+			else if (ExceedsPerkLimit(player, perkItem)) response = $"You have exceeded the Perk Limit for the Perk '{perkItem.DisplayName}'";
+			else response = "You do not have enough money to buy that perk.";
 
 			response = "That is not a purchasable perk or you do not have enough money";
 			return false;
-			
-			// if(buyItem == null) 
-			// 	response = "That is not a valid item to buy!";
-			// else if(ExceedsItemLimit(player, buyItem)) 
-			// 	response = $"You have exceeded the Item Limit for the Item '{buyItem.DisplayName}'";
-			// else
-			// 	response = "You do not have enough money to buy that!";
-			//
-			// return false;
 		}
 
 		private static bool TryPurchaseItem(Player player, string aliasOrEnum, out string response)
@@ -139,12 +117,9 @@ namespace FoundationFortune.Commands
 				return true;
 			}
 			
-			if(buyItem == null) 
-				response = "That is not a valid item to buy!";
-			else if(ExceedsItemLimit(player, buyItem)) 
-				response = $"You have exceeded the Item Limit for the Item '{buyItem.DisplayName}'";
-			else
-				response = "You do not have enough money to buy that!";
+			if (buyItem == null) response = "That is not a valid item to buy!";
+			else if (ExceedsItemLimit(player, buyItem)) response = $"You have exceeded the Item Limit for the Item '{buyItem.DisplayName}'";
+			else response = "You do not have enough money to buy that item.";
 			
 			return false;
 		}
@@ -175,7 +150,7 @@ namespace FoundationFortune.Commands
 				   .Replace("%perkItemPrice%", perkItem.Price.ToString())
 				   .Replace("%perkItemDescription%", perkItem.Description)));
 
-			return $"That is not a valid item to purchase!\nItems available for purchase: {itemsList} \nPerks available for purchase:{perksList}";
+			return $"That is not a valid item to purchase!\nItems available for purchase:\n {itemsList} \n\nPerks available for purchase:\n{perksList}";
 		}
 
 		private static bool ExceedsPerkLimit(Player player, PerkItem perkItem)

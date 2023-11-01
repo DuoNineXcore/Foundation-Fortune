@@ -16,7 +16,6 @@ namespace FoundationFortune.API.Database
         public static bool GetHintMinmode(string userId) => PlayersCollection.FindOne(p => p.UserId == userId)?.HintMinmode ?? false;
         public static bool GetHintDisable(string userId) => PlayersCollection.FindOne(p => p.UserId == userId)?.HintSystem ?? false;
         public static bool GetPluginAdmin(string userId) => PlayersCollection.FindOne(p => p.UserId == userId)?.HintAdmin ?? false;
-        public static int GetHintAlpha(string userId) => PlayersCollection.FindOne(p => p.UserId == userId)?.HintOpacity ?? 50;
         public static int GetHintLimit(string userId) => PlayersCollection.FindOne(p => p.UserId == userId)?.HintLimit ?? 5;
         public static int GetHintSize(string userId) => PlayersCollection.FindOne(p => p.UserId == userId)?.HintSize ?? 25;
         public static HintAnim GetHintAnim(string userId) => PlayersCollection.FindOne(p => p.UserId == userId)?.HintAnim ?? HintAnim.None;
@@ -24,7 +23,6 @@ namespace FoundationFortune.API.Database
 
         //player setter methods
         public static bool ToggleHintMinmode(string userId, bool enable) => UpdatePlayerProperty(userId, p => p.HintMinmode, (p, v) => p.HintMinmode = v, enable);
-        public static void SetHintOpacity(string userId, int hintAlpha) => UpdatePlayerProperty(userId, p => p.HintOpacity, (p, v) => p.HintOpacity = v, hintAlpha);
         public static void SetHintLimit(string userId, int hintLimit) => UpdatePlayerProperty(userId, p => p.HintLimit, (p, v) => p.HintLimit = v, hintLimit);
         public static void SetHintSize(string userId, int hintSize) => UpdatePlayerProperty(userId, p => p.HintSize, (p, v) => p.HintSize = v, hintSize);
         public static bool SetHintAnim(string userId, HintAnim hintAnim) => UpdatePlayerProperty(userId, p => p.HintAnim, (p, v) => p.HintAnim = v, hintAnim);

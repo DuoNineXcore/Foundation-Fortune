@@ -1,4 +1,5 @@
-﻿using Exiled.API.Features;
+﻿using System;
+using Exiled.API.Features;
 using FoundationFortune.API.Database;
 using MEC;
 using System.Collections.Generic;
@@ -34,7 +35,6 @@ namespace FoundationFortune.API.HintSystem
                     int moneySaved = PlayerDataRepository.GetMoneySaved(ply.UserId);
 
                     HintAlign hintAlignment = PlayerDataRepository.GetHintAlign(ply.UserId);
-                    int hintAlpha = PlayerDataRepository.GetHintAlpha(ply.UserId);
                     int hintSize = PlayerDataRepository.GetHintSize(ply.UserId);
 
                     StringBuilder hintMessageBuilder = new();
@@ -80,7 +80,7 @@ namespace FoundationFortune.API.HintSystem
                     string recentAnimatedHintsText = GetAnimatedHints(ply.UserId);
                     if (!string.IsNullOrEmpty(recentAnimatedHintsText)) hintMessageBuilder.Append(recentAnimatedHintsText);
 
-                    ply.ShowHint($"{IntToHexAlpha(hintAlpha)}<size={hintSize}><align={hintAlignment}>{hintMessageBuilder}</align>", 2);
+                    ply.ShowHint($"<size={hintSize}><align={hintAlignment}>{hintMessageBuilder}</align>", 2);
 
                     if (!confirmSell.ContainsKey(ply.UserId) || !(Time.time - dropTimestamp[ply.UserId] >=
                                                                   FoundationFortune.Singleton.Config
@@ -93,7 +93,7 @@ namespace FoundationFortune.API.HintSystem
             }
         }
 
-        public string GetRecentHints(string userId)
+        private string GetRecentHints(string userId)
 		{
 			if (!recentHints.TryGetValue(userId, out var hint)) return string.Empty;
 			var currentHints = hint
@@ -103,7 +103,7 @@ namespace FoundationFortune.API.HintSystem
 			return string.Join("\n", currentHints);
 		}
 
-		public string GetAnimatedHints(string userId)
+        private string GetAnimatedHints(string userId)
 		{
 			if (!recentHints.TryGetValue(userId, out var hint)) return string.Empty;
 			var currentHints = hint
@@ -117,10 +117,18 @@ namespace FoundationFortune.API.HintSystem
 		{
 			Log.Debug($"Enqueuing non-animated hint for player {player.UserId}");
 
-			float expirationTime = Time.time + duration;
-			if (!recentHints.ContainsKey(player.UserId)) recentHints[player.UserId] = new Queue<HintEntry>();
-			recentHints[player.UserId].Enqueue(new HintEntry(hint, expirationTime, false));
-			while (recentHints[player.UserId].Count > PlayerDataRepository.GetHintLimit(player.UserId)) recentHints[player.UserId].Dequeue();
+			try
+			{
+				float expirationTime = Time.time + duration;
+				if (!recentHints.ContainsKey(player.UserId)) recentHints[player.UserId] = new Queue<HintEntry>();
+				recentHints[player.UserId].Enqueue(new HintEntry(hint, expirationTime, false));
+				while (recentHints[player.UserId].Count > PlayerDataRepository.GetHintLimit(player.UserId))
+					recentHints[player.UserId].Dequeue();
+			}
+			catch (Exception ex)
+			{
+				Log.Info(ex);
+			}
 		}
 
 		public void EnqueueHint(Player player, string hint, float duration, HintAnim align)

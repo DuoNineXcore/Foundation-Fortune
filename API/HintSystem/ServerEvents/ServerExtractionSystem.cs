@@ -113,11 +113,9 @@ namespace FoundationFortune.API.HintSystem
 		        while (IsPlayerInExtractionRoom(player, activeExtractionRoom))
 		        {
 			        int totalMoneyOnHold = PlayerDataRepository.GetMoneyOnHold(player.UserId);
-			        if (totalMoneyOnHold > 0)
-			        {
-				        PlayerDataRepository.TransferMoney(player.UserId, true);
-				        Log.Debug($"Transferred {totalMoneyOnHold} money to player {player.UserId}");
-			        }
+			        if (totalMoneyOnHold <= 0) continue;
+			        PlayerDataRepository.TransferMoney(player.UserId, true);
+			        Log.Debug($"Transferred {totalMoneyOnHold} money to player {player.UserId}");
 		        }
 
 		        Log.Debug($"Money extraction finished for player {player.UserId}");

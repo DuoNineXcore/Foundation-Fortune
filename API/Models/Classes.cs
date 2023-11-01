@@ -137,6 +137,7 @@ namespace FoundationFortune.API.Models
         public VoiceChatChannel VoiceChat { get; set; }
         public byte Volume { get; set; }
         public string AudioFile { get; set; }
+        public BotType BotType { get; set; }
         public NPCVoiceChatUsageType VoiceChatUsageType { get; set; }
         public bool Loop { get; set; }
     }
@@ -176,7 +177,6 @@ namespace FoundationFortune.API.Models
         public string UserId { get; set; }
         public int MoneyOnHold { get; set; }
         public int MoneySaved { get; set; }
-        public int HintOpacity { get; set; }
         public int HintSize { get; set; }
         public int HintLimit { get; set; }
         public bool HintMinmode { get; set; }
