@@ -39,10 +39,10 @@ namespace FoundationFortune.Commands.FortuneCommands.AdminCommands.BountyCommand
                 return false;
             }
 
-            var bountiedPlayer = FoundationFortune.Singleton.ServerEvents.BountiedPlayers.FirstOrDefault(bounty => bounty.Player == player && bounty.IsBountied);
+            var bountiedPlayer = FoundationFortune.Singleton.FoundationFortuneAPI.BountiedPlayers.FirstOrDefault(bounty => bounty.Player == player && bounty.IsBountied);
             if (bountiedPlayer != null)
             {
-                FoundationFortune.Singleton.ServerEvents.StopBounty(player);
+                FoundationFortune.Singleton.FoundationFortuneAPI.StopBounty(player);
                 response = $"Bounty removed from {player.Nickname}.";
                 return true;
             }

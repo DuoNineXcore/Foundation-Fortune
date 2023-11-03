@@ -46,7 +46,7 @@ namespace FoundationFortune.Commands.FortuneCommands.AdminCommands.BountyCommand
             }
 
             TimeSpan bountyDuration = TimeSpan.FromSeconds(durationInSeconds);
-            FoundationFortune.Singleton.ServerEvents.AddBounty(player, bountyAmount, bountyDuration);
+            FoundationFortune.Singleton.FoundationFortuneAPI.AddBounty(player, bountyAmount, bountyDuration);
             response = $"Bounty of ${bountyAmount} added to {player.Nickname} for {durationInSeconds} seconds.";
             return true;
         }

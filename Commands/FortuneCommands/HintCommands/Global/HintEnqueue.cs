@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using FoundationFortune.API.Models;
+using FoundationFortune.API.Models.Enums;
 
 namespace FoundationFortune.Commands.FortuneCommands.HintCommands.Global
 {
@@ -53,20 +54,20 @@ namespace FoundationFortune.Commands.FortuneCommands.HintCommands.Global
                 case "self":
                 {
                     Player player = Player.Get(sender);
-                    FoundationFortune.Singleton.ServerEvents.EnqueueHint(player, hint, duration, alignment);
+                    FoundationFortune.Singleton.FoundationFortuneAPI.EnqueueHint(player, hint, duration, alignment);
                     response = "Hint broadcasted successfully.";
                     break;
                 }
                 case "all":
                 {
-                    foreach (Player ply in Player.List.Where(p => !p.IsNPC)) FoundationFortune.Singleton.ServerEvents.EnqueueHint(ply, hint, duration, alignment);
+                    foreach (Player ply in Player.List.Where(p => !p.IsNPC)) FoundationFortune.Singleton.FoundationFortuneAPI.EnqueueHint(ply, hint, duration, alignment);
                     response = "Hint broadcasted successfully.";
                     break;
                 }
                 default:
                 {
                     Player steamId = Player.Get(target);
-                    FoundationFortune.Singleton.ServerEvents.EnqueueHint(steamId, hint, duration, alignment);
+                    FoundationFortune.Singleton.FoundationFortuneAPI.EnqueueHint(steamId, hint, duration, alignment);
                     response = $"Hint broadcasted successfully.";
                     break;
                 }

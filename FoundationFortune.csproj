@@ -62,13 +62,35 @@
   <ItemGroup>
     <Compile Include="API\AudioPlayer.cs" />
     <Compile Include="API\CoroutineManager.cs" />
+    <Compile Include="API\Events\EventArgs\UsedFoundationFortuneNPCEventArgs.cs" />
+    <Compile Include="API\Events\Handlers\FoundationFortuneNPCs.cs" />
+    <Compile Include="API\FoundationFortuneAPI.cs" />
     <Compile Include="API\HintSystem\ServerEvents\ServerBountySystem.cs" />
     <Compile Include="API\HintSystem\ServerEvents\ServerExtractionSystem.cs" />
     <Compile Include="API\Items\CustomItems\DeathCoin.cs" />
     <Compile Include="API\Items\PerkItems\PerkBottle.cs" />
     <Compile Include="API\Items\PerkItems\ResurgenceBeacon.cs" />
-    <Compile Include="API\Models\Classes.cs" />
-    <Compile Include="API\Models\Enums.cs" />
+    <Compile Include="API\Models\Classes\Hints\HintEntry.cs" />
+    <Compile Include="API\Models\Classes\Items\BuyableItem.cs" />
+    <Compile Include="API\Models\Classes\Items\ObjectInteractions.cs" />
+    <Compile Include="API\Models\Classes\Items\PerkItem.cs" />
+    <Compile Include="API\Models\Classes\Items\SellableItem.cs" />
+    <Compile Include="API\Models\Classes\NPCs\BuyingBotSpawn.cs" />
+    <Compile Include="API\Models\Classes\NPCs\NPCVoiceChatSettings.cs" />
+    <Compile Include="API\Models\Classes\NPCs\PlayerMusicBotPair.cs" />
+    <Compile Include="API\Models\Classes\NPCs\SellingBotSpawn.cs" />
+    <Compile Include="API\Models\Classes\Player\PlayerData.cs" />
+    <Compile Include="API\Models\Classes\Player\PlayerVoiceChatSettings.cs" />
+    <Compile Include="API\Models\Classes\Events\Bounty.cs" />
+    <Compile Include="API\Models\Classes\Events\ExtractionTimerData.cs" />
+    <Compile Include="API\Models\Enums\Hints\HintAlign.cs" />
+    <Compile Include="API\Models\Enums\Hints\HintAnim.cs" />
+    <Compile Include="API\Models\Enums\NPCs\NpcType.cs" />
+    <Compile Include="API\Models\Enums\NPCs\NpcUsageOutcome.cs" />
+    <Compile Include="API\Models\Enums\NPCs\NpcVoiceChatUsageType.cs" />
+    <Compile Include="API\Models\Enums\Perks\PerkType.cs" />
+    <Compile Include="API\Models\Enums\Player\PlayerTeamConditions.cs" />
+    <Compile Include="API\Models\Enums\Player\PlayerVoiceChatUsageType.cs" />
     <Compile Include="API\NPCs\NPCHelperMethods.cs" />
     <Compile Include="API\Database\PlayerDataRepository.cs" />
     <Compile Include="API\NPCs\BuyingBot.cs" />
@@ -99,10 +121,8 @@
     <Compile Include="API\Perks\PerkSystem.cs" />
     <Compile Include="Configs\PluginConfigs.cs" />
     <Compile Include="API\HintSystem\HintSystem.cs" />
-    <Compile Include="API\NPCs\NPCInitialization.cs" />
     <Compile Include="EventHandlers.cs" />
     <Compile Include="Patches\Transpilers.cs" />
-    <Compile Include="API\HintSystem\HintSystemMethods.cs" />
     <Compile Include="MainClass.cs" />
     <Compile Include="Configs\PluginTranslations.cs" />
     <Compile Include="Patches\Postfixes.cs" />
@@ -112,7 +132,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="EXILED">
-      <Version>8.3.7</Version>
+      <Version>8.3.8</Version>
     </PackageReference>
     <PackageReference Include="Lib.Harmony">
       <Version>2.2.2</Version>

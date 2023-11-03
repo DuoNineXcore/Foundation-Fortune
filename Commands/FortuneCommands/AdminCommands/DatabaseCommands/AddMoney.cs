@@ -53,7 +53,7 @@ namespace FoundationFortune.Commands.FortuneCommands.AdminCommands.DatabaseComma
                     }
 
                     string SelfAddMoney = pluginTranslations.SelfAddMoney.Replace("%amount%", amount.ToString());
-                    FoundationFortune.Singleton.ServerEvents.EnqueueHint(ply, $"{SelfAddMoney}", 5f);
+                    FoundationFortune.Singleton.FoundationFortuneAPI.EnqueueHint(ply, $"{SelfAddMoney}", 5f);
                     PlayerDataRepository.ModifyMoney(ply.UserId, amount, false, addToHold, addToSaved);
                     response = $"Gave {amount} money to player '{ply}'.";
                     return true;
@@ -68,7 +68,7 @@ namespace FoundationFortune.Commands.FortuneCommands.AdminCommands.DatabaseComma
                     string AllAddMoney = pluginTranslations.AllAddMoney.Replace("%amount%", allAmount.ToString());
                     foreach (var player in Player.List)
                     {
-                        FoundationFortune.Singleton.ServerEvents.EnqueueHint(player, $"{AllAddMoney}", 5f);
+                        FoundationFortune.Singleton.FoundationFortuneAPI.EnqueueHint(player, $"{AllAddMoney}", 5f);
                         PlayerDataRepository.ModifyMoney(player.UserId, allAmount, true, addToHold, addToSaved);
                     }
                     response = $"Gave {allAmount} money to all players.";
@@ -83,7 +83,7 @@ namespace FoundationFortune.Commands.FortuneCommands.AdminCommands.DatabaseComma
 
                     var targetPlayer = Player.Get(addmoneytarget);
                     string SteamIDAddMoney = pluginTranslations.SteamIDAddMoney.Replace("%amount%", steamIdAmount.ToString());
-                    if (targetPlayer != null) FoundationFortune.Singleton.ServerEvents.EnqueueHint(targetPlayer, $"{SteamIDAddMoney}", 5f);
+                    if (targetPlayer != null) FoundationFortune.Singleton.FoundationFortuneAPI.EnqueueHint(targetPlayer, $"{SteamIDAddMoney}", 5f);
                     PlayerDataRepository.ModifyMoney(SteamIDAddMoney, steamIdAmount, true, true, false);
                     response = $"Gave {steamIdAmount} money to player '{addmoneytarget}'.";
                     return true;

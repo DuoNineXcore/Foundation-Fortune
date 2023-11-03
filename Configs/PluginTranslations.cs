@@ -2,6 +2,8 @@
 using Exiled.API.Interfaces;
 using System.ComponentModel;
 using FoundationFortune.API.Models;
+using FoundationFortune.API.Models.Enums;
+using FoundationFortune.API.Models.Enums.Perks;
 
 namespace FoundationFortune.Configs
 {
@@ -34,7 +36,7 @@ namespace FoundationFortune.Configs
 		};
 
 		[Description("Hint System Events")]
-		public string WrongBot { get; set; } = "<b><color=red>This is not a selling bot.</color></b>\\n";
+		public string WrongBot { get; set; } = "<b><color=red>Wrong Bot.</color></b>\\n";
 		public string SaleCancelled { get; set; } = "<b><color=red>Item changed. Sale canceled.</color></b>\\n";
 		public string SellSuccess { get; set; } = "<b><color=green>+%price%$</color> Sold %itemName%.</color></b>\\n";
 		public string ItemConfirmation { get; set; } = "<b>This item is worth <color=green>%price%</color>, Confirm sale? (%time% seconds left)</b>\\n</align>";
@@ -49,8 +51,8 @@ namespace FoundationFortune.Configs
 		public string DeathCoinPickup { get; set; } = "<b><color=green>+%coinValue%</color> Picked up Death Coin.</b>\\n";
 
 		[Description("Item and Perk list return messages.")]
-		public string ItemsList { get; set; } = "\\n%buyableItemDisplayName% (%buyableItemAlias%): $%buyableItemPrice%";
-		public string PerksList { get; set; } = "\\n%perkItemDisplayName% (%perkItemAlias%) - %perkItemDescription%: $%perkItemPrice%";
+		public string ItemsList { get; set; } = "%buyableItemDisplayName% (%buyableItemAlias%): $%buyableItemPrice%";
+		public string PerksList { get; set; } = "%perkItemDisplayName% (%perkItemAlias%) - %perkItemDescription%: $%perkItemPrice%";
 
 		[Description("Revival System Hints")]
 		public string RevivalNoDeadPlayer { get; set; } = "<b>No dead player with Name: '%targetName%' found nearby to revive.</b>\\n";
@@ -73,7 +75,7 @@ namespace FoundationFortune.Configs
 		public string SteamIDRemoveMoney { get; set; } = "<b><color=red>-$%amount%.</color> Admin Command.</b>\\n";
 
 		[Description("Perk bottles")]
-		public string DrankPerkBottle { get; set; } = "<b>You drank a <color=#FFC0CB>%type%</color> Perk bottle.</b>";
-		public string HoldingPerkBottle { get; set; } = "<b>You are holding a <color=#FFC0CB>%type%</color> perk bottle.</b>";
+		public string DrankPerkBottle { get; set; } = "<b>You drank a Perk bottle. [<color=#FFC0CB>%type%</color>]</b>";
+		public string HoldingPerkBottle { get; set; } = "<b>You are holding a Perk bottle. [<color=#FFC0CB>%type%</color>]</b>";
 	}
 }

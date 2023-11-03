@@ -14,18 +14,25 @@ using System.Collections.Generic;
 using FoundationFortune.API.Perks;
 using Exiled.API.Extensions;
 using Exiled.API.Enums;
-using FoundationFortune.API.Models;
+using FoundationFortune.API.Events.EventArgs;
+using FoundationFortune.API.Models.Classes.Items;
+using FoundationFortune.API.Models.Classes.NPCs;
+using FoundationFortune.API.Models.Classes.Player;
+using FoundationFortune.API.Models.Enums;
+using FoundationFortune.API.Models.Enums.NPCs;
+using FoundationFortune.API.Models.Enums.Perks;
+using FoundationFortune.API.Models.Enums.Player;
 using PlayerStatsSystem;
 
 // ReSharper disable once CheckNamespace
 // STFU!!!!!!!!!!!!!!!!
-namespace FoundationFortune.API.HintSystem
+namespace FoundationFortune.API
 {
 	/// <summary>
 	/// the leg
 	/// </summary>
-	public partial class ServerEvents
-	{
+	public partial class FoundationFortuneAPI
+	{ 
 		private readonly Dictionary<(LeadingTeam, Team?), (PlayerTeamConditions, string)> teamConditionsMap = new()
 	   {
 			{(LeadingTeam.FacilityForces, Team.FoundationForces), (PlayerTeamConditions.Winning, "#0080FF")},
@@ -36,8 +43,30 @@ namespace FoundationFortune.API.HintSystem
 			{(LeadingTeam.Draw, null), (PlayerTeamConditions.Draw, "#808080")}
 	   };
 
+		#region Foundation Fortune Events
+		public void UsedFoundationFortuneNPC(UsedFoundationFortuneNPCEventArgs ev)
+		{
+			NpcVoiceChatUsageType voiceChatUsageType = GetVoiceChatUsageType(ev.Type, ev.Outcome);
+
+			if (voiceChatUsageType == NpcVoiceChatUsageType.None) return;
+			
+			NPCVoiceChatSettings npcVoiceChatSettings = FoundationFortune.Singleton.Config.NPCVoiceChatSettings
+				.FirstOrDefault(settings => settings.VoiceChatUsageType == voiceChatUsageType);
+
+			if (npcVoiceChatSettings != null)
+			{
+				AudioPlayer.PlayAudio(ev.NPC, npcVoiceChatSettings.AudioFile, npcVoiceChatSettings.Volume,
+					npcVoiceChatSettings.Loop, npcVoiceChatSettings.VoiceChat);
+			}
+		}
+		#endregion
+		
+		#region EXILED Events
 		public void RoundStart()
 		{
+			if (FoundationFortune.Singleton.Config.FoundationFortuneNPCs) InitializeFoundationFortuneNPCs();
+			if (FoundationFortune.Singleton.Config.UseSellingWorkstation) InitializeWorkstationPositions();
+			
 			CoroutineManager.KillCoroutines();
 			CoroutineManager.Coroutines.Add(Timing.RunCoroutine(UpdateMoneyAndHints()));
 			CoroutineManager.Coroutines.Add(Timing.RunCoroutine(NPCHelperMethods.UpdateNpcDirection()));
@@ -48,11 +77,6 @@ namespace FoundationFortune.API.HintSystem
 				Timing.CallDelayed(extractionTime, StartExtractionEvent);
 				Log.Info($"Round Started. The first extraction will commence at T-{extractionTime} Seconds.");
 			}
-
-			InitializeWorkstationPositions();
-			
-			if (FoundationFortune.Singleton.Config.FoundationFortuneNPCs) InitializeFoundationFortuneNPCs();
-			else Log.Debug("Foundation Fortune NPCs have been disabled. Not spawning any.");
 		}
 
 		public void RegisterInDatabase(VerifiedEventArgs ev)
@@ -122,9 +146,10 @@ namespace FoundationFortune.API.HintSystem
 		{
 			var config = FoundationFortune.Singleton.Config;
 			var bountiedPlayer = BountiedPlayers.FirstOrDefault(bounty => bounty.Player == ev.Player && bounty.IsBountied);
-
+			
+			if (!ev.Player.IsNPC) AudioPlayer.StopAudio(ev.Player);
+			
 			PerkSystem.ClearConsumedPerks(ev.Player);
-
 			if (PerkSystem.ViolentImpulsesPlayers.Contains(ev.Attacker)) ev.Attacker.ReferenceHub.playerStats.GetModule<AhpStat>().ServerAddProcess(15f).DecayRate = 2.0f;
 
 			if (bountiedPlayer != null && ev.Attacker != null)
@@ -183,15 +208,15 @@ namespace FoundationFortune.API.HintSystem
 		public void SellingItem(DroppingItemEventArgs ev)
 		{
 			var translation = FoundationFortune.Singleton.Translation;
-			if (!IsPlayerOnSellingWorkstation(ev.Player) && !IsPlayerNearSellingBot(ev.Player))
+			if (!IsPlayerOnSellingWorkstation(ev.Player) && !NPCHelperMethods.IsPlayerNearSellingBot(ev.Player))
 			{
 				ev.IsAllowed = true;
 				return;
 			}
 
-			Npc sellingBot = GetNearestSellingBot(ev.Player);
+			Npc sellingBot = NPCHelperMethods.GetNearestSellingBot(ev.Player);
 
-			if (IsPlayerNearSellingBot(ev.Player))
+			if (NPCHelperMethods.IsPlayerNearSellingBot(ev.Player))
 			{
 				if (!confirmSell.ContainsKey(ev.Player.UserId))
 				{
@@ -217,11 +242,6 @@ namespace FoundationFortune.API.HintSystem
 
 							if (soldItem == ev.Item)
 							{
-								NPCVoiceChatSettings sellVoiceChatSettings = FoundationFortune.Singleton.Config.FFNPCVoiceChatSettings.FirstOrDefault(settings => settings.VoiceChatUsageType == NPCVoiceChatUsageType.Selling);
-								if (sellVoiceChatSettings != null)
-									AudioPlayer.PlayAudio(sellingBot, sellVoiceChatSettings.AudioFile,
-										sellVoiceChatSettings.Volume, sellVoiceChatSettings.Loop,
-										sellVoiceChatSettings.VoiceChat);
 								var str = FoundationFortune.Singleton.Translation.SellSuccess
 									.Replace("%price%", price.ToString())
 									.Replace("%itemName%", FoundationFortune.Singleton.Config.SellableItems.Find(x => x.ItemType == ev.Item.Type).DisplayName);
@@ -229,8 +249,15 @@ namespace FoundationFortune.API.HintSystem
 								PlayerDataRepository.ModifyMoney(ev.Player.UserId, price, false, true, false);
 								EnqueueHint(ev.Player, str, 3f);
 								ev.Player.RemoveItem(ev.Item);
+
+								SellableItem sellableItem = FoundationFortune.Singleton.Config.SellableItems.Find(x => x.ItemType == ev.Item.Type);
+								AddToPlayerLimits(ev.Player, sellableItem);
+
+								UsedFoundationFortuneNPCEventArgs usedFoundationFortuneNpcEventArgs = new(ev.Player, sellingBot, NpcType.Selling, NpcUsageOutcome.SellSuccess);
+								Events.Handlers.FoundationFortuneNPC.OnUsedFoundationFortuneNPC(usedFoundationFortuneNpcEventArgs);
 							}
 							else EnqueueHint(ev.Player, translation.SaleCancelled, 3f);
+							
 
 							itemsBeingSold.Remove(ev.Player.UserId);
 							ev.IsAllowed = true;
@@ -242,10 +269,8 @@ namespace FoundationFortune.API.HintSystem
 			else
 			{
 				ev.IsAllowed = true;
-				NPCVoiceChatSettings wrongBotSettings = FoundationFortune.Singleton.Config.FFNPCVoiceChatSettings.FirstOrDefault(settings => settings.VoiceChatUsageType == NPCVoiceChatUsageType.WrongBuyingBot);
-				if (wrongBotSettings != null)
-					AudioPlayer.PlayAudio(sellingBot, wrongBotSettings.AudioFile, wrongBotSettings.Volume,
-						wrongBotSettings.Loop, wrongBotSettings.VoiceChat);
+				UsedFoundationFortuneNPCEventArgs usedFoundationFortuneNpcEventArgs = new(ev.Player, sellingBot, NpcType.Selling, NpcUsageOutcome.WrongBot);
+				Events.Handlers.FoundationFortuneNPC.OnUsedFoundationFortuneNPC(usedFoundationFortuneNpcEventArgs);
 				EnqueueHint(ev.Player, FoundationFortune.Singleton.Translation.WrongBot, 3f);
 			}
 			ev.IsAllowed = true;
@@ -304,5 +329,6 @@ namespace FoundationFortune.API.HintSystem
         public void FuckYourAbility(ActivatingSenseEventArgs ev) { if (ev.Target != null && ev.Target.IsNPC) ev.IsAllowed = false; }
 		public void FuckYourOtherAbility(TriggeringBloodlustEventArgs ev) { if (ev.Target != null && ev.Target.IsNPC) ev.IsAllowed = false; }
         public void PreventBotsFromSpawningInWaves(RespawningTeamEventArgs ev) { foreach (Player player in ev.Players.Where(p => p.IsNPC)) ev.Players.Remove(player); }
-    }
+        #endregion
+	}
 }

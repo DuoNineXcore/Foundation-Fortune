@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using CentralAuth;
 using FoundationFortune.API.Models;
+using FoundationFortune.API.Models.Classes.NPCs;
 
 namespace FoundationFortune.API.NPCs
 {

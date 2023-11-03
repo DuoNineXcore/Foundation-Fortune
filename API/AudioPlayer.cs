@@ -54,10 +54,7 @@ namespace FoundationFortune.API
                 PlayAudio(ply, audioFile, volume, loop, channel);
                 Npc spawnedMusicBot = MusicBot.GetMusicBotByPlayer(ply);
                 var ap2 = AudioPlayerBase.Get(spawnedMusicBot.ReferenceHub);
-                Timing.CallDelayed(0.20f, delegate
-                {
-                    spawnedMusicBot.Role.Set(RoleTypeId.Spectator, SpawnReason.None);
-                });
+                Timing.CallDelayed(0.20f, delegate{spawnedMusicBot.Role.Set(RoleTypeId.Spectator, SpawnReason.None);});
                 ap2.Enqueue(path, -1);
                 ap2.LogDebug = false;
                 ap2.BroadcastChannel = VoiceChatChannel.Mimicry;

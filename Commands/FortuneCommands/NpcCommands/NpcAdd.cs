@@ -8,6 +8,7 @@ using Exiled.API.Features;
 using Exiled.Permissions.Extensions;
 using FoundationFortune.API.Models;
 using FoundationFortune.API.NPCs;
+using FoundationFortune.API.Models.Enums.NPCs;
 using MEC;
 using PlayerRoles;
 using RemoteAdmin;
@@ -22,7 +23,7 @@ namespace FoundationFortune.Commands.FortuneCommands.NpcCommands
         public string Command { get; } = "ff_addnpc";
         public string Description { get; } = "Add an NPC to the game.";
         public string[] Aliases { get; } = new string[] {};
-        public string[] Usage { get; } = new string[] { "<BotType> <Name> <Badge> <Color> <RoleTypeId> <HeldItemId> <ScaleX> <ScaleY> <ScaleZ>" };
+        public string[] Usage { get; } = new string[] { "<NpcType> <Name> <Badge> <Color> <RoleTypeId> <HeldItemId> <ScaleX> <ScaleY> <ScaleZ>" };
 
         public bool Execute(ArraySegment<string> args, ICommandSender sender, out string response)
         {
@@ -34,14 +35,14 @@ namespace FoundationFortune.Commands.FortuneCommands.NpcCommands
 
             if (args.Count < 10)
             {
-                response = "Usage: <BotType> <Name> <Badge> <Color> <Role> <HeldItem> <ScaleX> <ScaleY> <ScaleZ>";
+                response = "Usage: <NpcType> <Name> <Badge> <Color> <Role> <HeldItem> <ScaleX> <ScaleY> <ScaleZ>";
                 return false;
             }
 
-            string botTypeString = args.At(0);
-            if (!Enum.TryParse(botTypeString, true, out BotType botType))
+            string NpcTypeString = args.At(0);
+            if (!Enum.TryParse(NpcTypeString, true, out NpcType NpcType))
             {
-                response = "Invalid BotType specified.";
+                response = "Invalid NpcType specified.";
                 return false;
             }
 
@@ -66,16 +67,16 @@ namespace FoundationFortune.Commands.FortuneCommands.NpcCommands
             Vector3 scale = new(scaleX, scaleY, scaleZ);
 
             Npc bot = null;
-            switch (botType)
+            switch (NpcType)
             {
-                case BotType.Buying:
+                case NpcType.Buying:
                     bot = BuyingBot.SpawnBuyingBot(name, badge, color, role, heldItem, scale);
                     break;
-                case BotType.Selling:
+                case NpcType.Selling:
                     bot = SellingBot.SpawnSellingBot(name, badge, color, role, heldItem, scale);
                     break;
                 default:
-                    response = "Invalid BotType specified.";
+                    response = "Invalid NpcType specified.";
                     return false;
             }
 
@@ -90,7 +91,7 @@ namespace FoundationFortune.Commands.FortuneCommands.NpcCommands
                 Timing.CallDelayed(1f, delegate
                 {
                     bot.Teleport(self.ReferenceHub.gameObject.transform.position);
-                    FoundationFortune.Singleton.ServerEvents.buyingBotPositions.Add(bot, bot.Position);
+                    FoundationFortune.Singleton.FoundationFortuneAPI.buyingBotPositions.Add(bot, bot.Position);
                 });
 
                 response = $"BuyingBot '{name}' added successfully and teleported to your position.";

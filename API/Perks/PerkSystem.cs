@@ -4,9 +4,16 @@ using InventorySystem.Items.Usables.Scp330;
 using PlayerRoles;
 using System.Linq;
 using System;
+using System.Collections;
 using MEC;
 using System.Collections.Generic;
+using System.Text;
+using Exiled.API.Enums;
 using FoundationFortune.API.Models;
+using FoundationFortune.API.Models.Classes.Player;
+using FoundationFortune.API.Models.Enums;
+using FoundationFortune.API.Models.Enums.Perks;
+using FoundationFortune.API.Models.Enums.Player;
 using PlayerStatsSystem;
 using UnityEngine;
 
@@ -22,7 +29,17 @@ namespace FoundationFortune.API.Perks
 		public static readonly List<Player> EthericVitalityPlayers = new();
 
 		public static void ClearConsumedPerks(Player player) { if (FoundationFortune.Singleton.ConsumedPerks.TryGetValue(player, out var perk)) perk.Clear(); }
-
+		public static void UpdatePerkIndicator(Dictionary<Player, Dictionary<PerkType, int>> consumedPerks, ref StringBuilder perkIndicator)
+		{
+			foreach (var perkEntry in consumedPerks.SelectMany(playerPerks => playerPerks.Value))
+			{
+				var (perkType, count) = (perkEntry.Key, perkEntry.Value);
+				if (!FoundationFortune.Singleton.Translation.PerkCounterEmojis.TryGetValue(perkType, out var emoji)) continue;
+				perkIndicator.Append(count > 1 ? $"{emoji}x{count} " : $"{emoji} "); 
+			}
+			perkIndicator.AppendLine();
+		}
+		
         public static void GrantPerk(Player ply, PerkType perk)
 		{
 			switch (perk)
@@ -48,45 +65,65 @@ namespace FoundationFortune.API.Perks
 			}
 		}
 
-        public static void ConsumePerk(Player player, PerkType perkType)
-        {
-			var consumedPerks = FoundationFortune.Singleton.ConsumedPerks;
-            if (!consumedPerks.ContainsKey(player)) consumedPerks[player] = new Dictionary<PerkType, int>();
-            if (consumedPerks[player].ContainsKey(perkType)) consumedPerks[player][perkType]++;
-            else consumedPerks[player][perkType] = 1;
-        }
-
         private static IEnumerator<float> BlissfulUnawarenessCoroutine(Player ply)
 		{
-			Log.Debug("Blissful Unawareness 1st coroutine started.");
-			ply.EnableEffect<MovementBoost>(120);
-			ply.ChangeEffectIntensity<MovementBoost>(10);
+			ply.EnableEffect<RainbowTaste>(40);
+			
 			yield return Timing.WaitForSeconds(80f);
-            ply.EnableEffect<Blinded>(1);
-            
-            
-            Scp330Bag.AddSimpleRegeneration(ply.ReferenceHub, 5f, 50f);
-            Log.Debug("Blissful Unawareness 1st coroutine finished.");
-			Log.Debug("Blissful Unawareness 2nd coroutine started.");
-			PlayerVoiceChatSettings BlissfulUnawarenessSettings = FoundationFortune.Singleton.Config.PlayerVoiceChatSettings
-			    .FirstOrDefault(settings => settings.VoiceChatUsageType == PlayerVoiceChatUsageType.BlissfulUnawareness);
+
+			Timing.RunCoroutine(CircularOutHealingCoroutine(ply, 50f, 700f));
 			ply.EnableEffect<SoundtrackMute>(50f);
+			
+			PlayerVoiceChatSettings BlissfulUnawarenessSettings = FoundationFortune.Singleton.Config.PlayerVoiceChatSettings
+				.FirstOrDefault(settings => settings.VoiceChatUsageType == PlayerVoiceChatUsageType.BlissfulUnawareness);
 			if (BlissfulUnawarenessSettings != null)
 				AudioPlayer.PlaySpecialAudio(ply, BlissfulUnawarenessSettings.AudioFile,
 					BlissfulUnawarenessSettings.Volume, BlissfulUnawarenessSettings.Loop,
 					BlissfulUnawarenessSettings.VoiceChat);
 
-			yield return Timing.WaitForSeconds(41f);
-
-			Log.Debug("Blissful Unawareness 2nd coroutine finished.");
-			Map.Explode(ply.Position, Exiled.API.Enums.ProjectileType.Flashbang, ply);
-			Map.Explode(ply.Position, Exiled.API.Enums.ProjectileType.FragGrenade, ply);
+			yield return Timing.WaitForSeconds(1f);
+			
+			Map.Explode(ply.Position, ProjectileType.Flashbang, ply);
+			Map.Explode(ply.Position, ProjectileType.FragGrenade);
+			ply.Kill("Blissful Unawareness", "");
 		}
+        
+        private static IEnumerator<float> CircularOutHealingCoroutine(Player ply, float duration, float totalHealedHP)
+        {
+	        const float startHealingRate = 1f;
+	        const float endHealingRate = 20f;
 
-		public static bool ActivateResurgenceBeacon(Player reviver, string targetName)
+	        float elapsedTime = 0f;
+	        float totalHealed = 0f;
+
+	        while (elapsedTime < duration && totalHealed < totalHealedHP)
+	        {
+		        float t = elapsedTime / duration;
+		        float circularOutFactor = Mathf.Sqrt(1 - Mathf.Pow(t - 1, 2));
+		        float currentHealingRate = Mathf.Lerp(startHealingRate, endHealingRate, circularOutFactor);
+		        float healedThisFrame = currentHealingRate * Time.deltaTime;
+
+		        if (totalHealed + healedThisFrame > totalHealedHP) healedThisFrame = totalHealedHP - totalHealed;
+
+		        ply.Heal(healedThisFrame, true);
+		        ply.ArtificialHealth += healedThisFrame;
+
+		        elapsedTime += Time.deltaTime;
+		        totalHealed += healedThisFrame;
+
+		        yield return currentHealingRate;
+	        }
+
+	        ply.Heal(endHealingRate);
+	        ply.ArtificialHealth += endHealingRate;
+
+	        yield return endHealingRate;
+        }
+
+        public static void ActivateResurgenceBeacon(Player reviver, string targetName)
 		{
 			Player targetToRevive = Player.Get(targetName);
-			if (targetToRevive == null) return false;
+			if (targetToRevive == null) return;
 			if (targetToRevive.IsDead)
 			{
 				if (FoundationFortune.Singleton.Config.ResetRevivedInventory) targetToRevive.Role.Set(reviver.Role, RoleSpawnFlags.None);
@@ -95,21 +132,16 @@ namespace FoundationFortune.API.Perks
 				targetToRevive.Teleport(reviver.Position);
 				if (FoundationFortune.Singleton.Config.HuntReviver)
 				{
-					FoundationFortune.Singleton.ServerEvents.AddBounty(reviver, FoundationFortune.Singleton.Config.RevivalBountyKillReward, TimeSpan.FromSeconds(FoundationFortune.Singleton.Config.RevivalBountyTimeSeconds));
+					FoundationFortune.Singleton.FoundationFortuneAPI.AddBounty(reviver, FoundationFortune.Singleton.Config.RevivalBountyKillReward, TimeSpan.FromSeconds(FoundationFortune.Singleton.Config.RevivalBountyTimeSeconds));
 				}
 				foreach (var ply in Player.List.Where(p => !p.IsNPC))
 				{
-					FoundationFortune.Singleton.ServerEvents.EnqueueHint(ply, FoundationFortune.Singleton.Translation.RevivalSuccess.Replace("%rolecolor%", reviver.Role.Color.ToHex())
+					FoundationFortune.Singleton.FoundationFortuneAPI.EnqueueHint(ply, FoundationFortune.Singleton.Translation.RevivalSuccess.Replace("%rolecolor%", reviver.Role.Color.ToHex())
 					    .Replace("%nickname%", reviver.Nickname)
 					    .Replace("%target%", targetToRevive.Nickname), 3f);
 				}
-				return true;
 			}
-			else
-			{
-				FoundationFortune.Singleton.ServerEvents.EnqueueHint(reviver, FoundationFortune.Singleton.Translation.RevivalNoDeadPlayer.Replace("%targetName%", targetName), 3f);
-				return false;
-			}
+			else FoundationFortune.Singleton.FoundationFortuneAPI.EnqueueHint(reviver, FoundationFortune.Singleton.Translation.RevivalNoDeadPlayer.Replace("%targetName%", targetName), 3f);
 		}
 	}
 }

@@ -64,7 +64,7 @@ namespace FoundationFortune.Commands.FortuneCommands.AdminCommands.DatabaseComma
 
                         string SelfRemoveMoney = pluginTranslations.SelfRemoveMoney.Replace("%amount%", amount.ToString());
 
-                        FoundationFortune.Singleton.ServerEvents.EnqueueHint(ply, $"{SelfRemoveMoney}", 5f);
+                        FoundationFortune.Singleton.FoundationFortuneAPI.EnqueueHint(ply, $"{SelfRemoveMoney}", 5f);
                         response = $"Removed {amount} money from player '{ply}' (Saved: {subtractSaved}, On-Hold: {subtractOnHold}).";
                         return true;
 
@@ -80,7 +80,7 @@ namespace FoundationFortune.Commands.FortuneCommands.AdminCommands.DatabaseComma
                             foreach (var player in Player.List)
                             {
                                 string AllRemoveMoney = pluginTranslations.AllRemoveMoney.Replace("%amount%", allAmount.ToString());
-                                FoundationFortune.Singleton.ServerEvents.EnqueueHint(player, $"{AllRemoveMoney}", 5f);
+                                FoundationFortune.Singleton.FoundationFortuneAPI.EnqueueHint(player, $"{AllRemoveMoney}", 5f);
                                 PlayerDataRepository.ModifyMoney(player.UserId, allAmount, true, false, true);
                             }
                         }
@@ -96,7 +96,7 @@ namespace FoundationFortune.Commands.FortuneCommands.AdminCommands.DatabaseComma
                             foreach (var player in Player.List)
                             {
                                 string AllRemoveMoney = pluginTranslations.AllRemoveMoney.Replace("%amount%", allAmount.ToString());
-                                FoundationFortune.Singleton.ServerEvents.EnqueueHint(player, $"{AllRemoveMoney}", 5f);
+                                FoundationFortune.Singleton.FoundationFortuneAPI.EnqueueHint(player, $"{AllRemoveMoney}", 5f);
                                 PlayerDataRepository.ModifyMoney(player.UserId, allAmount, true, true, false);
                             }
                         }
@@ -120,7 +120,7 @@ namespace FoundationFortune.Commands.FortuneCommands.AdminCommands.DatabaseComma
                                 if (subtractOnHold) PlayerDataRepository.ModifyMoney(targetPlayer.UserId, steamIdAmount, true, false, true);
 
                                 string SteamIdRemoveMoney = pluginTranslations.SteamIDRemoveMoney.Replace("%amount%", steamIdAmount.ToString());
-                                FoundationFortune.Singleton.ServerEvents.EnqueueHint(targetPlayer, $"{SteamIdRemoveMoney}", 5f);
+                                FoundationFortune.Singleton.FoundationFortuneAPI.EnqueueHint(targetPlayer, $"{SteamIdRemoveMoney}", 5f);
                             }
                         }
 

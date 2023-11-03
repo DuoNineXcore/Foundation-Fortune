@@ -40,11 +40,9 @@ namespace FoundationFortune.API.NPCs
             Round.IgnoredPlayers.Add(spawnedBuyingBot.ReferenceHub);
             Timing.CallDelayed(0.5f, () =>
             {
-                if (HeldItem.HasValue)
-                {
-                    spawnedBuyingBot.ClearInventory();
-                    spawnedBuyingBot.CurrentItem = Item.Create((ItemType)HeldItem, spawnedBuyingBot);
-                }
+                if (!HeldItem.HasValue) return;
+                spawnedBuyingBot.ClearInventory();
+                spawnedBuyingBot.CurrentItem = Item.Create((ItemType)HeldItem, spawnedBuyingBot);
             });
             return spawnedBuyingBot;
         }

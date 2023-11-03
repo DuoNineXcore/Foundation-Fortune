@@ -2,10 +2,17 @@
 using System.Linq;
 using CommandSystem;
 using Exiled.API.Features;
+using Exiled.Events;
 using FoundationFortune.API.Database;
-using FoundationFortune.API.HintSystem;
+using FoundationFortune.API.Events.EventArgs;
+using FoundationFortune.API;
 using FoundationFortune.API.Items.PerkItems;
 using FoundationFortune.API.Models;
+using FoundationFortune.API.Models.Classes.Items;
+using FoundationFortune.API.Models.Enums;
+using FoundationFortune.API.Models.Enums.NPCs;
+using FoundationFortune.API.Models.Enums.Perks;
+using FoundationFortune.API.NPCs;
 using Utils.NonAllocLINQ;
 
 namespace FoundationFortune.Commands
@@ -22,7 +29,7 @@ namespace FoundationFortune.Commands
 		{
 			Player player = Player.Get(sender);
 
-			if (!FoundationFortune.Singleton.ServerEvents.IsPlayerOnSellingWorkstation(player) && !ServerEvents.IsPlayerNearBuyingBot(player))
+			if (!FoundationFortune.Singleton.FoundationFortuneAPI.IsPlayerOnSellingWorkstation(player) && !NPCHelperMethods.IsPlayerNearBuyingBot(player))
 			{
 				response = "You must be at a Selling Workstation / Buying Bot to buy an item.";
 				return false;
@@ -57,6 +64,8 @@ namespace FoundationFortune.Commands
 			{
 				if (ResurgenceBeacon.SpawnResurgenceBeacon(player, targetName))
 				{
+					UsedFoundationFortuneNPCEventArgs usedFoundationFortuneNpcEventArgs = new(player, NPCHelperMethods.GetNearestBuyingBot(player), NpcType.Buying, NpcUsageOutcome.BuySuccess);
+					API.Events.Handlers.FoundationFortuneNPC.OnUsedFoundationFortuneNPC(usedFoundationFortuneNpcEventArgs);
 					response = $"You have successfully bought a Resurgence Beacon for ${revivalPerkPrice} to revive '{targetName}'.";
 					return true;
 				}
@@ -81,18 +90,28 @@ namespace FoundationFortune.Commands
 				string boughtHint = FoundationFortune.Singleton.Translation.BuyItemSuccess
 						    .Replace("%itemAlias%", perkItem.Alias)
 						    .Replace("%itemPrice%", perkItem.Price.ToString());
-				FoundationFortune.Singleton.ServerEvents.EnqueueHint(player, boughtHint, 3f);
+				FoundationFortune.Singleton.FoundationFortuneAPI.EnqueueHint(player, boughtHint, 3f);
+				
 				PlayerDataRepository.ModifyMoney(player.UserId, perkItem.Price, true);
 				PerkBottle.GivePerkBottle(player, perkItem.PerkType);
-				ServerEvents.AddToPlayerLimits(player, perkItem);
+				FoundationFortuneAPI.AddToPlayerLimits(player, perkItem);
 
+				UsedFoundationFortuneNPCEventArgs usedFoundationFortuneNpcEventArgs = new(player, NPCHelperMethods.GetNearestBuyingBot(player), NpcType.Buying, NpcUsageOutcome.BuySuccess);
+				API.Events.Handlers.FoundationFortuneNPC.OnUsedFoundationFortuneNPC(usedFoundationFortuneNpcEventArgs);
+				
 				response = $"You have successfully bought {perkItem.DisplayName} for ${perkItem.Price}";
 				return true;
 			}
 
 			if (perkItem == null) response = "That is not a valid perk to buy!";
+			
 			else if (ExceedsPerkLimit(player, perkItem)) response = $"You have exceeded the Perk Limit for the Perk '{perkItem.DisplayName}'";
-			else response = "You do not have enough money to buy that perk.";
+			else
+			{
+				UsedFoundationFortuneNPCEventArgs usedFoundationFortuneNpcEventArgs = new(player, NPCHelperMethods.GetNearestBuyingBot(player), NpcType.Buying, NpcUsageOutcome.NotEnoughMoney);
+				API.Events.Handlers.FoundationFortuneNPC.OnUsedFoundationFortuneNPC(usedFoundationFortuneNpcEventArgs);
+				response = "You do not have enough money to buy that perk.";
+			}
 
 			response = "That is not a purchasable perk or you do not have enough money";
 			return false;
@@ -109,17 +128,27 @@ namespace FoundationFortune.Commands
 				string BoughtHint = FoundationFortune.Singleton.Translation.BuyItemSuccess
 				    .Replace("%itemAlias%", buyItem.Alias)
 				    .Replace("%itemPrice%", buyItem.Price.ToString());
-				FoundationFortune.Singleton.ServerEvents.EnqueueHint(player, $"{BoughtHint}", 3f);
+				FoundationFortune.Singleton.FoundationFortuneAPI.EnqueueHint(player, $"{BoughtHint}", 3f);
+				
 				PlayerDataRepository.ModifyMoney(player.UserId, buyItem.Price, true);
 				player.AddItem(buyItem.ItemType);
-				ServerEvents.AddToPlayerLimits(player, buyItem);
+				FoundationFortuneAPI.AddToPlayerLimits(player, buyItem);
+				
+				UsedFoundationFortuneNPCEventArgs usedFoundationFortuneNpcEventArgs = new(player, NPCHelperMethods.GetNearestBuyingBot(player), NpcType.Buying, NpcUsageOutcome.BuySuccess);
+				API.Events.Handlers.FoundationFortuneNPC.OnUsedFoundationFortuneNPC(usedFoundationFortuneNpcEventArgs);
+				
 				response = $"You have successfully bought {buyItem.DisplayName} for ${buyItem.Price}";
 				return true;
 			}
-			
-			if (buyItem == null) response = "That is not a valid item to buy!";
+
+			if (buyItem == null) { response = "That is not a valid item to buy!"; }
 			else if (ExceedsItemLimit(player, buyItem)) response = $"You have exceeded the Item Limit for the Item '{buyItem.DisplayName}'";
-			else response = "You do not have enough money to buy that item.";
+			else
+			{
+				UsedFoundationFortuneNPCEventArgs usedFoundationFortuneNpcEventArgs = new(player, NPCHelperMethods.GetNearestBuyingBot(player), NpcType.Buying, NpcUsageOutcome.NotEnoughMoney);
+				API.Events.Handlers.FoundationFortuneNPC.OnUsedFoundationFortuneNPC(usedFoundationFortuneNpcEventArgs);
+				response = "You do not have enough money to buy that item.";
+			}
 			
 			return false;
 		}

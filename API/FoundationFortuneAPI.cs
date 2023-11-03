@@ -1,42 +1,27 @@
-﻿using System;
-using MEC;
-using UnityEngine;
-using Exiled.API.Features;
-using FoundationFortune.API.NPCs;
-using System.Linq;
+﻿using Exiled.API.Features;
 using System.Collections.Generic;
-using FoundationFortune.API.Perks;
+using System.Linq;
+using UnityEngine;
+using InventorySystem.Items.Firearms.Attachments;
+using Random = UnityEngine.Random;
+using System.Text;
 using Exiled.API.Enums;
 using Exiled.API.Features.Doors;
-using System.Text;
-using FoundationFortune.API.Models;
-using Random = UnityEngine.Random;
+using FoundationFortune.API.Models.Classes.Items;
+using FoundationFortune.API.Models.Classes.NPCs;
+using FoundationFortune.API.Models.Enums.NPCs;
+using FoundationFortune.API.NPCs;
+using FoundationFortune.API.Perks;
+using MEC;
 
-namespace FoundationFortune.API.HintSystem
+// ReSharper disable once CheckNamespace
+namespace FoundationFortune.API
 {
-    public partial class ServerEvents
-    {
-        public Dictionary<Npc, Vector3> buyingBotPositions = new();
-        public Dictionary<Npc, Vector3> sellingBotPositions = new();
-        public Dictionary<Npc, Vector3> musicBotPositions = new();
-
-        public static Npc GetNearestBuyingBot(Player player)
-        {
-            var botPositions = FoundationFortune.Singleton.BuyingBots
-                .Where(kvp => kvp.Value.bot != null)
-                .ToDictionary(kvp => kvp.Value.bot, kvp => kvp.Value.bot.Position);
-
-            return GetNearestFoundationFortuneBot(player, botPositions, BotType.Buying);
-        }
-
-        public static Npc GetNearestSellingBot(Player player)
-        {
-            var botPositions = FoundationFortune.Singleton.SellingBots
-                .Where(kvp => kvp.Value.bot != null)
-                .ToDictionary(kvp => kvp.Value.bot, kvp => kvp.Value.bot.Position);
-
-            return GetNearestFoundationFortuneBot(player, botPositions, BotType.Selling);
-        }
+	public partial class FoundationFortuneAPI
+	{
+        #region NPCs
+        public readonly Dictionary<Npc, Vector3> buyingBotPositions = new();
+        private readonly Dictionary<Npc, Vector3> sellingBotPositions = new();
 
         private void InitializeFoundationFortuneNPCs()
         {
@@ -60,7 +45,6 @@ namespace FoundationFortune.API.HintSystem
 
                 if (FoundationFortune.Singleton.Config.BuyingBotFixedLocation)
                 {
-                    Log.Debug($"Bots spawned.");
                     var rooms = FoundationFortune.Singleton.Config.BuyingBotSpawnSettings.Select(location => location.Room).ToList();
 
                     foreach (var kvp in FoundationFortune.Singleton.BuyingBots)
@@ -86,7 +70,6 @@ namespace FoundationFortune.API.HintSystem
                 }
                 else
                 {
-                    Log.Debug($"Bots spawned randomly.");
                     var rooms = Room.List.Where(r => FoundationFortune.Singleton.Config.BuyingBotRandomRooms.Contains(r.Type)).ToList();
                     var availableIndexes = Enumerable.Range(0, rooms.Count).ToList();
 
@@ -156,6 +139,7 @@ namespace FoundationFortune.API.HintSystem
                             Timing.CallDelayed(1f, () =>
                             {
                                 bot.Teleport(Position);
+                                bot.IsGodModeEnabled = true;
                                 sellingBotPositions[bot] = bot.Position;
                                 Log.Debug($"Teleported Selling Bot with indexation {indexation} to room {roomType}, Pos: {bot.Position}, Rot: {bot.Rotation}");
                             });
@@ -187,6 +171,7 @@ namespace FoundationFortune.API.HintSystem
                             Timing.CallDelayed(1f, () =>
                             {
                                 bot.Teleport(position);
+                                bot.IsGodModeEnabled = true;
                                 sellingBotPositions[bot] = bot.Position;
                                 Log.Debug($"Teleported Selling Bot to room {roomType}, Pos: {bot.Position}, Rot: {bot.Rotation}");
                             });
@@ -197,13 +182,25 @@ namespace FoundationFortune.API.HintSystem
             }
         }
 
+        private static NpcVoiceChatUsageType GetVoiceChatUsageType(NpcType npcType, NpcUsageOutcome outcome)
+        {
+            return outcome switch
+            {
+                NpcUsageOutcome.SellSuccess when npcType == NpcType.Selling => NpcVoiceChatUsageType.Selling,
+                NpcUsageOutcome.BuySuccess when npcType == NpcType.Buying => NpcVoiceChatUsageType.Buying,
+                NpcUsageOutcome.NotEnoughMoney when npcType == NpcType.Buying => NpcVoiceChatUsageType.NotEnoughMoney,
+                NpcUsageOutcome.WrongBot when npcType is NpcType.Buying or NpcType.Selling => NpcVoiceChatUsageType.WrongBot,
+                _ => NpcVoiceChatUsageType.None
+            };
+        }
+
+        #endregion
+
+        #region Hint System
         private void UpdateNpcProximityMessages(Player ply, ref StringBuilder hintMessage)
         {
-            Npc buyingBot = GetNearestBuyingBot(ply);
-            Npc sellingBot = GetNearestSellingBot(ply);
-
-            if (IsPlayerNearBuyingBot(ply)) hintMessage.Append($"{FoundationFortune.Singleton.Translation.BuyingBot}");
-            else if (IsPlayerNearSellingBot(ply))
+            if (NPCHelperMethods.IsPlayerNearBuyingBot(ply)) hintMessage.Append($"{FoundationFortune.Singleton.Translation.BuyingBot}");
+            else if (NPCHelperMethods.IsPlayerNearSellingBot(ply))
             {
                 if (!confirmSell.ContainsKey(ply.UserId)) hintMessage.Append($"{FoundationFortune.Singleton.Translation.SellingBot}");
                 else if (confirmSell[ply.UserId])
@@ -221,96 +218,15 @@ namespace FoundationFortune.API.HintSystem
                 }
             }
         }
-
-        private static Dictionary<Player, DateTime> LastAudioPlayTimes = new Dictionary<Player, DateTime>();
-        private static TimeSpan CooldownDuration = TimeSpan.FromMinutes(2);
-
-        public static bool IsPlayerNearBuyingBot(Player player)
-        {
-            var botPositions = FoundationFortune.Singleton.BuyingBots
-                .Where(kvp => kvp.Value.bot != null)
-                .ToDictionary(kvp => kvp.Value.bot, kvp => kvp.Value.bot.Position);
-
-            return IsPlayerNearFoundationFortuneBot(player, botPositions, BotType.Buying);
-        }
-
-        public static bool IsPlayerNearSellingBot(Player player)
-        {
-            var botPositions = FoundationFortune.Singleton.SellingBots
-                .Where(kvp => kvp.Value.bot != null)
-                .ToDictionary(kvp => kvp.Value.bot, kvp => kvp.Value.bot.Position);
-
-            return IsPlayerNearFoundationFortuneBot(player, botPositions, BotType.Selling);
-        }
-
-        private static bool CanPlayAudio(Player player)
-        {
-            if (LastAudioPlayTimes.TryGetValue(player, out DateTime lastPlayTime))
-            {
-                TimeSpan timeSinceLastPlay = DateTime.Now - lastPlayTime;
-                return timeSinceLastPlay >= CooldownDuration;
-            }
-
-            return true;
-        }
-
-        private static void UpdateLastAudioPlayTime(Player player) => LastAudioPlayTimes[player] = DateTime.Now;
-
-        private static bool IsPlayerNearFoundationFortuneBot(Player player, Dictionary<Npc, Vector3> botPositions,
-            BotType botType)
-        {
-            float botRadius = FoundationFortune.Singleton.Config.BuyingBotRadius;
-
-            foreach (var kvp in botPositions)
-            {
-                Npc bot = kvp.Key;
-                Vector3 botPosition = kvp.Value;
-                float distance = Vector3.Distance(player.Position, botPosition);
-
-                if (distance <= botRadius)
-                {
-                    switch (botType)
-                    {
-                        case BotType.Buying when FoundationFortune.Singleton.BuyingBots.Any(x => x.Value.bot == bot):
-                            var buyingSettings = FoundationFortune.Singleton.Config.FFNPCVoiceChatSettings
-                                .FirstOrDefault(x => x.VoiceChatUsageType == NPCVoiceChatUsageType.Buying);
-                            if (buyingSettings != null && CanPlayAudio(player))
-                            {
-                                AudioPlayer.PlayAudio(bot, buyingSettings.AudioFile, buyingSettings.Volume,buyingSettings.Loop, buyingSettings.VoiceChat);
-                                UpdateLastAudioPlayTime(bot); 
-                            }
-                            return true;
-                        case BotType.Selling when FoundationFortune.Singleton.SellingBots.Any(x => x.Value.bot == bot):
-                            var sellingSettings = FoundationFortune.Singleton.Config.FFNPCVoiceChatSettings
-                                .FirstOrDefault(x => x.VoiceChatUsageType == NPCVoiceChatUsageType.Selling);
-                            if (sellingSettings != null && CanPlayAudio(player))
-                            {
-                                AudioPlayer.PlayAudio(bot, sellingSettings.AudioFile, sellingSettings.Volume, loop: sellingSettings.Loop, sellingSettings.VoiceChat);
-                                UpdateLastAudioPlayTime(bot);
-                            }
-                            return true;
-                    }
-                }
-            }
-            return false;
-        }
         
-        private static Npc GetNearestFoundationFortuneBot(Player player, Dictionary<Npc, Vector3> botPositions, BotType botType)
+        private string GetConfirmationTimeLeft(Player ply)
         {
-            float botRadius = FoundationFortune.Singleton.Config.BuyingBotRadius;
-            foreach (var kvp in from kvp in botPositions let botPosition = kvp.Value let distance = Vector3.Distance(player.Position, botPosition) where distance <= botRadius select kvp)
-            {
-                switch (botType)
-                {
-                    case BotType.Buying when FoundationFortune.Singleton.BuyingBots.Any(x => x.Value.bot == kvp.Key):
-                        return kvp.Key;
-                    case BotType.Selling when FoundationFortune.Singleton.SellingBots.Any(x => x.Value.bot == kvp.Key):
-                        return kvp.Key;
-                }
-            }
-            return null;
+            if (!dropTimestamp.ContainsKey(ply.UserId)) return "0";
+            float timeLeft = FoundationFortune.Singleton.Config.SellingConfirmationTime - (Time.time - dropTimestamp[ply.UserId]);
+            return timeLeft > 0 ? timeLeft.ToString("F0") : "0";
         }
-
+        #endregion
+        
         private void ClearIndexations()
         {
             foreach (var botData in FoundationFortune.Singleton.BuyingBots.Values.ToList()) BuyingBot.RemoveBuyingBot(botData.bot.Nickname);
@@ -323,5 +239,87 @@ namespace FoundationFortune.API.HintSystem
             FoundationFortune.Singleton.ConsumedPerks.Clear();
             FoundationFortune.PlayerPurchaseLimits.Clear();
         }
-    }
+
+        public static void AddToPlayerLimits(Player player, PerkItem perkItem)
+		{
+			var playerLimit = FoundationFortune.PlayerPurchaseLimits.FirstOrDefault(p => p.Player.UserId == player.UserId);
+			if (playerLimit == null)
+			{
+				playerLimit = new ObjectInteractions(player);
+				FoundationFortune.PlayerPurchaseLimits.Add(playerLimit);
+			}
+
+			if (playerLimit.BoughtPerks.ContainsKey(perkItem)) playerLimit.BoughtPerks[perkItem]++;
+			else playerLimit.BoughtPerks[perkItem] = 1;
+		}
+
+		public static void AddToPlayerLimits(Player player, BuyableItem buyItem)
+		{
+			var playerLimit = FoundationFortune.PlayerPurchaseLimits.FirstOrDefault(p => p.Player.UserId == player.UserId);
+			if (playerLimit == null)
+			{
+				playerLimit = new ObjectInteractions(player);
+				FoundationFortune.PlayerPurchaseLimits.Add(playerLimit);
+			}
+
+			if (playerLimit.BoughtItems.ContainsKey(buyItem)) playerLimit.BoughtItems[buyItem]++;
+            else playerLimit.BoughtItems[buyItem] = 1;
+        }
+
+        private static void AddToPlayerLimits(Player player, SellableItem sellItem)
+		{
+			var playerLimit = FoundationFortune.PlayerPurchaseLimits.FirstOrDefault(p => p.Player.UserId == player.UserId);
+			if (playerLimit == null)
+			{
+				playerLimit = new ObjectInteractions(player);
+				FoundationFortune.PlayerPurchaseLimits.Add(playerLimit);
+			}
+
+			if (playerLimit.SoldItems.ContainsKey(sellItem)) playerLimit.SoldItems[sellItem]++;
+			else playerLimit.SoldItems[sellItem] = 1;
+		}
+        
+        #region Workstations
+        
+        private Dictionary<WorkstationController, Vector3> workstationPositions = new();
+        public bool IsPlayerOnSellingWorkstation(Player player) => workstationPositions.Count != 0 && workstationPositions.Values.Select(workstationPosition => 
+            Vector3.Distance(player.Position, workstationPosition)).Any(distance => distance <= FoundationFortune.Singleton.Config.SellingWorkstationRadius);
+        
+        private void InitializeWorkstationPositions()
+        {
+            Log.Debug($"Initializing Selling workstations.");
+            if (!FoundationFortune.Singleton.Config.UseSellingWorkstation)
+            {
+                Log.Debug($"no workstations they're turned off nvm");
+                return;
+            }
+
+            HashSet<WorkstationController> allWorkstations = WorkstationController.AllWorkstations;
+            int numWorkstationsToConsider = allWorkstations.Count / 2;
+            HashSet<WorkstationController> selectedWorkstations = new();
+
+            foreach (var workstation in allWorkstations.OrderBy(_ => Random.value).Take(numWorkstationsToConsider))
+                selectedWorkstations.Add(workstation);
+
+            workstationPositions = selectedWorkstations.ToDictionary(workstation => workstation, workstation => workstation.transform.position);
+        }
+        
+        private void UpdateWorkstationMessages(Player ply, ref StringBuilder hintMessage)
+        {
+            if (!IsPlayerOnSellingWorkstation(ply)) return;
+	        
+            if (!confirmSell.ContainsKey(ply.UserId))
+                hintMessage.Append($"{FoundationFortune.Singleton.Translation.SellingWorkstation}");
+            else if (confirmSell[ply.UserId])
+            {
+                hintMessage.Append($"{FoundationFortune.Singleton.Translation.SellingWorkstation}");
+                if (!itemsBeingSold.TryGetValue(ply.UserId, out var soldItemData)) return;
+                int price = soldItemData.price;
+                hintMessage.Append($"{FoundationFortune.Singleton.Translation.ItemConfirmation
+                    .Replace("%price%", price.ToString()).Replace("%time%", GetConfirmationTimeLeft(ply))}");
+            }
+        }
+        
+        #endregion
+	}
 }

@@ -47,7 +47,7 @@ namespace FoundationFortune.Commands.FortuneCommands.AdminCommands.ExtractionCom
                 return false;
             }
 
-            FoundationFortune.Singleton.ServerEvents.StartExtractionEvent(roomType, duration);
+            FoundationFortune.Singleton.FoundationFortuneAPI.StartExtractionEvent(roomType, duration);
 
             response = $"Extraction zone event created for {roomType} lasting {duration} seconds.";
             return true;

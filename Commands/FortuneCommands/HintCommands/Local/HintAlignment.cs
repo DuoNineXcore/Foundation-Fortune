@@ -4,6 +4,7 @@ using RemoteAdmin;
 using System;
 using Exiled.API.Features;
 using FoundationFortune.API.Models;
+using FoundationFortune.API.Models.Enums;
 
 namespace FoundationFortune.Commands.FortuneCommands.HintCommands.Local
 {

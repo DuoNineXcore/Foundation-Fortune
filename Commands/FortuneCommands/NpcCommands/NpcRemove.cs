@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using FoundationFortune.API.Models.Enums.NPCs;
 using System.Threading.Tasks;
 using FoundationFortune.API.Models;
 
@@ -18,7 +19,7 @@ namespace FoundationFortune.Commands.FortuneCommands.NpcCommands
         public string Command { get; } = "ff_removenpc";
         public string Description { get; } = "Remove an NPC from the game.";
         public string[] Aliases { get; } = new string[] { };
-        public string[] Usage { get; } = new string[] { "<BotType> <IndexationNumber>" };
+        public string[] Usage { get; } = new string[] { "<NpcType> <IndexationNumber>" };
 
         public bool Execute(ArraySegment<string> args, ICommandSender sender, out string response)
         {
@@ -30,14 +31,14 @@ namespace FoundationFortune.Commands.FortuneCommands.NpcCommands
 
             if (args.Count < 2)
             {
-                response = "Usage: ff_removenpc <BotType> <IndexationNumber>";
+                response = "Usage: ff_removenpc <NpcType> <IndexationNumber>";
                 return false;
             }
 
-            string botTypeString = args.At(0);
-            if (!Enum.TryParse(botTypeString, true, out BotType botType))
+            string NpcTypeString = args.At(0);
+            if (!Enum.TryParse(NpcTypeString, true, out NpcType NpcType))
             {
-                response = "Invalid BotType specified.";
+                response = "Invalid NpcType specified.";
                 return false;
             }
 
@@ -49,9 +50,9 @@ namespace FoundationFortune.Commands.FortuneCommands.NpcCommands
 
             string indexationString = indexationNumber.ToString();
 
-            switch (botType)
+            switch (NpcType)
             {
-                case BotType.Buying:
+                case NpcType.Buying:
                     if (BuyingBot.RemoveBuyingBot(indexationString))
                     {
                         response = $"Removed BuyingBot with Indexation Number {indexationNumber}.";
@@ -62,7 +63,7 @@ namespace FoundationFortune.Commands.FortuneCommands.NpcCommands
                         response = $"No BuyingBot found with Indexation Number {indexationNumber}.";
                         return false;
                     }
-                case BotType.Selling:
+                case NpcType.Selling:
                     if (SellingBot.RemoveSellingBot(indexationString))
                     {
                         response = $"Removed SellingBot with Indexation Number {indexationNumber}.";
@@ -73,7 +74,7 @@ namespace FoundationFortune.Commands.FortuneCommands.NpcCommands
                         response = $"No SellingBot found with Indexation Number {indexationNumber}.";
                         return false;
                     }
-                case BotType.Music:
+                case NpcType.Music:
                     if (MusicBot.RemoveMusicBot(indexationString))
                     {
                         response = $"Removed MusicBot with Indexation Number {indexationNumber}.";
@@ -85,7 +86,7 @@ namespace FoundationFortune.Commands.FortuneCommands.NpcCommands
                         return false;
                     }
                 default:
-                    response = "Invalid BotType specified.";
+                    response = "Invalid NpcType specified.";
                     return false;
             }
         }

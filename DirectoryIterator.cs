@@ -7,6 +7,7 @@ using System.Linq;
 using System.Net;
 using Exiled.API.Features;
 using FoundationFortune.API.Models;
+using FoundationFortune.API.Models.Classes.Player;
 using LiteDB;
 using MEC;
 
@@ -80,15 +81,25 @@ namespace FoundationFortune
                 {
                     if (entry.FullName.EndsWith(extension, StringComparison.OrdinalIgnoreCase))
                     {
-                        string fileName = Path.GetFileName(entry.FullName);
-                        string destinationPath = Path.Combine(destinationDirectory, fileName);
+                        string relativeEntryPath = entry.FullName;
+                        string destinationPath = Path.Combine(destinationDirectory, relativeEntryPath);
+
+                        if (relativeEntryPath.EndsWith("/"))
+                        {
+                            Directory.CreateDirectory(destinationPath);
+                            continue;
+                        }
+
+                        string entryDirectory = Path.GetDirectoryName(destinationPath);
+                        if (entryDirectory != null) Directory.CreateDirectory(entryDirectory);
 
                         if (!File.Exists(destinationPath))
                         {
                             entry.ExtractToFile(destinationPath, true);
                             filesReplaced = true;
                         }
-                        else existingFiles.Add(fileName);
+                        else existingFiles.Add(relativeEntryPath);
+                        
                     }
                     else missingFiles.Add(entry.FullName);
                 }
@@ -97,19 +108,25 @@ namespace FoundationFortune
             if (existingFiles.Count > 0)
             {
                 string existingFilesMessage = string.Join(", ", existingFiles);
-                Log.SendRaw($"[Foundation Fortune's DirectoryIterator] The following files: {existingFilesMessage} already exist, not replacing those.", ConsoleColor.DarkCyan);
+                Log.SendRaw(
+                    $"[Foundation Fortune's DirectoryIterator] The following files: {existingFilesMessage} already exist, not replacing those.",
+                    ConsoleColor.DarkCyan);
             }
 
             if (missingFiles.Count > 0)
             {
                 string missingFilesMessage = string.Join(", ", missingFiles);
-                Log.SendRaw($"[Foundation Fortune's DirectoryIterator] The following files are missing: {missingFilesMessage}.", ConsoleColor.DarkBlue);
+                Log.SendRaw(
+                    $"[Foundation Fortune's DirectoryIterator] The following files are missing: {missingFilesMessage}",
+                    ConsoleColor.DarkBlue);
             }
 
-            Log.SendRaw(filesReplaced ? "[Foundation Fortune's DirectoryIterator] Successfully extracted audio files and replaced missing files!" 
+            Log.SendRaw(filesReplaced
+                    ? "[Foundation Fortune's DirectoryIterator] Successfully extracted audio files and replaced missing files!"
                     : "[Foundation Fortune's DirectoryIterator] All files already exist, no files need to be replaced.",
                 ConsoleColor.DarkCyan);
         }
+
 
         private static void InitializeDatabase()
         {

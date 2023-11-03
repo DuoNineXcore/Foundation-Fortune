@@ -5,6 +5,7 @@ using FoundationFortune.API.NPCs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using FoundationFortune.API.Models.Enums.NPCs;
 using System.Text;
 using System.Threading.Tasks;
 using FoundationFortune.API.Models;
@@ -30,17 +31,17 @@ namespace FoundationFortune.Commands.FortuneCommands.NpcCommands
             int count;
             if (args.Array != null)
             {
-                string botTypeString = args.Count > 0 ? args.Array[args.Offset] : null;
+                string NpcTypeString = args.Count > 0 ? args.Array[args.Offset] : null;
 
-                if (Enum.TryParse(botTypeString, true, out BotType botType))
+                if (Enum.TryParse(NpcTypeString, true, out NpcType NpcType))
                 {
-                    switch (botType)
+                    switch (NpcType)
                     {
-                        case BotType.Buying:
+                        case NpcType.Buying:
                             count = RemoveBots(FoundationFortune.Singleton.BuyingBots, BuyingBot.RemoveBuyingBot);
                             response = $"Flushed {count} BuyingBots from the server.";
                             return true;
-                        case BotType.Selling:
+                        case NpcType.Selling:
                             count = RemoveBots(FoundationFortune.Singleton.SellingBots, SellingBot.RemoveSellingBot);
                             response = $"Flushed {count} SellingBots from the server.";
                             return true;

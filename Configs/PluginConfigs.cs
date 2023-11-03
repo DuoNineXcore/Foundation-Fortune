@@ -1,11 +1,17 @@
 ﻿using System.ComponentModel;
-using NPCVoiceChatSettings = FoundationFortune.API.Models.NPCVoiceChatSettings;
-using PlayerVoiceChatSettings = FoundationFortune.API.Models.PlayerVoiceChatSettings;
+using NPCVoiceChatSettings = FoundationFortune.API.Models.Classes.NPCs.NPCVoiceChatSettings;
+using PlayerVoiceChatSettings = FoundationFortune.API.Models.Classes.Player.PlayerVoiceChatSettings;
 using Exiled.API.Enums;
 using Exiled.API.Interfaces;
 using PlayerRoles;
 using System.Collections.Generic;
 using FoundationFortune.API.Models;
+using FoundationFortune.API.Models.Classes.Items;
+using FoundationFortune.API.Models.Classes.NPCs;
+using FoundationFortune.API.Models.Enums;
+using FoundationFortune.API.Models.Enums.NPCs;
+using FoundationFortune.API.Models.Enums.Perks;
+using FoundationFortune.API.Models.Enums.Player;
 using UnityEngine;
 using VoiceChat;
 
@@ -150,24 +156,24 @@ namespace FoundationFortune.Configs
 		public float SellingConfirmationTime { get; set; } = 5f;
 
 		[Description("NPC-Related Event Sound Effects.")]
-		public List<NPCVoiceChatSettings> FFNPCVoiceChatSettings { get; set; } = new List<NPCVoiceChatSettings>()
+		public List<NPCVoiceChatSettings> NPCVoiceChatSettings { get; set; } = new List<NPCVoiceChatSettings>()
 		{
-			new NPCVoiceChatSettings { VoiceChatUsageType = NPCVoiceChatUsageType.Selling, VoiceChat = VoiceChatChannel.Mimicry, Loop = false, AudioFile = "SellSuccess.ogg", Volume = 50},
-			new NPCVoiceChatSettings { VoiceChatUsageType = NPCVoiceChatUsageType.Buying, VoiceChat = VoiceChatChannel.Mimicry, Loop = false, AudioFile = "BuySuccess.ogg", Volume = 50},
-			new NPCVoiceChatSettings { VoiceChatUsageType = NPCVoiceChatUsageType.WrongBuyingBot, VoiceChat = VoiceChatChannel.Mimicry, Loop = false, AudioFile = "WrongBot.ogg", Volume = 50},
-			new NPCVoiceChatSettings { VoiceChatUsageType = NPCVoiceChatUsageType.NotEnoughMoney, VoiceChat = VoiceChatChannel.Mimicry, Loop = false, AudioFile = "NoMoney.ogg", Volume = 50},
-			new NPCVoiceChatSettings { VoiceChatUsageType = NPCVoiceChatUsageType.BuyingBotInRange, VoiceChat = VoiceChatChannel.Mimicry, Loop = false, AudioFile = "BuyingRange.ogg", Volume = 50},
-			new NPCVoiceChatSettings { VoiceChatUsageType = NPCVoiceChatUsageType.SellingBotInRange, VoiceChat = VoiceChatChannel.Mimicry, Loop = false, AudioFile = "SellingRange.ogg", Volume = 50}
+			new NPCVoiceChatSettings { VoiceChatUsageType = NpcVoiceChatUsageType.Selling, VoiceChat = VoiceChatChannel.Mimicry, Loop = false, AudioFile = "NPCVoiceChatUsageType\\Selling.ogg", Volume = 50},
+			new NPCVoiceChatSettings { VoiceChatUsageType = NpcVoiceChatUsageType.Buying, VoiceChat = VoiceChatChannel.Mimicry, Loop = false, AudioFile = "NPCVoiceChatUsageType\\Buying.ogg", Volume = 50},
+			new NPCVoiceChatSettings { VoiceChatUsageType = NpcVoiceChatUsageType.WrongBot, VoiceChat = VoiceChatChannel.Mimicry, Loop = false, AudioFile = "NPCVoiceChatUsageType\\WrongBot.ogg", Volume = 50},
+			new NPCVoiceChatSettings { VoiceChatUsageType = NpcVoiceChatUsageType.NotEnoughMoney, VoiceChat = VoiceChatChannel.Mimicry, Loop = false, AudioFile = "NPCVoiceChatUsageType\\NoMoney.ogg", Volume = 50},
+			new NPCVoiceChatSettings { VoiceChatUsageType = NpcVoiceChatUsageType.BuyingBotInRange, VoiceChat = VoiceChatChannel.Mimicry, Loop = false, AudioFile = "NPCVoiceChatUsageType\\BuyingRange.ogg", Volume = 50},
+			new NPCVoiceChatSettings { VoiceChatUsageType = NpcVoiceChatUsageType.SellingBotInRange, VoiceChat = VoiceChatChannel.Mimicry, Loop = false, AudioFile = "NPCVoiceChatUsageType\\SellingRange.ogg", Volume = 50}
 		};
 
 		[Description("Player-Related Event Sound Effects.")]
 		public List<PlayerVoiceChatSettings> PlayerVoiceChatSettings { get; set; } = new List<PlayerVoiceChatSettings>()
 		{
-			new PlayerVoiceChatSettings { VoiceChatUsageType = PlayerVoiceChatUsageType.EtherealIntervention, VoiceChat = VoiceChatChannel.Mimicry, Loop = false, AudioFile = "BuySuccess.ogg", Volume = 50},
-			new PlayerVoiceChatSettings { VoiceChatUsageType = PlayerVoiceChatUsageType.BlissfulUnawareness, VoiceChat = VoiceChatChannel.Mimicry, Loop = false, AudioFile = "Explode.ogg", Volume = 50},
-			new PlayerVoiceChatSettings { VoiceChatUsageType = PlayerVoiceChatUsageType.ResurgenceBeacon, VoiceChat = VoiceChatChannel.Mimicry, Loop = false, AudioFile = "Beacon.ogg", Volume = 50},
-			new PlayerVoiceChatSettings { VoiceChatUsageType = PlayerVoiceChatUsageType.Hunted, VoiceChat = VoiceChatChannel.Mimicry, Loop = false, AudioFile = "Hunted.ogg", Volume = 50},
-			new PlayerVoiceChatSettings { VoiceChatUsageType = PlayerVoiceChatUsageType.Hunter, VoiceChat = VoiceChatChannel.Mimicry, Loop = false, AudioFile = "Hunter.ogg", Volume = 50},
+			new PlayerVoiceChatSettings { VoiceChatUsageType = PlayerVoiceChatUsageType.EtherealIntervention, VoiceChat = VoiceChatChannel.Mimicry, Loop = false, AudioFile = "PlayerVoiceChatUsageType\\EtherealIntervention.ogg", Volume = 50},
+			new PlayerVoiceChatSettings { VoiceChatUsageType = PlayerVoiceChatUsageType.BlissfulUnawareness, VoiceChat = VoiceChatChannel.Mimicry, Loop = false, AudioFile = "PlayerVoiceChatUsageType\\BlissfulUnawareness.ogg", Volume = 50},
+			new PlayerVoiceChatSettings { VoiceChatUsageType = PlayerVoiceChatUsageType.ResurgenceBeacon, VoiceChat = VoiceChatChannel.Mimicry, Loop = false, AudioFile = "PlayerVoiceChatUsageType\\Beacon.ogg", Volume = 50},
+			new PlayerVoiceChatSettings { VoiceChatUsageType = PlayerVoiceChatUsageType.Hunted, VoiceChat = VoiceChatChannel.Mimicry, Loop = false, AudioFile = "PlayerVoiceChatUsageType\\Hunted.ogg", Volume = 50},
+			new PlayerVoiceChatSettings { VoiceChatUsageType = PlayerVoiceChatUsageType.Hunter, VoiceChat = VoiceChatChannel.Mimicry, Loop = false, AudioFile = "PlayerVoiceChatUsageType\\Hunter.ogg", Volume = 50},
 		};
 
 		[Description("List of items that can be sold.")]

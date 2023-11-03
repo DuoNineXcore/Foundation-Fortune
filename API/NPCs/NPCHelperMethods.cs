@@ -16,7 +16,8 @@ using System.Linq;
 using CentralAuth;
 using UnityEngine;
 using VoiceChat;
-using FoundationFortune.API.HintSystem;
+using FoundationFortune.API;
+using FoundationFortune.API.Models.Enums.NPCs;
 
 namespace FoundationFortune.API.NPCs
 {
@@ -34,6 +35,82 @@ namespace FoundationFortune.API.NPCs
         {
             if (targetTrack.Role.TryGetOwner(out ReferenceHub refHub)) return IsFoundationFortuneNPC(refHub);
             return false;
+        }
+        
+        public static Npc GetNearestBuyingBot(Player player)
+        {
+            var botPositions = FoundationFortune.Singleton.BuyingBots
+                .Where(kvp => kvp.Value.bot != null)
+                .ToDictionary(kvp => kvp.Value.bot, kvp => kvp.Value.bot.Position);
+
+            return GetNearestFoundationFortuneBot(player, botPositions, NpcType.Buying);
+        }
+
+        public static Npc GetNearestSellingBot(Player player)
+        {
+            var botPositions = FoundationFortune.Singleton.SellingBots
+                .Where(kvp => kvp.Value.bot != null)
+                .ToDictionary(kvp => kvp.Value.bot, kvp => kvp.Value.bot.Position);
+
+            return GetNearestFoundationFortuneBot(player, botPositions, NpcType.Selling);
+        }
+        
+        public static bool IsPlayerNearBuyingBot(Player player)
+        {
+            var botPositions = FoundationFortune.Singleton.BuyingBots
+                .Where(kvp => kvp.Value.bot != null)
+                .ToDictionary(kvp => kvp.Value.bot, kvp => kvp.Value.bot.Position);
+
+            return IsPlayerNearFoundationFortuneBot(player, botPositions, NpcType.Buying);
+        }
+
+        public static bool IsPlayerNearSellingBot(Player player)
+        {
+            var botPositions = FoundationFortune.Singleton.SellingBots
+                .Where(kvp => kvp.Value.bot != null)
+                .ToDictionary(kvp => kvp.Value.bot, kvp => kvp.Value.bot.Position);
+
+            return IsPlayerNearFoundationFortuneBot(player, botPositions, NpcType.Selling);
+        }
+
+        private static bool IsPlayerNearFoundationFortuneBot(Player player, Dictionary<Npc, Vector3> botPositions, NpcType botType)
+        {
+            float botRadius = FoundationFortune.Singleton.Config.BuyingBotRadius;
+
+            foreach (var kvp in botPositions)
+            {
+                Npc bot = kvp.Key;
+                Vector3 botPosition = kvp.Value;
+                float distance = Vector3.Distance(player.Position, botPosition);
+
+                if (distance <= botRadius)
+                {
+                    switch (botType)
+                    {
+                        case NpcType.Buying when FoundationFortune.Singleton.BuyingBots.Any(x => x.Value.bot == bot):
+                            return true;
+                        case NpcType.Selling when FoundationFortune.Singleton.SellingBots.Any(x => x.Value.bot == bot):
+                            return true;
+                    }
+                }
+            }
+            return false;
+        }
+        
+        private static Npc GetNearestFoundationFortuneBot(Player player, Dictionary<Npc, Vector3> botPositions, NpcType botType)
+        {
+            float botRadius = FoundationFortune.Singleton.Config.BuyingBotRadius;
+            foreach (var kvp in from kvp in botPositions let botPosition = kvp.Value let distance = Vector3.Distance(player.Position, botPosition) where distance <= botRadius select kvp)
+            {
+                switch (botType)
+                {
+                    case NpcType.Buying when FoundationFortune.Singleton.BuyingBots.Any(x => x.Value.bot == kvp.Key):
+                        return kvp.Key;
+                    case NpcType.Selling when FoundationFortune.Singleton.SellingBots.Any(x => x.Value.bot == kvp.Key):
+                        return kvp.Key;
+                }
+            }
+            return null;
         }
 
         public static Npc SpawnFix(string name, RoleTypeId role, int id = 0, Vector3? position = null)
@@ -75,7 +152,6 @@ namespace FoundationFortune.API.NPCs
                 Timing.CallDelayed(0.5f, delegate
                 {
                     npc.Position = position.Value;
-                    npc.IsGodModeEnabled = true;
                 });
             }
             return npc;
@@ -131,8 +207,8 @@ namespace FoundationFortune.API.NPCs
                 {
                     if (!player.IsAlive) continue;
                     
-                    Npc buyingBot = ServerEvents.GetNearestBuyingBot(player);
-                    Npc sellingBot = ServerEvents.GetNearestSellingBot(player);
+                    Npc buyingBot = GetNearestBuyingBot(player);
+                    Npc sellingBot = GetNearestSellingBot(player);
                     
                     if(buyingBot != null) LookAt(buyingBot, player.Position);
                     else if(sellingBot != null) LookAt(sellingBot, player.Position);

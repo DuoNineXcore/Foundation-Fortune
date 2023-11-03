@@ -9,10 +9,14 @@ using Exiled.API.Features.Items;
 using System.Text;
 using FoundationFortune.API.Items.PerkItems;
 using FoundationFortune.API.Models;
+using FoundationFortune.API.Models.Classes.Hints;
+using FoundationFortune.API.Models.Enums;
+using FoundationFortune.API.Perks;
 
-namespace FoundationFortune.API.HintSystem
+// ReSharper disable once CheckNamespace
+namespace FoundationFortune.API
 {
-	public partial class ServerEvents
+	public partial class FoundationFortuneAPI
 	{
 		private Dictionary<string, Queue<HintEntry>> recentHints = new();
 		private Dictionary<string, bool> confirmSell = new();
@@ -38,7 +42,7 @@ namespace FoundationFortune.API.HintSystem
                     int hintSize = PlayerDataRepository.GetHintSize(ply.UserId);
 
                     StringBuilder hintMessageBuilder = new();
-                    UpdatePerkIndicator(FoundationFortune.Singleton.ConsumedPerks, ref hintMessageBuilder);
+                    PerkSystem.UpdatePerkIndicator(FoundationFortune.Singleton.ConsumedPerks, ref hintMessageBuilder);
 
                     if (!PlayerDataRepository.GetHintMinmode(ply.UserId))
                     {
@@ -82,9 +86,9 @@ namespace FoundationFortune.API.HintSystem
 
                     ply.ShowHint($"<size={hintSize}><align={hintAlignment}>{hintMessageBuilder}</align>", 2);
 
-                    if (!confirmSell.ContainsKey(ply.UserId) || !(Time.time - dropTimestamp[ply.UserId] >=
-                                                                  FoundationFortune.Singleton.Config
-	                                                                  .SellingConfirmationTime)) continue;
+                    if (!confirmSell.ContainsKey(ply.UserId) || !(Time.time - dropTimestamp[ply.UserId] >= FoundationFortune.Singleton.Config.SellingConfirmationTime))
+	                    continue;
+                    
                     confirmSell.Remove(ply.UserId);
                     dropTimestamp.Remove(ply.UserId);
                 }

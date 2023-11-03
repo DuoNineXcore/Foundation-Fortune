@@ -26,11 +26,11 @@ namespace FoundationFortune.Commands.FortuneCommands.AdminCommands.ExtractionCom
 
             switch (FoundationFortune.Singleton.Config.MoneyExtractionSystem)
             {
-                case true when !FoundationFortune.Singleton.ServerEvents.limitReached:
-                    FoundationFortune.Singleton.ServerEvents.DeactivateExtractionPoint(true);
+                case true when !FoundationFortune.Singleton.FoundationFortuneAPI.limitReached:
+                    FoundationFortune.Singleton.FoundationFortuneAPI.DeactivateExtractionPoint(true);
                     break;
                 case true:
-                    FoundationFortune.Singleton.ServerEvents.DeactivateExtractionPoint(false);
+                    FoundationFortune.Singleton.FoundationFortuneAPI.DeactivateExtractionPoint(false);
                     break;
             }
 

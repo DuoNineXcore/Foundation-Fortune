@@ -11,6 +11,8 @@ using System.Collections.Generic;
 using FoundationFortune.API.Perks;
 using System.Text;
 using FoundationFortune.API.Models;
+using FoundationFortune.API.Models.Enums;
+using FoundationFortune.API.Models.Enums.Perks;
 
 namespace FoundationFortune.API.Items.PerkItems
 {
@@ -54,7 +56,7 @@ namespace FoundationFortune.API.Items.PerkItems
 			if (playerPerks.TryGetValue(perkType, out var count)) playerPerks[perkType] = count + 1;
 			else playerPerks[perkType] = 1;
 			
-			FoundationFortune.Singleton.ServerEvents.EnqueueHint(ev.Player, FoundationFortune.Singleton.Translation.DrankPerkBottle.Replace("%type%", perkType.ToString()), 2);
+			FoundationFortune.Singleton.FoundationFortuneAPI.EnqueueHint(ev.Player, FoundationFortune.Singleton.Translation.DrankPerkBottle.Replace("%type%", perkType.ToString()), 2);
 			DroppedPerkBottles.Remove(ev.Item.Serial);
 		}
 		

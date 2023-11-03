@@ -3,9 +3,12 @@ the server crashes when moving money on the extraction event after the 10 second
 bots still count towards the chaos target counter
 ff_togglehintsystem always disables
 ok so now it plays the audios when in proximity of a buying bot or selling bot, but the cooldown doesnt like, work.
-for blissful unawareness make the hp and ahp counter go up and increase exponentially when the second coroutine starts playing, just a little funny thing.
 
 ## FINISHED:
+
+for blissful unawareness make the hp and ahp counter go up and increase exponentially when the second coroutine starts playing, just a little funny thing.
+=> done 
+
 the audio player feature of blissful unawareness nor ethereal intervention do not work, not sure why, might be a music bot issue
 play an audio for when a player is within a buying bot or selling bot's radius, something intended a long time ago
 fix buy success hints not displaying along with their audio, odd..

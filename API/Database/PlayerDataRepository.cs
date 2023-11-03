@@ -2,6 +2,8 @@
 using LiteDB;
 using System;
 using FoundationFortune.API.Models;
+using FoundationFortune.API.Models.Classes.Player;
+using FoundationFortune.API.Models.Enums;
 
 namespace FoundationFortune.API.Database
 {

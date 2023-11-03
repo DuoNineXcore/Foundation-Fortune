@@ -6,12 +6,16 @@ using MEC;
 using System.Text;
 using Exiled.API.Enums;
 using FoundationFortune.API.Models;
+using FoundationFortune.API.Models.Classes.Events;
+using FoundationFortune.API.Models.Classes.Player;
+using FoundationFortune.API.Models.Enums;
+using FoundationFortune.API.Models.Enums.Player;
 
 // ReSharper disable once CheckNamespace
 // STFU!!!!!!!!!!!!!!!!
-namespace FoundationFortune.API.HintSystem
+namespace FoundationFortune.API
 {
-	public partial class ServerEvents
+	public partial class FoundationFortuneAPI
 	{
 		public List<Bounty> BountiedPlayers { get; } = new List<Bounty>();
 
