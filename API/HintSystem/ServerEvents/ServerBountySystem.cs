@@ -21,17 +21,17 @@ namespace FoundationFortune.API
 
 		public void AddBounty(Player player, int bountyPrice, TimeSpan duration)
 		{
-			PlayerVoiceChatSettings hunted = FoundationFortune.Singleton.Config.PlayerVoiceChatSettings
+			PlayerVoiceChatSettings hunted = FoundationFortune.VoiceChatSettings.PlayerVoiceChatSettings
 				.FirstOrDefault(settings => settings.VoiceChatUsageType == PlayerVoiceChatUsageType.Hunted);
-			PlayerVoiceChatSettings hunter = FoundationFortune.Singleton.Config.PlayerVoiceChatSettings
+			PlayerVoiceChatSettings hunter = FoundationFortune.VoiceChatSettings.PlayerVoiceChatSettings
 				.FirstOrDefault(settings => settings.VoiceChatUsageType == PlayerVoiceChatUsageType.Hunter);
 			
 			DateTime expirationTime = DateTime.Now.Add(duration);
 			BountiedPlayers.Add(new Bounty(player, true, bountyPrice, expirationTime));
 			
-			if (hunted != null) AudioPlayer.PlayTo(player, hunted.AudioFile, hunted.Volume, hunted.Loop, hunted.VoiceChat);
+			if (hunted != null) AudioPlayer.PlayTo(player, hunted.AudioFile, hunted.Volume, hunted.Loop, true);
 			foreach (Player ply in Player.List.Where(p => !p.IsNPC && p != player)) 
-				if (hunter != null) AudioPlayer.PlayTo(ply, hunter.AudioFile, hunter.Volume, hunter.Loop, hunter.VoiceChat);
+				if (hunter != null) AudioPlayer.PlayTo(ply, hunter.AudioFile, hunter.Volume, hunter.Loop, true);
 
 			Timing.CallDelayed((float)duration.TotalSeconds, () => StopBounty(player));
 		}

@@ -6,6 +6,8 @@
         Hunter, 
         BlissfulUnawareness, 
         ResurgenceBeacon, 
-        EtherealIntervention
+        EtherealIntervention,
+        HyperactiveBehaviorOn,
+        HyperactiveBehaviorOff,
     }   
 }

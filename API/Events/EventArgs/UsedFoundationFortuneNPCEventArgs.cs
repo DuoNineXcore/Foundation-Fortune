@@ -1,7 +1,5 @@
 ﻿using Exiled.API.Features;
 using Exiled.Events.EventArgs.Interfaces;
-using FoundationFortune.API.Models;
-using FoundationFortune.API.Models.Enums;
 using FoundationFortune.API.Models.Enums.NPCs;
 
 namespace FoundationFortune.API.Events.EventArgs

@@ -7,7 +7,7 @@ using Exiled.Events.EventArgs.Player;
 using FoundationFortune.API.Database;
 using Exiled.API.Features.Items;
 using System.Collections.Generic;
-using FoundationFortune.API.Perks;
+using FoundationFortune.API.Models.Enums.Perks;
 
 namespace FoundationFortune.API.Items.CustomItems
 {
@@ -35,16 +35,17 @@ namespace FoundationFortune.API.Items.CustomItems
 
 		private void OnDeath(DyingEventArgs ev)
 		{
-			if (PerkSystem.EtherealInterventionPlayers.Contains(ev.Player)) return;
+			if (PerkSystem.HasPerk(ev.Player, PerkType.EtherealIntervention)) return;
 
 			int moneyBeforeDeath = PlayerDataRepository.GetMoneyOnHold(ev.Player.UserId);
 			if (moneyBeforeDeath <= 0 || PlayerDataRepository.GetPluginAdmin(ev.Player.UserId)) return;
 			FoundationFortune.Singleton.FoundationFortuneAPI.EnqueueHint(ev.Player, FoundationFortune.Singleton.Translation.Death.Replace("%moneyBeforeDeath%", moneyBeforeDeath.ToString()), 5f);
-			PlayerDataRepository.EmptyMoney(ev.Player.UserId, true, false);
+			PlayerDataRepository.EmptyMoney(ev.Player.UserId, true);
 			int coinValue = moneyBeforeDeath / FoundationFortune.Singleton.Config.DeathCoinsToDrop;
 			for (int i = 0; i < FoundationFortune.Singleton.Config.DeathCoinsToDrop; i++)
 			{
 				if (!TrySpawn(Id, ev.Player.Position, out Pickup coin)) continue;
+				if (coin == null) continue;
 				Log.Debug($"Spawned coin at Pos:{coin.Position} Rotation:{coin.Rotation}, Serial: {coin.Serial}, Value: {coinValue}");
 				droppedCoins[coin.Serial] = (coinValue, ev.Player);
 			}

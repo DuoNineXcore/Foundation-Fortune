@@ -24,11 +24,8 @@ namespace FoundationFortune.API.NPCs
         public static Npc SpawnBuyingBot(string target, string Badge, string Color, RoleTypeId Role, ItemType? HeldItem, Vector3 scale)
         {
             int indexation = 0;
-            while (FoundationFortune.Singleton.BuyingBots.Values.Any(data => data.indexation == indexation))
-            {
-                indexation++;
-            }
-
+            while (FoundationFortune.Singleton.BuyingBots.Values.Any(data => data.indexation == indexation)) indexation++;
+            
             Npc spawnedBuyingBot = NPCHelperMethods.SpawnFix(target, Role, indexation);
             string botKey = $"BuyingBot-{target}";
             FoundationFortune.Singleton.BuyingBots[botKey] = (spawnedBuyingBot, indexation);

@@ -28,10 +28,7 @@ namespace FoundationFortune.API.NPCs
         public static Npc SpawnSellingBot(string target, string Badge, string Color, RoleTypeId Role, ItemType? HeldItem, Vector3 scale)
         {
             int indexation = 0;
-            while (FoundationFortune.Singleton.SellingBots.Values.Any(data => data.indexation == indexation))
-            {
-                indexation++;
-            }
+            while (FoundationFortune.Singleton.SellingBots.Values.Any(data => data.indexation == indexation)) indexation++;
 
             Npc spawnedSellingBot = NPCHelperMethods.SpawnFix(target, Role, indexation);
             string botKey = $"SellingBot-{target}";

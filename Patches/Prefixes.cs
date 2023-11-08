@@ -1,8 +1,10 @@
 ﻿using HarmonyLib;
 using Exiled.API.Features;
 using FoundationFortune.API.Items.PerkItems;
+using FoundationFortune.API.NPCs;
 using PlayerRoles.PlayableScps.Scp079;
 using InventorySystem.Items.Usables;
+using PlayerRoles.PlayableScps.Scp079.Map;
 
 namespace FoundationFortune.Patches
 {
@@ -15,38 +17,27 @@ namespace FoundationFortune.Patches
     [HarmonyPatch(typeof(Scp079ScannerTracker), nameof(Scp079ScannerTracker.AddTarget))]
 	internal static class Scp079TargetAddPatch
 	{
-		private static bool Prefix(Scp079ScannerTracker __instance, ReferenceHub hub)
-		{
-			Player player = Player.Get(hub);
-			if (player is null) return false;
-			if (player.IsNPC) return false;
-			return true;
-		}
+		private static bool Prefix(Scp079ScannerTracker __instance, ReferenceHub hub) => hub is not null && NPCHelperMethods.IsFoundationFortuneNPC(hub);
 	}
 
-    [HarmonyPatch(typeof(Scp079Recontainer), nameof(Scp079Recontainer.OnServerRoleChanged))]
+	[HarmonyPatch(typeof(Scp079Recontainer), nameof(Scp079Recontainer.OnServerRoleChanged))]
 	internal static class Scp079RecontainPatch
 	{
 		private static bool Prefix(Scp079Recontainer __instance, ReferenceHub hub)
 		{
-			Player player = Player.Get(hub);
-			if (player == null) return true;
-			if (player.IsNPC) return false;
-
-			return true;
+			if (hub == null) return true;
+			return !NPCHelperMethods.IsFoundationFortuneNPC(hub);
 		}
 	}
 	
     [HarmonyPatch(typeof(NineTailedFoxAnnouncer), nameof(NineTailedFoxAnnouncer.AnnounceScpTermination))]
 	internal static class TerminationPatch
 	{
-		[HarmonyPrefix]
 		private static bool Prefix(ReferenceHub scp)
 		{
 			var BuyingBot = Player.Get(scp);
 			if (BuyingBot == null) return false;
-			if (BuyingBot.IsNPC) return false;
-			return true;
+			return !BuyingBot.IsNPC;
 		}
 	}
 }

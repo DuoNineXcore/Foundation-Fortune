@@ -31,21 +31,21 @@ namespace FoundationFortune.API
 
 		private void StartExtractionEvent()
 		{
-			if (!FoundationFortune.Singleton.Config.MoneyExtractionSystem) return;
-			if (extractionCount >= FoundationFortune.Singleton.Config.ExtractionLimit)
+			if (!FoundationFortune.MoneyExtractionSystemSettings.MoneyExtractionSystem) return;
+			if (extractionCount >= FoundationFortune.MoneyExtractionSystemSettings.ExtractionLimit)
 			{
 				limitReached = true;
 				return;
 			}
 
 			extractionStartTime = Time.time;
-			activeExtractionRoom = FoundationFortune.Singleton.Config.ExtractionPointRooms[UnityEngine.Random.Range(0, FoundationFortune.Singleton.Config.ExtractionPointRooms.Count)];
+			activeExtractionRoom = FoundationFortune.MoneyExtractionSystemSettings.ExtractionPointRooms[UnityEngine.Random.Range(0, FoundationFortune.MoneyExtractionSystemSettings.ExtractionPointRooms.Count)];
 
 			isExtractionPointActive = true;
-			Log.Debug($"Extraction point activated in room: {activeExtractionRoom}. It will be active for {FoundationFortune.Singleton.Config.ExtractionPointDuration} seconds.");
+			Log.Debug($"Extraction point activated in room: {activeExtractionRoom}. It will be active for {FoundationFortune.MoneyExtractionSystemSettings.ExtractionPointDuration} seconds.");
 
 			extractionCount++;
-			CoroutineManager.Coroutines.Add(Timing.CallDelayed(FoundationFortune.Singleton.Config.ExtractionPointDuration, () => DeactivateExtractionPoint(true)));
+			CoroutineManager.Coroutines.Add(Timing.CallDelayed(FoundationFortune.MoneyExtractionSystemSettings.ExtractionPointDuration, () => DeactivateExtractionPoint(true)));
 		}
 
 		public void StartExtractionEvent(RoomType room, float duration)
@@ -66,8 +66,8 @@ namespace FoundationFortune.API
 			if (restart)
 			{
 				isExtractionPointActive = false;
-				if (extractionCount >= FoundationFortune.Singleton.Config.ExtractionLimit) return;
-				nextExtractionTime = UnityEngine.Random.Range(FoundationFortune.Singleton.Config.MinExtractionPointGenerationTime, FoundationFortune.Singleton.Config.MaxExtractionPointGenerationTime + 1);
+				if (extractionCount >= FoundationFortune.MoneyExtractionSystemSettings.ExtractionLimit) return;
+				nextExtractionTime = UnityEngine.Random.Range(FoundationFortune.MoneyExtractionSystemSettings.MinExtractionPointGenerationTime, FoundationFortune.MoneyExtractionSystemSettings.MaxExtractionPointGenerationTime + 1);
 				Log.Debug($"Extraction point in room {activeExtractionRoom} deactivated. Next extraction in T-{nextExtractionTime} Seconds.");
 				CoroutineManager.Coroutines.Add(Timing.CallDelayed(nextExtractionTime, StartExtractionEvent));
 			}
@@ -102,7 +102,7 @@ namespace FoundationFortune.API
 
 				string extractionHint = FoundationFortune.Singleton.Translation.ExtractionEvent
 					.Replace("%room%", activeExtractionRoom.ToString())
-					.Replace("%time%", TimeSpan.FromSeconds(FoundationFortune.Singleton.Config.ExtractionPointDuration - (Time.time - extractionStartTime)).ToString(@"hh\:mm\:ss"));
+					.Replace("%time%", TimeSpan.FromSeconds(FoundationFortune.MoneyExtractionSystemSettings.ExtractionPointDuration - (Time.time - extractionStartTime)).ToString(@"hh\:mm\:ss"));
 				hintMessage.Append(extractionHint);
 			}
 		}
@@ -135,7 +135,7 @@ namespace FoundationFortune.API
 			ExtractMoney(player);
 		}
 		
-		private void ExtractMoney(Player player)
+		private static void ExtractMoney(Player player)
 		{
 			int totalMoneyOnHold = PlayerDataRepository.GetMoneyOnHold(player.UserId);
 			if (totalMoneyOnHold <= 0) return;

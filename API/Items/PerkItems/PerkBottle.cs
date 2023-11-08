@@ -8,7 +8,6 @@ using Exiled.CustomItems.API.EventArgs;
 using Exiled.CustomItems.API.Features;
 using Exiled.Events.EventArgs.Player;
 using System.Collections.Generic;
-using FoundationFortune.API.Perks;
 using System.Text;
 using FoundationFortune.API.Models;
 using FoundationFortune.API.Models.Enums;
@@ -62,11 +61,13 @@ namespace FoundationFortune.API.Items.PerkItems
 		
         public static void GivePerkBottle(Player player, PerkType perkType)
         {
-	        if (!TrySpawn(331, player.Position, out Pickup perkBottle)) return;
-	        if (perkBottle == null) return;
+	        CustomItem customItem = new PerkBottle();
+	        var item = Item.Create(ItemType.AntiSCP207, player);
+
+	        customItem.Give(player, item,false);
 	        
-	        Log.Debug($"Spawned Perk Bottle at Pos:{perkBottle.Position} Serial: {perkBottle.Serial}, PerkType: {perkType}");
-	        DroppedPerkBottles[perkBottle.Serial] = (perkType, player);
+	        Log.Debug($"Spawned Perk Bottle at {item.Serial}");
+	        DroppedPerkBottles[item.Serial] = (perkType, player);
         }
 
         protected override void OnAcquired(Player player, Item item, bool displayMessage)

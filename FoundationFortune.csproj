@@ -63,7 +63,10 @@
     <Compile Include="API\AudioPlayer.cs" />
     <Compile Include="API\CoroutineManager.cs" />
     <Compile Include="API\Events\EventArgs\UsedFoundationFortuneNPCEventArgs.cs" />
+    <Compile Include="API\Events\EventArgs\UsedFoundationFortunePerkEventArgs.cs" />
+    <Compile Include="API\Events\EventHelperMethods.cs" />
     <Compile Include="API\Events\Handlers\FoundationFortuneNPCs.cs" />
+    <Compile Include="API\Events\Handlers\FoundationFortunePerks.cs" />
     <Compile Include="API\FoundationFortuneAPI.cs" />
     <Compile Include="API\HintSystem\ServerEvents\ServerBountySystem.cs" />
     <Compile Include="API\HintSystem\ServerEvents\ServerExtractionSystem.cs" />
@@ -91,11 +94,14 @@
     <Compile Include="API\Models\Enums\Perks\PerkType.cs" />
     <Compile Include="API\Models\Enums\Player\PlayerTeamConditions.cs" />
     <Compile Include="API\Models\Enums\Player\PlayerVoiceChatUsageType.cs" />
+    <Compile Include="API\Models\Interfaces\IFoundationFortuneConfig.cs" />
     <Compile Include="API\NPCs\NPCHelperMethods.cs" />
     <Compile Include="API\Database\PlayerDataRepository.cs" />
     <Compile Include="API\NPCs\BuyingBot.cs" />
     <Compile Include="API\NPCs\MusicBot.cs" />
     <Compile Include="API\NPCs\SellingBot.cs" />
+    <Compile Include="API\PerkSystem.cs" />
+    <Compile Include="API\YamlConverters\VectorsConverter.cs" />
     <Compile Include="Commands\BuyCommand.cs" />
     <Compile Include="Commands\FortuneCommands\AdminCommands\AddAdmin.cs" />
     <Compile Include="Commands\FortuneCommands\AdminCommands\RemoveAdmin.cs" />
@@ -118,13 +124,19 @@
     <Compile Include="Commands\FortuneCommands\NpcCommands\NpcFlush.cs" />
     <Compile Include="Commands\FortuneCommands\NpcCommands\NpcList.cs" />
     <Compile Include="Commands\FortuneCommands\NpcCommands\NpcRemove.cs" />
-    <Compile Include="API\Perks\PerkSystem.cs" />
-    <Compile Include="Configs\PluginConfigs.cs" />
+    <Compile Include="Configs\BuyableItemsList.cs" />
+    <Compile Include="Configs\EXILED\PluginConfigs.cs" />
+    <Compile Include="Configs\EXILED\PluginTranslations.cs" />
+    <Compile Include="Configs\FoundationFortuneNPCSettings.cs" />
+    <Compile Include="Configs\MoneyExtractionSystemSettings.cs" />
+    <Compile Include="Configs\PerkSystemSettings.cs" />
     <Compile Include="API\HintSystem\HintSystem.cs" />
+    <Compile Include="Configs\SellableItemsList.cs" />
+    <Compile Include="Configs\ServerEventSettings.cs" />
+    <Compile Include="Configs\VoiceChatSettings.cs" />
     <Compile Include="EventHandlers.cs" />
     <Compile Include="Patches\Transpilers.cs" />
     <Compile Include="MainClass.cs" />
-    <Compile Include="Configs\PluginTranslations.cs" />
     <Compile Include="Patches\Postfixes.cs" />
     <Compile Include="Patches\Prefixes.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -132,7 +144,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="EXILED">
-      <Version>8.3.8</Version>
+      <Version>8.3.9</Version>
     </PackageReference>
     <PackageReference Include="Lib.Harmony">
       <Version>2.2.2</Version>
@@ -143,9 +155,9 @@
     <PackageReference Include="System.Collections">
       <Version>4.3.0</Version>
     </PackageReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Todo.txt" />
+    <PackageReference Include="Tomlyn">
+      <Version>0.16.2</Version>
+    </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

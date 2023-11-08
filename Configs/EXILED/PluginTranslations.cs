@@ -1,18 +1,16 @@
 ﻿using System.Collections.Generic;
-using Exiled.API.Interfaces;
 using System.ComponentModel;
-using FoundationFortune.API.Models;
-using FoundationFortune.API.Models.Enums;
+using Exiled.API.Interfaces;
 using FoundationFortune.API.Models.Enums.Perks;
 
-namespace FoundationFortune.Configs
+namespace FoundationFortune.Configs.EXILED
 {
 	public class PluginTranslations : ITranslation
 	{
 		[Description("Server Events")]
-		public string Kill { get; set; } = "<b><color=green>+$300</color> %victim%'s Termination.</b>\\n";
-		public string Escape { get; set; } = "<b><color=green>+$300</color> Successfully Escaped.</b>\\n";
-		public string Death { get; set; } = "<b><color=red>$-%moneyBeforeDeath%.</color> You died.</b>\\n";
+		public string Kill { get; set; } = "<b><color=green>+$300</color> %victim%'s Termination.</b>";
+		public string Escape { get; set; } = "<b><color=green>+$300</color> Successfully Escaped.</b>";
+		public string Death { get; set; } = "<b><color=red>$-%moneyBeforeDeath%.</color> You died.</b>";
 		public string RoundEndWin { get; set; } = "<b><color=%winningFactionColor%>+$%winningAmount%</color> Winning Bonus.</b>\\n";
 		public string RoundEndDraw { get; set; } = "<b><color=%drawFactionColor%>+$%drawAmount%</color> Draw Bonus.</b>\\n";
 		public string RoundEndLoss { get; set; } = "<b><color=%losingFactionColor%>+$%losingAmount%</color> Losing Bonus.</b>\\n";

@@ -26,16 +26,15 @@ namespace FoundationFortune.API.NPCs
             allowedMusicBotNameColors = allowedColors;
         }
 
-        public static Npc SpawnMusicBot(Player target)
+        public static void SpawnMusicBot(Player target)
         {
-            Npc spawnedBuyingBot = SpawnFix(target.Nickname, RoleTypeId.Spectator);
-
-            PlayerMusicBotPair pair = new PlayerMusicBotPair(target, spawnedBuyingBot);
+            Npc spawnedMusicBot = SpawnFix(target.Nickname, RoleTypeId.Spectator);
+            
+            PlayerMusicBotPair pair = new PlayerMusicBotPair(target, spawnedMusicBot);
             FoundationFortune.Singleton.MusicBotPairs.Add(pair);
-            Log.Debug($"Generated Music Bot for player {target.Nickname} / Bot: {spawnedBuyingBot.Nickname ?? "Null"}");
+            Log.Debug($"Generated Music Bot for player {target.Nickname} / Bot: {spawnedMusicBot.Nickname ?? "Null"}");
 
-            Round.IgnoredPlayers.Add(spawnedBuyingBot.ReferenceHub);
-            return spawnedBuyingBot;
+            Round.IgnoredPlayers.Add(spawnedMusicBot.ReferenceHub);
         }
 
         public static Npc GetMusicBotByPlayer(Player player)
@@ -83,7 +82,7 @@ namespace FoundationFortune.API.NPCs
                 // ignored
             }
 
-            npc.ReferenceHub.nicknameSync.Network_myNickSync = $"MusicBot-{name}";
+            npc.ReferenceHub.nicknameSync.Network_myNickSync = $"MusicBot-[{name}]";
             Timing.CallDelayed(0.5f, delegate
             {
                 npc.Role.Set(role);

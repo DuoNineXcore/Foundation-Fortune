@@ -2,14 +2,11 @@
 using System.Linq;
 using CommandSystem;
 using Exiled.API.Features;
-using Exiled.Events;
 using FoundationFortune.API.Database;
-using FoundationFortune.API.Events.EventArgs;
 using FoundationFortune.API;
+using FoundationFortune.API.Events;
 using FoundationFortune.API.Items.PerkItems;
-using FoundationFortune.API.Models;
 using FoundationFortune.API.Models.Classes.Items;
-using FoundationFortune.API.Models.Enums;
 using FoundationFortune.API.Models.Enums.NPCs;
 using FoundationFortune.API.Models.Enums.Perks;
 using FoundationFortune.API.NPCs;
@@ -19,11 +16,12 @@ namespace FoundationFortune.Commands
 {
 	[CommandHandler(typeof(ClientCommandHandler))]
 	[CommandHandler(typeof(RemoteAdminCommandHandler))]
-	public sealed class BuyCommand : ICommand
+	public sealed class BuyCommand : ICommand,IUsageProvider
 	{
 		public string Command { get; } = "buy";
-		public string[] Aliases { get; } = new string[] { string.Empty };
+		public string[] Aliases { get; } = { string.Empty };
 		public string Description { get; } = "Buy items, wow.";
+		public string[] Usage { get; } = { "<ItemType/PerkType>" };
 
 		public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
 		{
@@ -41,7 +39,7 @@ namespace FoundationFortune.Commands
 				return false;
 			}
 			
-			if (Enum.TryParse(arguments.At(0), ignoreCase: true, out PerkType perkType) && perkType == PerkType.ResurgenceBeacon || FoundationFortune.Singleton.Config.PerkItems.Any(p => p.PerkType == PerkType.ResurgenceBeacon && arguments.At(0).ToLower() == p.Alias.ToLower()))
+			if (Enum.TryParse(arguments.At(0), ignoreCase: true, out PerkType perkType) && perkType == PerkType.ResurgenceBeacon || FoundationFortune.BuyableItemsList.PerkItems.Any(p => p.PerkType == PerkType.ResurgenceBeacon && arguments.At(0).ToLower() == p.Alias.ToLower()))
 			{
 				if (arguments.Count >= 2) return TryPurchaseRevivalPerk(player, string.Join(" ", arguments.Skip(0).Skip(1)), out response);
 				response = "You must specify a valid player to revive!";
@@ -55,124 +53,118 @@ namespace FoundationFortune.Commands
 
 		private static bool TryPurchaseRevivalPerk(Player player, string targetName, out string response)
 		{
-			int revivalPerkPrice = FoundationFortune.Singleton.Config.PerkItems
+			int revivalPerkPrice = FoundationFortune.BuyableItemsList.PerkItems
 				.Where(perk => perk.PerkType == PerkType.ResurgenceBeacon)
 				.Select(perk => perk.Price)
 				.FirstOrDefault();
 
-			if (CanPurchase(player, revivalPerkPrice))
+			if (!CanPurchase(player, revivalPerkPrice))
 			{
-				if (ResurgenceBeacon.SpawnResurgenceBeacon(player, targetName))
-				{
-					UsedFoundationFortuneNPCEventArgs usedFoundationFortuneNpcEventArgs = new(player, NPCHelperMethods.GetNearestBuyingBot(player), NpcType.Buying, NpcUsageOutcome.BuySuccess);
-					API.Events.Handlers.FoundationFortuneNPC.OnUsedFoundationFortuneNPC(usedFoundationFortuneNpcEventArgs);
-					response = $"You have successfully bought a Resurgence Beacon for ${revivalPerkPrice} to revive '{targetName}'.";
-					return true;
-				}
-				else
-				{
-					response = "That player either doesn't exist or hasnt died yet!";
-					return false;
-				}
+				response = $"You don't have enough money to purchase the Resurgence Beacon.";
+				EventHelperMethods.RegisterOnUsedFoundationFortuneNPC(player, NpcType.Buying, NpcUsageOutcome.NotEnoughMoney);
+				return false;
 			}
-			response = $"You don't have enough money to purchase the Resurgence Beacon to revive '{targetName}'.";
-			return false;
+
+			if (!ResurgenceBeacon.GiveBeacon(player, targetName))
+			{
+				response = "That player either doesn't exist or hasnt died yet!";
+				return false;
+			}
+
+			EventHelperMethods.RegisterOnUsedFoundationFortuneNPC(player, NpcType.Buying, NpcUsageOutcome.BuySuccess);
+			response = $"You have successfully bought a Resurgence Beacon for ${revivalPerkPrice} to revive '{targetName}'.";
+			return true;
 		}
 
 		private static bool TryPurchasePerk(Player player, string aliasOrEnum, out string response)
 		{
-			PerkItem perkItem = FoundationFortune.Singleton.Config.PerkItems.FirstOrDefault(p =>
+			PerkItem perkItem = FoundationFortune.BuyableItemsList.PerkItems.FirstOrDefault(p =>
 				p.Alias.Equals(aliasOrEnum, StringComparison.OrdinalIgnoreCase) ||
 				p.PerkType.ToString().Equals(aliasOrEnum, StringComparison.OrdinalIgnoreCase));
 
-			if (perkItem != null && CanPurchase(player, perkItem.Price) && !ExceedsPerkLimit(player, perkItem))
+			if (perkItem == null || !CanPurchase(player, perkItem.Price) || ExceedsPerkLimit(player, perkItem))
 			{
-				string boughtHint = FoundationFortune.Singleton.Translation.BuyItemSuccess
-						    .Replace("%itemAlias%", perkItem.Alias)
-						    .Replace("%itemPrice%", perkItem.Price.ToString());
-				FoundationFortune.Singleton.FoundationFortuneAPI.EnqueueHint(player, boughtHint, 3f);
-				
-				PlayerDataRepository.ModifyMoney(player.UserId, perkItem.Price, true);
-				PerkBottle.GivePerkBottle(player, perkItem.PerkType);
-				FoundationFortuneAPI.AddToPlayerLimits(player, perkItem);
+				if (perkItem == null) response = "That is not a valid perk to buy!";
 
-				UsedFoundationFortuneNPCEventArgs usedFoundationFortuneNpcEventArgs = new(player, NPCHelperMethods.GetNearestBuyingBot(player), NpcType.Buying, NpcUsageOutcome.BuySuccess);
-				API.Events.Handlers.FoundationFortuneNPC.OnUsedFoundationFortuneNPC(usedFoundationFortuneNpcEventArgs);
-				
-				response = $"You have successfully bought {perkItem.DisplayName} for ${perkItem.Price}";
-				return true;
+				else if (ExceedsPerkLimit(player, perkItem)) response = $"You have exceeded the Perk Limit for the Perk '{perkItem.DisplayName}'";
+				else
+				{
+					EventHelperMethods.RegisterOnUsedFoundationFortuneNPC(player, NpcType.Buying, NpcUsageOutcome.NotEnoughMoney);
+					response = "You do not have enough money to buy that perk.";
+				}
+
+				response = "That is not a purchasable perk or you do not have enough money";
+				return false;
 			}
 
-			if (perkItem == null) response = "That is not a valid perk to buy!";
-			
-			else if (ExceedsPerkLimit(player, perkItem)) response = $"You have exceeded the Perk Limit for the Perk '{perkItem.DisplayName}'";
-			else
-			{
-				UsedFoundationFortuneNPCEventArgs usedFoundationFortuneNpcEventArgs = new(player, NPCHelperMethods.GetNearestBuyingBot(player), NpcType.Buying, NpcUsageOutcome.NotEnoughMoney);
-				API.Events.Handlers.FoundationFortuneNPC.OnUsedFoundationFortuneNPC(usedFoundationFortuneNpcEventArgs);
-				response = "You do not have enough money to buy that perk.";
-			}
+			string boughtHint = FoundationFortune.Singleton.Translation.BuyItemSuccess
+				.Replace("%itemAlias%", perkItem.Alias)
+				.Replace("%itemPrice%", perkItem.Price.ToString());
+			FoundationFortune.Singleton.FoundationFortuneAPI.EnqueueHint(player, boughtHint, 3f);
+				
+			PlayerDataRepository.ModifyMoney(player.UserId, perkItem.Price, true, true, false);
+			PerkBottle.GivePerkBottle(player, perkItem.PerkType);
+				
+			FoundationFortuneAPI.AddToPlayerLimits(player, perkItem);
+			EventHelperMethods.RegisterOnUsedFoundationFortuneNPC(player, NpcType.Buying, NpcUsageOutcome.BuySuccess);
 
-			response = "That is not a purchasable perk or you do not have enough money";
-			return false;
+			response = $"You have successfully bought {perkItem.DisplayName} for ${perkItem.Price}";
+			return true;
 		}
 
 		private static bool TryPurchaseItem(Player player, string aliasOrEnum, out string response)
 		{
-			BuyableItem buyItem = FoundationFortune.Singleton.Config.BuyableItems.FirstOrDefault(p =>
+			BuyableItem buyItem = FoundationFortune.BuyableItemsList.BuyableItems.FirstOrDefault(p =>
 			    p.Alias.Equals(aliasOrEnum, StringComparison.OrdinalIgnoreCase) ||
 			    p.ItemType.ToString().Equals(aliasOrEnum, StringComparison.OrdinalIgnoreCase));
 
-			if (buyItem != null && CanPurchase(player, buyItem.Price) && !ExceedsItemLimit(player, buyItem))
+			if (buyItem == null || !CanPurchase(player, buyItem.Price) || ExceedsItemLimit(player, buyItem))
 			{
-				string BoughtHint = FoundationFortune.Singleton.Translation.BuyItemSuccess
-				    .Replace("%itemAlias%", buyItem.Alias)
-				    .Replace("%itemPrice%", buyItem.Price.ToString());
-				FoundationFortune.Singleton.FoundationFortuneAPI.EnqueueHint(player, $"{BoughtHint}", 3f);
-				
-				PlayerDataRepository.ModifyMoney(player.UserId, buyItem.Price, true);
-				player.AddItem(buyItem.ItemType);
-				FoundationFortuneAPI.AddToPlayerLimits(player, buyItem);
-				
-				UsedFoundationFortuneNPCEventArgs usedFoundationFortuneNpcEventArgs = new(player, NPCHelperMethods.GetNearestBuyingBot(player), NpcType.Buying, NpcUsageOutcome.BuySuccess);
-				API.Events.Handlers.FoundationFortuneNPC.OnUsedFoundationFortuneNPC(usedFoundationFortuneNpcEventArgs);
-				
-				response = $"You have successfully bought {buyItem.DisplayName} for ${buyItem.Price}";
-				return true;
+				if (buyItem == null) response = "That is not a valid item to buy!";
+				else if (ExceedsItemLimit(player, buyItem)) response = $"You have exceeded the Item Limit for the Item '{buyItem.DisplayName}'";
+				else
+				{
+					EventHelperMethods.RegisterOnUsedFoundationFortuneNPC(player, NpcType.Buying, NpcUsageOutcome.NotEnoughMoney);
+					response = "You do not have enough money to buy that item.";
+				}
+
+				return false;
 			}
 
-			if (buyItem == null) { response = "That is not a valid item to buy!"; }
-			else if (ExceedsItemLimit(player, buyItem)) response = $"You have exceeded the Item Limit for the Item '{buyItem.DisplayName}'";
-			else
-			{
-				UsedFoundationFortuneNPCEventArgs usedFoundationFortuneNpcEventArgs = new(player, NPCHelperMethods.GetNearestBuyingBot(player), NpcType.Buying, NpcUsageOutcome.NotEnoughMoney);
-				API.Events.Handlers.FoundationFortuneNPC.OnUsedFoundationFortuneNPC(usedFoundationFortuneNpcEventArgs);
-				response = "You do not have enough money to buy that item.";
-			}
-			
-			return false;
+			string BoughtHint = FoundationFortune.Singleton.Translation.BuyItemSuccess
+				.Replace("%itemAlias%", buyItem.Alias)
+				.Replace("%itemPrice%", buyItem.Price.ToString());
+			FoundationFortune.Singleton.FoundationFortuneAPI.EnqueueHint(player, $"{BoughtHint}", 3f);
+				
+			PlayerDataRepository.ModifyMoney(player.UserId, buyItem.Price, true, true, false);
+			player.AddItem(buyItem.ItemType);
+				
+			FoundationFortuneAPI.AddToPlayerLimits(player, buyItem);
+			EventHelperMethods.RegisterOnUsedFoundationFortuneNPC(player, NpcType.Buying, NpcUsageOutcome.BuySuccess);
+
+			response = $"You have successfully bought {buyItem.DisplayName} for ${buyItem.Price}";
+			return true;
 		}
 
 		private static bool CanPurchase(Player player, int price)
 		{
 			if (PlayerDataRepository.GetPluginAdmin(player.UserId)) return true;
-			int money = PlayerDataRepository.GetMoneySaved(player.UserId);
+			int money = PlayerDataRepository.GetMoneyOnHold(player.UserId);
 			return money >= price;
 		}
 
 		private static string GetList()
 		{
 			var translation = FoundationFortune.Singleton.Translation;
-			var config = FoundationFortune.Singleton.Config;
 
-			string itemsList = string.Join("\n", config.BuyableItems
+			string itemsList = string.Join("\n", FoundationFortune.BuyableItemsList.BuyableItems
 			    .Select(buyableItem => translation.ItemsList
 				   .Replace("%buyableItemType%", buyableItem.ItemType.ToString())
 				   .Replace("%buyableItemDisplayName%", buyableItem.DisplayName)
 				   .Replace("%buyableItemAlias%", buyableItem.Alias)
 				   .Replace("%buyableItemPrice%", buyableItem.Price.ToString())));
 
-			string perksList = string.Join("\n", config.PerkItems
+			string perksList = string.Join("\n", FoundationFortune.BuyableItemsList.PerkItems
 			    .Select(perkItem => translation.PerksList
 				   .Replace("%perkItemDisplayName%", perkItem.DisplayName)
 				   .Replace("%perkItemAlias%", perkItem.Alias)

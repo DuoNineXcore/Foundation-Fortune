@@ -31,11 +31,7 @@ namespace FoundationFortune.API.NPCs
                    || FoundationFortune.Singleton.MusicBotPairs.Any(pair => pair.Player == targetPlayer);
         }
 
-        public static bool IsFoundationFortuneNPC(ScpSubroutineBase targetTrack)
-        {
-            if (targetTrack.Role.TryGetOwner(out ReferenceHub refHub)) return IsFoundationFortuneNPC(refHub);
-            return false;
-        }
+        public static bool IsFoundationFortuneNPC(ScpSubroutineBase targetTrack) => targetTrack.Role.TryGetOwner(out ReferenceHub refHub) && IsFoundationFortuneNPC(refHub);
         
         public static Npc GetNearestBuyingBot(Player player)
         {
@@ -75,23 +71,16 @@ namespace FoundationFortune.API.NPCs
 
         private static bool IsPlayerNearFoundationFortuneBot(Player player, Dictionary<Npc, Vector3> botPositions, NpcType botType)
         {
-            float botRadius = FoundationFortune.Singleton.Config.BuyingBotRadius;
+            float botRadius = FoundationFortune.FoundationFortuneNpcSettings.BuyingBotRadius;
 
-            foreach (var kvp in botPositions)
+            foreach (var bot in from kvp in botPositions let bot = kvp.Key let botPosition = kvp.Value let distance = Vector3.Distance(player.Position, botPosition) where distance <= botRadius select bot)
             {
-                Npc bot = kvp.Key;
-                Vector3 botPosition = kvp.Value;
-                float distance = Vector3.Distance(player.Position, botPosition);
-
-                if (distance <= botRadius)
+                switch (botType)
                 {
-                    switch (botType)
-                    {
-                        case NpcType.Buying when FoundationFortune.Singleton.BuyingBots.Any(x => x.Value.bot == bot):
-                            return true;
-                        case NpcType.Selling when FoundationFortune.Singleton.SellingBots.Any(x => x.Value.bot == bot):
-                            return true;
-                    }
+                    case NpcType.Buying when FoundationFortune.Singleton.BuyingBots.Any(x => x.Value.bot == bot):
+                        return true;
+                    case NpcType.Selling when FoundationFortune.Singleton.SellingBots.Any(x => x.Value.bot == bot):
+                        return true;
                 }
             }
             return false;
@@ -99,7 +88,7 @@ namespace FoundationFortune.API.NPCs
         
         private static Npc GetNearestFoundationFortuneBot(Player player, Dictionary<Npc, Vector3> botPositions, NpcType botType)
         {
-            float botRadius = FoundationFortune.Singleton.Config.BuyingBotRadius;
+            float botRadius = FoundationFortune.FoundationFortuneNpcSettings.BuyingBotRadius;
             foreach (var kvp in from kvp in botPositions let botPosition = kvp.Value let distance = Vector3.Distance(player.Position, botPosition) where distance <= botRadius select kvp)
             {
                 switch (botType)
@@ -116,10 +105,8 @@ namespace FoundationFortune.API.NPCs
         public static Npc SpawnFix(string name, RoleTypeId role, int id = 0, Vector3? position = null)
         {
             GameObject gameObject = UnityEngine.Object.Instantiate(NetworkManager.singleton.playerPrefab);
-            Npc npc = new(gameObject)
-            {
-                IsNPC = true
-            };
+            Npc npc = new(gameObject) { IsNPC = true };
+            
             try
             {
                 npc.ReferenceHub.roleManager.InitializeNewRole(RoleTypeId.None, RoleChangeReason.None, RoleSpawnFlags.None);
@@ -143,21 +130,12 @@ namespace FoundationFortune.API.NPCs
             }
 
             npc.ReferenceHub.nicknameSync.Network_myNickSync = name;
-            Timing.CallDelayed(0.25f, delegate
-            {
-                npc.Role.Set(role, SpawnReason.ForceClass, position.HasValue ? RoleSpawnFlags.AssignInventory : RoleSpawnFlags.All);
-            });
-            if (position.HasValue)
-            {
-                Timing.CallDelayed(0.5f, delegate
-                {
-                    npc.Position = position.Value;
-                });
-            }
+            Timing.CallDelayed(0.25f, delegate { npc.Role.Set(role, SpawnReason.ForceClass, position.HasValue ? RoleSpawnFlags.AssignInventory : RoleSpawnFlags.All); });
+            if (position.HasValue) Timing.CallDelayed(0.5f, delegate { npc.Position = position.Value; });
             return npc;
         }
 
-        public static (ushort horizontal, ushort vertical) ToClientUShorts(Quaternion rotation)
+        private static (ushort horizontal, ushort vertical) ToClientUShorts(Quaternion rotation)
         {
             if (rotation.eulerAngles.z != 0f) rotation = Quaternion.LookRotation(rotation * Vector3.forward, Vector3.up);
 
@@ -190,7 +168,7 @@ namespace FoundationFortune.API.NPCs
             }
         }
 
-        public static void LookAt(Npc npc, Vector3 position)
+        private static void LookAt(Npc npc, Vector3 position)
         {
             Vector3 direction = position - npc.Position;
             Quaternion quat = Quaternion.LookRotation(direction, Vector3.up);
@@ -205,6 +183,7 @@ namespace FoundationFortune.API.NPCs
             {
                 foreach (Player player in Player.List)
                 {
+                    if (!player.GetEffect(EffectType.Invisible)) continue;
                     if (!player.IsAlive) continue;
                     
                     Npc buyingBot = GetNearestBuyingBot(player);
@@ -214,7 +193,7 @@ namespace FoundationFortune.API.NPCs
                     else if(sellingBot != null) LookAt(sellingBot, player.Position);
                 }
 
-                yield return Timing.WaitForSeconds(0.01f);
+                yield return Timing.WaitForSeconds(FoundationFortune.Singleton.Config.NPCLookatUpdateRate);
             }
         }
     }

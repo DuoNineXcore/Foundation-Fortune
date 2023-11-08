@@ -5,7 +5,7 @@ using Exiled.API.Features.Spawn;
 using Exiled.CustomItems.API.Features;
 using Exiled.Events.EventArgs.Player;
 using System.Collections.Generic;
-using FoundationFortune.API.Perks;
+using Exiled.API.Features.Items;
 
 namespace FoundationFortune.API.Items.PerkItems
 {
@@ -36,18 +36,17 @@ namespace FoundationFortune.API.Items.PerkItems
             revivalInfo.PlayerToRevive.RemoveItem(ev.Item, true);
             ev.IsAllowed = false;
         }
-
-        public static bool SpawnResurgenceBeacon(Player giver, string targetPlayerUserId)
+        
+        public static bool GiveBeacon(Player giver, string targetPlayerUserId)
         {
+            CustomItem customItem = new ResurgenceBeacon();
             Player targetPlayer = Player.Get(targetPlayerUserId);
-            if (targetPlayer == null) return false;
+            var item = Item.Create(ItemType.Radio, giver);
 
-            if (!TrySpawn(332, giver.Position, out Pickup resurgencebeacon)) return false;
-            if (resurgencebeacon != null)
-            {
-                Log.Debug($"Spawned Resurgence Beacon at Pos:{resurgencebeacon.Position} Serial: {resurgencebeacon.Serial}, Player to be revived: {targetPlayer}");
-                RevivalData[resurgencebeacon.Serial] = (giver, targetPlayer);
-            }
+            customItem.Give(giver, item,false);
+	        
+            Log.Debug($"Resurgence Beacon Given to Player: {giver.Nickname} Serial: {item.Serial} Set to revive: {targetPlayer.Nickname}");
+            RevivalData[item.Serial] = (giver, targetPlayer);
             return true;
         }
     }

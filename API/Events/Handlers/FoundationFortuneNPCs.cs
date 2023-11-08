@@ -7,6 +7,7 @@ namespace FoundationFortune.API.Events.Handlers
     {
         public static Event<UsedFoundationFortuneNPCEventArgs> UsedFoundationFortuneNPC { get; set; } = new();
     
+        
         public static void OnUsedFoundationFortuneNPC(UsedFoundationFortuneNPCEventArgs ev) => UsedFoundationFortuneNPC.InvokeSafely(ev);
-    }   
+    }
 }

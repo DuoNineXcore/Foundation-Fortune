@@ -24,7 +24,7 @@ namespace FoundationFortune.Commands.FortuneCommands.AdminCommands.ExtractionCom
                 return false;
             }
 
-            switch (FoundationFortune.Singleton.Config.MoneyExtractionSystem)
+            switch (FoundationFortune.MoneyExtractionSystemSettings.MoneyExtractionSystem)
             {
                 case true when !FoundationFortune.Singleton.FoundationFortuneAPI.limitReached:
                     FoundationFortune.Singleton.FoundationFortuneAPI.DeactivateExtractionPoint(true);

@@ -11,7 +11,7 @@ using FoundationFortune.API.Items.PerkItems;
 using FoundationFortune.API.Models;
 using FoundationFortune.API.Models.Classes.Hints;
 using FoundationFortune.API.Models.Enums;
-using FoundationFortune.API.Perks;
+using FoundationFortune.API.NPCs;
 
 // ReSharper disable once CheckNamespace
 namespace FoundationFortune.API
@@ -44,32 +44,21 @@ namespace FoundationFortune.API
                     StringBuilder hintMessageBuilder = new();
                     PerkSystem.UpdatePerkIndicator(FoundationFortune.Singleton.ConsumedPerks, ref hintMessageBuilder);
 
-                    if (!PlayerDataRepository.GetHintMinmode(ply.UserId))
+                    if ((!PlayerDataRepository.GetHintMinmode(ply.UserId)) || (NPCHelperMethods.IsPlayerNearSellingBot(ply) || NPCHelperMethods.IsPlayerNearBuyingBot(ply)))
                     {
-                        string moneySavedString;
-                        string moneyHoldString;
-                        
-                        if (PlayerDataRepository.GetPluginAdmin(ply.UserId))
-                        {
-                            moneySavedString = FoundationFortune.Singleton.Translation.MoneyCounterSaved
-                                .Replace("%rolecolor%", ply.Role.Color.ToHex())
-                                .Replace("%moneySaved%", "inf");
+	                    bool isPluginAdmin = PlayerDataRepository.GetPluginAdmin(ply.UserId);
+	                    string moneySavedValue = isPluginAdmin ? "inf" : moneySaved.ToString();
+	                    string moneyOnHoldValue = isPluginAdmin ? "inf" : moneyOnHold.ToString();
 
-                            moneyHoldString = FoundationFortune.Singleton.Translation.MoneyCounterOnHold
-                                .Replace("%rolecolor%", ply.Role.Color.ToHex())
-                                .Replace("%moneyOnHold%", "inf");
-                        }
-                        else
-                        {
-                            moneySavedString = FoundationFortune.Singleton.Translation.MoneyCounterSaved
-                                .Replace("%rolecolor%", ply.Role.Color.ToHex())
-                                .Replace("%moneySaved%", moneySaved.ToString());
+	                    string moneySavedString = FoundationFortune.Singleton.Translation.MoneyCounterSaved
+		                    .Replace("%rolecolor%", ply.Role.Color.ToHex())
+		                    .Replace("%moneySaved%", moneySavedValue);
 
-                            moneyHoldString = FoundationFortune.Singleton.Translation.MoneyCounterOnHold
-                                .Replace("%rolecolor%", ply.Role.Color.ToHex())
-                                .Replace("%moneyOnHold%", moneyOnHold.ToString());
-                        }
-                        hintMessageBuilder.Append($"{moneySavedString}{moneyHoldString}");
+	                    string moneyHoldString = FoundationFortune.Singleton.Translation.MoneyCounterOnHold
+		                    .Replace("%rolecolor%", ply.Role.Color.ToHex())
+		                    .Replace("%moneyOnHold%", moneyOnHoldValue);
+	                    
+	                    hintMessageBuilder.Append($"{moneySavedString}{moneyHoldString}");
                     }
 
                     UpdateExtractionMessages(ply, ref hintMessageBuilder);
@@ -86,7 +75,7 @@ namespace FoundationFortune.API
 
                     ply.ShowHint($"<size={hintSize}><align={hintAlignment}>{hintMessageBuilder}</align>", 2);
 
-                    if (!confirmSell.ContainsKey(ply.UserId) || !(Time.time - dropTimestamp[ply.UserId] >= FoundationFortune.Singleton.Config.SellingConfirmationTime))
+                    if (!confirmSell.ContainsKey(ply.UserId) || !(Time.time - dropTimestamp[ply.UserId] >= FoundationFortune.SellableItemsList.SellingConfirmationTime))
 	                    continue;
                     
                     confirmSell.Remove(ply.UserId);
@@ -101,7 +90,7 @@ namespace FoundationFortune.API
 		{
 			if (!recentHints.TryGetValue(userId, out var hint)) return string.Empty;
 			var currentHints = hint
-				.Where(entry => !entry.IsAnimated && (Time.time - entry.Timestamp) <= FoundationFortune.Singleton.Config.MaxHintAge)
+				.Where(entry => !entry.IsAnimated && (Time.time - entry.Timestamp) <= FoundationFortune.ServerEventSettings.MaxHintAge)
 				.Select(entry => entry.Text);
 
 			return string.Join("\n", currentHints);
@@ -111,7 +100,7 @@ namespace FoundationFortune.API
 		{
 			if (!recentHints.TryGetValue(userId, out var hint)) return string.Empty;
 			var currentHints = hint
-				.Where(entry => entry.IsAnimated && (Time.time - entry.Timestamp) <= FoundationFortune.Singleton.Config.MaxHintAge)
+				.Where(entry => entry.IsAnimated && (Time.time - entry.Timestamp) <= FoundationFortune.ServerEventSettings.MaxHintAge)
 				.Select(entry => entry.Text);
 
 			return string.Join("\n", currentHints);

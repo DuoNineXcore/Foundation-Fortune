@@ -9,9 +9,7 @@ using Exiled.API.Enums;
 using Exiled.API.Features.Doors;
 using FoundationFortune.API.Models.Classes.Items;
 using FoundationFortune.API.Models.Classes.NPCs;
-using FoundationFortune.API.Models.Enums.NPCs;
 using FoundationFortune.API.NPCs;
-using FoundationFortune.API.Perks;
 using MEC;
 
 // ReSharper disable once CheckNamespace
@@ -21,31 +19,24 @@ namespace FoundationFortune.API
 	{
         #region NPCs
         public readonly Dictionary<Npc, Vector3> buyingBotPositions = new();
-        private readonly Dictionary<Npc, Vector3> sellingBotPositions = new();
+        public readonly Dictionary<Npc, Vector3> sellingBotPositions = new();
 
         private void InitializeFoundationFortuneNPCs()
         {
             Log.Debug($"Initializing Foundation Fortune NPCs.");
-            if (!FoundationFortune.Singleton.Config.BuyingBots) Log.Debug($"Buying bots are turned off");
+            if (!FoundationFortune.FoundationFortuneNpcSettings.BuyingBots) Log.Debug("Buying bots are turned off");
             else
             {
                 Log.Debug($"Initializing Buying Bot NPCs.");
-                foreach (BuyingBotSpawn spawn in FoundationFortune.Singleton.Config.BuyingBotSpawnSettings)
+                foreach (BuyingBotSpawn spawn in FoundationFortune.FoundationFortuneNpcSettings.BuyingBotSpawnSettings)
                 {
                     Log.Debug($"Spawning Bot: {spawn.Name}");
-                    BuyingBot.SpawnBuyingBot(
-                        spawn.Name,
-                        spawn.Badge,
-                        spawn.BadgeColor,
-                        spawn.Role,
-                        spawn.HeldItem,
-                        spawn.Scale
-                    );
+                    BuyingBot.SpawnBuyingBot(spawn.Name, spawn.Badge, spawn.BadgeColor, spawn.Role, spawn.HeldItem, spawn.Scale);
                 }
 
-                if (FoundationFortune.Singleton.Config.BuyingBotFixedLocation)
+                if (FoundationFortune.FoundationFortuneNpcSettings.BuyingBotFixedLocation)
                 {
-                    var rooms = FoundationFortune.Singleton.Config.BuyingBotSpawnSettings.Select(location => location.Room).ToList();
+                    var rooms = FoundationFortune.FoundationFortuneNpcSettings.BuyingBotSpawnSettings.Select(location => location.Room).ToList();
 
                     foreach (var kvp in FoundationFortune.Singleton.BuyingBots)
                     {
@@ -70,7 +61,7 @@ namespace FoundationFortune.API
                 }
                 else
                 {
-                    var rooms = Room.List.Where(r => FoundationFortune.Singleton.Config.BuyingBotRandomRooms.Contains(r.Type)).ToList();
+                    var rooms = Room.List.Where(r => FoundationFortune.FoundationFortuneNpcSettings.BuyingBotRandomRooms.Contains(r.Type)).ToList();
                     var availableIndexes = Enumerable.Range(0, rooms.Count).ToList();
 
                     availableIndexes.Clear();
@@ -101,30 +92,23 @@ namespace FoundationFortune.API
                 }
             }
 
-            if (!FoundationFortune.Singleton.Config.SellingBots) Log.Debug($"Selling bots are turned off");
+            if (!FoundationFortune.FoundationFortuneNpcSettings.SellingBots) Log.Debug($"Selling bots are turned off");
             else
             {
                 Log.Debug($"Initializing Selling Bot NPCs.");
 
                 sellingBotPositions.Clear();
 
-                foreach (SellingBotSpawn spawn in FoundationFortune.Singleton.Config.SellingBotSpawnSettings)
+                foreach (SellingBotSpawn spawn in FoundationFortune.FoundationFortuneNpcSettings.SellingBotSpawnSettings)
                 {
-                    Log.Debug($"Spawning Bot: {spawn.Name}");
-                    SellingBot.SpawnSellingBot(
-                        spawn.Name,
-                        spawn.Badge,
-                        spawn.BadgeColor,
-                        spawn.Role,
-                        spawn.HeldItem,
-                        spawn.Scale
-                    );
+                    Log.Debug($"Selling Bot Spawned: {spawn.Name}");
+                    SellingBot.SpawnSellingBot(spawn.Name, spawn.Badge, spawn.BadgeColor, spawn.Role, spawn.HeldItem, spawn.Scale);
                 }
 
-                if (FoundationFortune.Singleton.Config.SellingBotFixedLocation)
+                if (FoundationFortune.FoundationFortuneNpcSettings.SellingBotFixedLocation)
                 {
                     Log.Debug($"Bots spawned.");
-                    var rooms = FoundationFortune.Singleton.Config.SellingBotSpawnSettings.Select(location => location.Room).ToList();
+                    var rooms = FoundationFortune.FoundationFortuneNpcSettings.SellingBotSpawnSettings.Select(location => location.Room).ToList();
 
                     foreach (var kvp in FoundationFortune.Singleton.SellingBots)
                     {
@@ -150,7 +134,7 @@ namespace FoundationFortune.API
                 else
                 {
                     Log.Debug($"Bots spawned randomly.");
-                    var rooms = Room.List.Where(r => FoundationFortune.Singleton.Config.SellingBotRandomRooms.Contains(r.Type)).ToList();
+                    var rooms = Room.List.Where(r => FoundationFortune.FoundationFortuneNpcSettings.SellingBotRandomRooms.Contains(r.Type)).ToList();
                     var availableIndexes = Enumerable.Range(0, rooms.Count).ToList();
 
                     availableIndexes.Clear();
@@ -182,18 +166,6 @@ namespace FoundationFortune.API
             }
         }
 
-        private static NpcVoiceChatUsageType GetVoiceChatUsageType(NpcType npcType, NpcUsageOutcome outcome)
-        {
-            return outcome switch
-            {
-                NpcUsageOutcome.SellSuccess when npcType == NpcType.Selling => NpcVoiceChatUsageType.Selling,
-                NpcUsageOutcome.BuySuccess when npcType == NpcType.Buying => NpcVoiceChatUsageType.Buying,
-                NpcUsageOutcome.NotEnoughMoney when npcType == NpcType.Buying => NpcVoiceChatUsageType.NotEnoughMoney,
-                NpcUsageOutcome.WrongBot when npcType is NpcType.Buying or NpcType.Selling => NpcVoiceChatUsageType.WrongBot,
-                _ => NpcVoiceChatUsageType.None
-            };
-        }
-
         #endregion
 
         #region Hint System
@@ -222,7 +194,7 @@ namespace FoundationFortune.API
         private string GetConfirmationTimeLeft(Player ply)
         {
             if (!dropTimestamp.ContainsKey(ply.UserId)) return "0";
-            float timeLeft = FoundationFortune.Singleton.Config.SellingConfirmationTime - (Time.time - dropTimestamp[ply.UserId]);
+            float timeLeft = FoundationFortune.SellableItemsList.SellingConfirmationTime - (Time.time - dropTimestamp[ply.UserId]);
             return timeLeft > 0 ? timeLeft.ToString("F0") : "0";
         }
         #endregion
@@ -232,12 +204,11 @@ namespace FoundationFortune.API
             foreach (var botData in FoundationFortune.Singleton.BuyingBots.Values.ToList()) BuyingBot.RemoveBuyingBot(botData.bot.Nickname);
             foreach (var botData in FoundationFortune.Singleton.SellingBots.Values.ToList()) SellingBot.RemoveSellingBot(botData.bot.Nickname);
             foreach (var botData in FoundationFortune.Singleton.MusicBotPairs.ToList()) MusicBot.RemoveMusicBot(botData.MusicBot.Nickname);
-            buyingBotPositions.Clear();
-            workstationPositions.Clear();
-            PerkSystem.EtherealInterventionPlayers.Clear();
-            PerkSystem.ViolentImpulsesPlayers.Clear();
+            PerkSystem.PerkPlayers.Clear();
             FoundationFortune.Singleton.ConsumedPerks.Clear();
             FoundationFortune.PlayerPurchaseLimits.Clear();
+            buyingBotPositions.Clear();
+            workstationPositions.Clear();
         }
 
         public static void AddToPlayerLimits(Player player, PerkItem perkItem)
@@ -280,8 +251,8 @@ namespace FoundationFortune.API
 		}
         
         #region Workstations
-        
         private Dictionary<WorkstationController, Vector3> workstationPositions = new();
+        
         public bool IsPlayerOnSellingWorkstation(Player player) => workstationPositions.Count != 0 && workstationPositions.Values.Select(workstationPosition => 
             Vector3.Distance(player.Position, workstationPosition)).Any(distance => distance <= FoundationFortune.Singleton.Config.SellingWorkstationRadius);
         
@@ -298,9 +269,7 @@ namespace FoundationFortune.API
             int numWorkstationsToConsider = allWorkstations.Count / 2;
             HashSet<WorkstationController> selectedWorkstations = new();
 
-            foreach (var workstation in allWorkstations.OrderBy(_ => Random.value).Take(numWorkstationsToConsider))
-                selectedWorkstations.Add(workstation);
-
+            foreach (var workstation in allWorkstations.OrderBy(_ => Random.value).Take(numWorkstationsToConsider)) selectedWorkstations.Add(workstation);
             workstationPositions = selectedWorkstations.ToDictionary(workstation => workstation, workstation => workstation.transform.position);
         }
         
