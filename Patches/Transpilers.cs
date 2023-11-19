@@ -5,6 +5,7 @@ using PlayerRoles.PlayableScps.Scp096;
 using PlayerRoles.PlayableScps.Scp173;
 using PlayerRoles.PlayableScps.Scp939.Ripples;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Reflection.Emit;
 using FoundationFortune.API.NPCs;
 
@@ -70,13 +71,11 @@ internal static class UpdateObservers
         Label skip = generator.DefineLabel();
 
         int index = newInstructions.FindIndex(x =>
-            x.opcode == OpCodes.Call && x.operand == (object)AccessTools.Method(typeof(Scp173ObserversTracker),
-                nameof(Scp173ObserversTracker.UpdateObserver))) + 3;
+            x.opcode == OpCodes.Call && (MethodInfo)x.operand == AccessTools.Method(typeof(Scp173ObserversTracker), nameof(Scp173ObserversTracker.UpdateObserver))) + 3;
         newInstructions[index].labels.Add(skip);
 
         index = newInstructions.FindIndex(x =>
-            x.opcode == OpCodes.Call && x.operand == (object)AccessTools.Method(typeof(Scp173ObserversTracker),
-                nameof(Scp173ObserversTracker.UpdateObserver))) - 3;
+            x.opcode == OpCodes.Call && (MethodInfo)x.operand == AccessTools.Method(typeof(Scp173ObserversTracker), nameof(Scp173ObserversTracker.UpdateObserver))) - 3;
         newInstructions.InsertRange(index, new List<CodeInstruction>()
         {
             new CodeInstruction(OpCodes.Ldloc_3),

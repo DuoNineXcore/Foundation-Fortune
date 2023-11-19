@@ -71,13 +71,13 @@ public class BuyableItemsList : IFoundationFortuneConfig
 		new BuyableItem { Limit = 1, Alias = "Lantern", ItemType = ItemType.Lantern, Price = 200, DisplayName = "Lantern" }, 
 	};	
 	
-	public List<PerkItem> PerkItems { get; set; } = new List<PerkItem>
+	public List<BuyablePerk> PerkItems { get; set; } = new List<BuyablePerk>
 	{
-		new PerkItem { Limit = 1, Alias = "speed", PerkType = PerkType.HyperactiveBehavior, Price = 2500, DisplayName = "Hyperactivity", Description = "" },
-		new PerkItem { Limit = 1, Alias = "regen", PerkType = PerkType.EthericVitality, Price = 2800, DisplayName = "Etheric Vitality", Description = "" },
-		new PerkItem { Limit = 1, Alias = "damage", PerkType = PerkType.ViolentImpulses, Price = 3000, DisplayName = "Violent Impulses", Description = "" },
-		new PerkItem { Limit = 1, Alias = "bliss", PerkType = PerkType.BlissfulUnawareness, Price = 3400, DisplayName = "Blissful Unawareness", Description = "" },
-		new PerkItem { Limit = 1, Alias = "revive", PerkType = PerkType.ResurgenceBeacon, Price = 4000, DisplayName = "Resurgence Beacon", Description = "" },
-		new PerkItem { Limit = 1, Alias = "selfres", PerkType = PerkType.EtherealIntervention, Price = 4000, DisplayName = "Ethereal Intervention", Description = "" },
+		new BuyablePerk { Limit = 1, Alias = "speed", PerkType = PerkType.HyperactiveBehavior, Price = 2500, DisplayName = "Hyperactivity", Description = "" },
+		new BuyablePerk { Limit = 1, Alias = "regen", PerkType = PerkType.EthericVitality, Price = 2800, DisplayName = "Etheric Vitality", Description = "" },
+		new BuyablePerk { Limit = 1, Alias = "damage", PerkType = PerkType.ViolentImpulses, Price = 3000, DisplayName = "Violent Impulses", Description = "" },
+		new BuyablePerk { Limit = 1, Alias = "bliss", PerkType = PerkType.BlissfulUnawareness, Price = 3400, DisplayName = "Blissful Unawareness", Description = "" },
+		new BuyablePerk { Limit = 1, Alias = "revive", PerkType = PerkType.ResurgenceBeacon, Price = 4000, DisplayName = "Resurgence Beacon", Description = "" },
+		new BuyablePerk { Limit = 1, Alias = "selfres", PerkType = PerkType.EtherealIntervention, Price = 4000, DisplayName = "Ethereal Intervention", Description = "" },
 	};
 }

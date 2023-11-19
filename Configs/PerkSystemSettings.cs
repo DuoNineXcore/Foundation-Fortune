@@ -34,4 +34,14 @@ public class PerkSystemSettings : IFoundationFortuneConfig
         RoomType.HczHid,
         RoomType.Lcz330
     };
+    
+    public Dictionary<PerkType, string> PerkCounterEmojis { get; set; } = new Dictionary<PerkType, string>
+    {
+        { PerkType.ViolentImpulses, "🔪" }, 
+        { PerkType.EthericVitality, "❤️" },
+        { PerkType.HyperactiveBehavior, "🏃" },
+        { PerkType.BlissfulUnawareness, "💞" },
+        { PerkType.ExtrasensoryPerception, "◎" },
+        { PerkType.EtherealIntervention, "✚" } 
+    };
 }

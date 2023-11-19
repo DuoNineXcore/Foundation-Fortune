@@ -1,13 +1,13 @@
-﻿using Exiled.API.Features;
-using UnityEngine;
-using MEC;
-using PlayerRoles;
+﻿using System.Collections.Generic;
 using System.Linq;
+using Exiled.API.Features;
 using Exiled.API.Features.Items;
+using MEC;
 using Mirror;
-using System.Collections.Generic;
+using PlayerRoles;
+using UnityEngine;
 
-namespace FoundationFortune.API.NPCs
+namespace FoundationFortune.API.NPCs.NpcTypes
 {
     public static class BuyingBot
     {
@@ -21,11 +21,21 @@ namespace FoundationFortune.API.NPCs
             allowedBuyingBotNameColors = allowedColors;
         }
 
+        /// <summary>
+        /// Spawns a buying bot with the specified parameters.
+        /// </summary>
+        /// <param name="target">The target user ID or name for the buying bot.</param>
+        /// <param name="Badge">The rank name for the buying bot.</param>
+        /// <param name="Color">The rank color for the buying bot.</param>
+        /// <param name="Role">The role type ID for the buying bot.</param>
+        /// <param name="HeldItem">The held item type for the buying bot (null for no item).</param>
+        /// <param name="scale">The scale vector for the buying bot.</param>
+        /// <returns>The spawned buying bot.</returns>
         public static Npc SpawnBuyingBot(string target, string Badge, string Color, RoleTypeId Role, ItemType? HeldItem, Vector3 scale)
         {
             int indexation = 0;
             while (FoundationFortune.Singleton.BuyingBots.Values.Any(data => data.indexation == indexation)) indexation++;
-            
+    
             Npc spawnedBuyingBot = NPCHelperMethods.SpawnFix(target, Role, indexation);
             string botKey = $"BuyingBot-{target}";
             FoundationFortune.Singleton.BuyingBots[botKey] = (spawnedBuyingBot, indexation);

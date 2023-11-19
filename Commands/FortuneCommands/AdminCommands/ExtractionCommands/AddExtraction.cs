@@ -4,6 +4,7 @@ using Exiled.API.Enums;
 using Exiled.API.Features;
 using Exiled.Permissions.Extensions;
 using FoundationFortune.API.Database;
+using FoundationFortune.API.EventSystems;
 
 namespace FoundationFortune.Commands.FortuneCommands.AdminCommands.ExtractionCommands
 {
@@ -47,7 +48,7 @@ namespace FoundationFortune.Commands.FortuneCommands.AdminCommands.ExtractionCom
                 return false;
             }
 
-            FoundationFortune.Singleton.FoundationFortuneAPI.StartExtractionEvent(roomType, duration);
+            ServerExtractionSystem.StartExtractionEvent(roomType, duration);
 
             response = $"Extraction zone event created for {roomType} lasting {duration} seconds.";
             return true;

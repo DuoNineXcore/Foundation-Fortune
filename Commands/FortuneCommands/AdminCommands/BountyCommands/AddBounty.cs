@@ -3,6 +3,7 @@ using CommandSystem;
 using Exiled.API.Features;
 using Exiled.Permissions.Extensions;
 using FoundationFortune.API.Database;
+using FoundationFortune.API.EventSystems;
 
 namespace FoundationFortune.Commands.FortuneCommands.AdminCommands.BountyCommands
 {
@@ -46,7 +47,7 @@ namespace FoundationFortune.Commands.FortuneCommands.AdminCommands.BountyCommand
             }
 
             TimeSpan bountyDuration = TimeSpan.FromSeconds(durationInSeconds);
-            FoundationFortune.Singleton.FoundationFortuneAPI.AddBounty(player, bountyAmount, bountyDuration);
+            ServerBountySystem.AddBounty(player, bountyAmount, bountyDuration);
             response = $"Bounty of ${bountyAmount} added to {player.Nickname} for {durationInSeconds} seconds.";
             return true;
         }

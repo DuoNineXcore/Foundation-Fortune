@@ -5,7 +5,9 @@ using Exiled.API.Features.Spawn;
 using Exiled.CustomItems.API.Features;
 using Exiled.Events.EventArgs.Player;
 using System.Collections.Generic;
+using Discord;
 using Exiled.API.Features.Items;
+using FoundationFortune.API.Systems;
 
 namespace FoundationFortune.API.Items.PerkItems
 {
@@ -45,7 +47,7 @@ namespace FoundationFortune.API.Items.PerkItems
 
             customItem.Give(giver, item,false);
 	        
-            Log.Debug($"Resurgence Beacon Given to Player: {giver.Nickname} Serial: {item.Serial} Set to revive: {targetPlayer.Nickname}");
+            FoundationFortune.Log($"Resurgence Beacon Given to Player: {giver.Nickname} Serial: {item.Serial} Set to revive: {targetPlayer.Nickname}", LogLevel.Debug);
             RevivalData[item.Serial] = (giver, targetPlayer);
             return true;
         }

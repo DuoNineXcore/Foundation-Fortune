@@ -3,6 +3,7 @@ using CommandSystem;
 using Exiled.API.Features;
 using Exiled.Permissions.Extensions;
 using FoundationFortune.API.Database;
+using FoundationFortune.API.EventSystems;
 
 namespace FoundationFortune.Commands.FortuneCommands.AdminCommands.ExtractionCommands
 {
@@ -26,11 +27,11 @@ namespace FoundationFortune.Commands.FortuneCommands.AdminCommands.ExtractionCom
 
             switch (FoundationFortune.MoneyExtractionSystemSettings.MoneyExtractionSystem)
             {
-                case true when !FoundationFortune.Singleton.FoundationFortuneAPI.limitReached:
-                    FoundationFortune.Singleton.FoundationFortuneAPI.DeactivateExtractionPoint(true);
+                case true when !ServerExtractionSystem.limitReached:
+                    ServerExtractionSystem.DeactivateExtractionPoint(true);
                     break;
                 case true:
-                    FoundationFortune.Singleton.FoundationFortuneAPI.DeactivateExtractionPoint(false);
+                    ServerExtractionSystem.DeactivateExtractionPoint(false);
                     break;
             }
 

@@ -6,14 +6,13 @@ using System.IO.Compression;
 using System.Linq;
 using System.Net;
 using Discord;
-using Exiled.Loader.Features.Configs;
 using FoundationFortune.API.Models.Classes.Player;
 using FoundationFortune.API.Models.Interfaces;
 using FoundationFortune.API.YamlConverters;
-using FoundationFortune.Configs;
 using LiteDB;
 using MEC;
 using YamlDotNet.Serialization;
+using YamlDotNet.Serialization.NamingConventions;
 
 namespace FoundationFortune;
 
@@ -25,21 +24,24 @@ public static class DirectoryIterator
     private static string tempZipFile;
     private const string zipFileUrl = "https://github.com/DuoNineXcore/Foundation-Fortune-Assets/releases/latest/download/AudioFiles.zip";
     private static readonly Dictionary<string, IFoundationFortuneConfig> _configs = new Dictionary<string, IFoundationFortuneConfig>();
-    private static readonly IDeserializer _deserializer = new DeserializerBuilder().WithNamingConvention(UnderscoredNamingConvention.Instance).Build();
-    private static readonly ISerializer _serializer = new SerializerBuilder().WithNamingConvention(UnderscoredNamingConvention.Instance).Build();
-
+    private static readonly IDeserializer _deserializer = new DeserializerBuilder()
+        .WithNamingConvention(PascalCaseNamingConvention.Instance)
+        .WithTypeConverter(new VectorsConverter())
+        .Build();
+    
+    private static List<string> directoriesToCreate = new List<string>
+    { 
+        FoundationFortune.CommonDirectoryPath,
+        FoundationFortune.DatabaseDirectoryPath,
+        FoundationFortune.AudioFilesPath,
+        FoundationFortune.NpcAudioFilesPath,
+        FoundationFortune.PlayerAudioFilesPath
+    };
+    
     public static void SetupDirectories()
     {
         if (!FoundationFortune.Singleton.Config.DirectoryIterator) return;
-
-        List<string> directoriesToCreate = new List<string>
-        {
-            FoundationFortune.commonDirectoryPath,
-            FoundationFortune.databaseDirectoryPath,
-            FoundationFortune.audioFilesPath,
-            FoundationFortune.npcAudioFilesPath,
-            FoundationFortune.playerAudioFilesPath
-        };
+        FoundationFortune.Log($"Directory Iterator Enabled.", LogLevel.Info);
 
         foreach (var directoryPath in directoriesToCreate.Where(directoryPath => !Directory.Exists(directoryPath)))
         {
@@ -51,10 +53,26 @@ public static class DirectoryIterator
         if (FoundationFortune.Singleton.Config.DirectoryIteratorCheckDatabase) InitializeDatabase();
     }
 
+    #region File Creation
+    public static void CreateFile(string filePath, string content)
+    {
+        string directory = Path.GetDirectoryName(filePath);
+        if (!Directory.Exists(directory)) if (directory != null) Directory.CreateDirectory(directory);
+        File.WriteAllText(filePath, content);
+        FoundationFortune.Log($"File {filePath} created.", LogLevel.Debug);
+    }
+    
+    public static void DeleteFile(string filePath)
+    {
+        if (File.Exists(filePath)) File.Delete(filePath);
+        else FoundationFortune.Log($"File '{filePath}' not found.", LogLevel.Error);
+    }
+    #endregion
+
     #region Github Auto-Downloader
     private static void InitializeAudioFileDirectories()
     {
-        tempZipFile = Path.Combine(FoundationFortune.audioFilesPath, "AudioFiles.zip");
+        tempZipFile = Path.Combine(FoundationFortune.AudioFilesPath, "AudioFiles.zip");
 
         using WebClient client = new WebClient();
         FoundationFortune.Log("Checking Foundation Fortune Audio Files...", LogLevel.Info);
@@ -73,7 +91,7 @@ public static class DirectoryIterator
 
         FoundationFortune.Log("Foundation Fortune Audio Files downloaded. Beginning Extract...", LogLevel.Info);
 
-        ExtractMissingAudioFiles(tempZipFile, FoundationFortune.commonDirectoryPath, ".ogg");
+        ExtractMissingAudioFiles(tempZipFile, FoundationFortune.CommonDirectoryPath, ".ogg");
         File.Delete(tempZipFile);
     }
 
@@ -137,51 +155,54 @@ public static class DirectoryIterator
     {
         var fileName = typeof(T).Name;
         if (_configs.ContainsKey(fileName)) return;
-        var configFilePath = Path.Combine(FoundationFortune.commonDirectoryPath, fileName + ".yml");
+        var configFilePath = Path.Combine(FoundationFortune.CommonDirectoryPath, fileName + ".yml");
+
+        T configInstance;
 
         if (!File.Exists(configFilePath))
         {
-            var newConfigInstance = new T();
-            SaveConfig(newConfigInstance);
-            _configs[fileName] = newConfigInstance;
+            configInstance = new T();
+            SaveConfig(configInstance);
+            _configs[fileName] = configInstance;
             FoundationFortune.Log($"Configuration file not found. Created new configuration: {fileName}.yml", LogLevel.Info);
-            return;
         }
-
-        var ymlContent = File.ReadAllText(configFilePath);
-        var configInstance = _deserializer.Deserialize<T>(ymlContent);
-
-        var defaultInstance = new T();
-        var properties = typeof(T).GetProperties();
-        foreach (var property in properties)
+        else
         {
-            var ymlPropertyValue = property.GetValue(configInstance);
-            var defaultValue = property.GetValue(defaultInstance);
-            if (ymlPropertyValue == null || ymlPropertyValue.Equals(defaultValue)) property.SetValue(configInstance, defaultValue);
-        }
+            var ymlContent = File.ReadAllText(configFilePath);
+            configInstance = _deserializer.Deserialize<T>(ymlContent);
+            var defaultInstance = new T();
+            var properties = typeof(T).GetProperties();
 
-        _configs[fileName] = configInstance;
-        FoundationFortune.Log($"Loaded configuration: {fileName}.yml", LogLevel.Info);
+            foreach (var property in properties)
+            {
+                var ymlPropertyValue = property.GetValue(configInstance);
+                var defaultValue = property.GetValue(defaultInstance);
+                if (ymlPropertyValue == null || ymlPropertyValue.Equals(defaultValue)) property.SetValue(configInstance, defaultValue);
+            }
+
+            SaveConfig(configInstance);
+            _configs[fileName] = configInstance;
+            FoundationFortune.Log($"Loaded configuration: {fileName}.yml", LogLevel.Info);
+        }
     }
     
     private static void SaveConfig<T>(T configInstance) where T : IFoundationFortuneConfig
     {
         var fileName = typeof(T).Name;
-        var configFilePath = Path.Combine(FoundationFortune.commonDirectoryPath, fileName + ".yml");
+        var configFilePath = Path.Combine(FoundationFortune.CommonDirectoryPath, fileName + ".yml");
 
         var builder = new SerializerBuilder()
-            .WithNamingConvention(UnderscoredNamingConvention.Instance)
+            .WithNamingConvention(PascalCaseNamingConvention.Instance)
             .DisableAliases()
-            .WithMaximumRecursion(10000) 
+            .WithMaximumRecursion(10000)
             .WithTypeConverter(new VectorsConverter());
-        
-        var serializer = builder.Build();
 
+        var serializer = builder.Build();
         var ymlContent = serializer.Serialize(configInstance);
+        
         File.WriteAllText(configFilePath, ymlContent);
         FoundationFortune.Log($"Saved configuration: {fileName}.yml", LogLevel.Info);
     }
-
 
     public static T GetConfig<T>() where T : IFoundationFortuneConfig, new()
     {
@@ -192,29 +213,23 @@ public static class DirectoryIterator
     }
     #endregion
     
-    #region Database Detection
+    #region check if the database is still alive
     private static void InitializeDatabase()
     {
         try
         {
-            string databaseFilePath = Path.Combine(FoundationFortune.databaseDirectoryPath, "Foundation Fortune.db");
+            string databaseFilePath = Path.Combine(FoundationFortune.DatabaseDirectoryPath, "Foundation Fortune.db");
 
-            if (!File.Exists(databaseFilePath))
-            {
-                FoundationFortune.Singleton.db = new LiteDatabase(databaseFilePath);
-                var collection = FoundationFortune.Singleton.db.GetCollection<PlayerData>();
-                collection.EnsureIndex(x => x.UserId);
-                FoundationFortune.Log($"Database created successfully at {databaseFilePath}", LogLevel.Info);
-            }
-            else
-            {
-                FoundationFortune.Singleton.db = new LiteDatabase(databaseFilePath);
-                FoundationFortune.Log($"Database loaded successfully at {databaseFilePath}.", LogLevel.Info);
-            }
+            FoundationFortune.Singleton.db = new LiteDatabase(databaseFilePath);
+            var collection = FoundationFortune.Singleton.db.GetCollection<PlayerData>();
+            collection.EnsureIndex(x => x.UserId);
+
+            if (!File.Exists(databaseFilePath)) FoundationFortune.Log($"Database created successfully at {databaseFilePath}", LogLevel.Info);
+            else FoundationFortune.Log($"Database loaded successfully at {databaseFilePath}.", LogLevel.Info);
         }
         catch (Exception ex)
         {
-            FoundationFortune.Log($" Failed to create/open database: {ex}", LogLevel.Error);
+            FoundationFortune.Log($"Failed to create/open database: {ex}", LogLevel.Error);
             Timing.CallDelayed(1f, FoundationFortune.Singleton.OnDisabled);
         }
     }

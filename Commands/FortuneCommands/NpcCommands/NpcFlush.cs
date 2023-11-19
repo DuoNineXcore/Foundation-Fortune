@@ -9,6 +9,7 @@ using FoundationFortune.API.Models.Enums.NPCs;
 using System.Text;
 using System.Threading.Tasks;
 using FoundationFortune.API.Models;
+using FoundationFortune.API.NPCs.NpcTypes;
 
 namespace FoundationFortune.Commands.FortuneCommands.NpcCommands
 {

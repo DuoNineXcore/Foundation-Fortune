@@ -67,4 +67,6 @@ public class SellableItemsList : IFoundationFortuneConfig
 	
 	[Description("The time you have to sell an item after asking for confirmation.")]
 	public float SellingConfirmationTime { get; set; } = 5f;
+	
+	public int DeathCoinsToDrop { get; set; } = 10;
 }

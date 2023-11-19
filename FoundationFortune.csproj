@@ -3,6 +3,7 @@
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <LangVersion>latest</LangVersion>
+    <Nullable>disable</Nullable>
   </PropertyGroup>
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -19,7 +20,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>C:\Users\DuoNineXcore\AppData\Roaming\EXILED\Plugins</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -29,19 +30,31 @@
     <PlatformTarget>x64</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>C:\Users\DuoNineXcore\AppData\Roaming\EXILED\Plugins</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
-		<Reference Include="Assembly-CSharp" HintPath="$(EXILED_REFERENCES)\Assembly-CSharp-Publicized.dll" Private="false" />
-		<Reference Include="Assembly-CSharp-firstpass" HintPath="$(EXILED_REFERENCES)\Assembly-CSharp-firstpass.dll" Private="false" />
+		<Reference Include="Assembly-CSharp">
+		  <HintPath>..\..\Documents\C# References\Assembly-CSharp-Publicized.dll</HintPath>
+		</Reference>
+		<Reference Include="Assembly-CSharp-firstpass">
+		  <HintPath>..\..\Documents\C# References\Assembly-CSharp-firstpass.dll</HintPath>
+		</Reference>
 		<Reference Include="CommandSystem.Core" HintPath="$(EXILED_REFERENCES)\CommandSystem.Core.dll" Private="false" />
-		<Reference Include="Mirror" HintPath="$(EXILED_REFERENCES)\Mirror.dll" Private="false" />
+		<Reference Include="LiteDB">
+		  <HintPath>..\..\Documents\C# References\LiteDB.dll</HintPath>
+		</Reference>
+		<Reference Include="Mirror">
+		  <HintPath>..\..\Documents\C# References\Mirror.dll</HintPath>
+		</Reference>
 		<Reference Include="NorthwoodLib" HintPath="$(EXILED_REFERENCES)\NorthwoodLib.dll" Private="false" />
 		<Reference Include="PluginAPI" HintPath="$(EXILED_REFERENCES)\PluginAPI.dll" Private="false" />
+		<Reference Include="Pooling">
+		  <HintPath>..\..\Documents\C# References\Pooling.dll</HintPath>
+		</Reference>
 		<Reference Include="SCPSLAudioApi">
 		  <HintPath>..\..\Documents\C# References\SCPSLAudioApi.dll</HintPath>
 		</Reference>
@@ -49,12 +62,16 @@
 		  <HintPath>..\..\Documents\C# References\System.IO.Compression.dll</HintPath>
 		</Reference>
 		<Reference Include="System.IO.Compression.FileSystem" />
-		<Reference Include="UnityEngine" HintPath="$(EXILED_REFERENCES)\UnityEngine.dll" Private="false" />
-		<Reference Include="UnityEngine.CoreModule" HintPath="$(EXILED_REFERENCES)\UnityEngine.CoreModule.dll" Private="false" />
-		<Reference Include="UnityEngine.PhysicsModule" HintPath="$(EXILED_REFERENCES)\UnityEngine.PhysicsModule.dll" Private="false" />
-		<Reference Include="LiteDB" HintPath="$(EXILED_REFERENCES)\LiteDB.dll" Private="false" />
-		<Reference Include="Pooling" HintPath="$(EXILED_REFERENCES)\Pooling.dll" Private="false" />
 		<Reference Include="System" />
+		<Reference Include="UnityEngine">
+		  <HintPath>..\..\Documents\C# References\UnityEngine.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine.CoreModule">
+		  <HintPath>..\..\Documents\C# References\UnityEngine.CoreModule.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine.PhysicsModule">
+		  <HintPath>..\..\Documents\C# References\UnityEngine.PhysicsModule.dll</HintPath>
+		</Reference>
 	</ItemGroup>
   <ItemGroup>
     <AppDesigner Include="Properties\" />
@@ -62,21 +79,22 @@
   <ItemGroup>
     <Compile Include="API\AudioPlayer.cs" />
     <Compile Include="API\CoroutineManager.cs" />
+    <Compile Include="API\Events\EventArgs\BoughtItemEventArgs.cs" />
+    <Compile Include="API\Events\EventArgs\BoughtPerkEventArgs.cs" />
+    <Compile Include="API\Events\EventArgs\SoldItemEventArgs.cs" />
     <Compile Include="API\Events\EventArgs\UsedFoundationFortuneNPCEventArgs.cs" />
     <Compile Include="API\Events\EventArgs\UsedFoundationFortunePerkEventArgs.cs" />
     <Compile Include="API\Events\EventHelperMethods.cs" />
     <Compile Include="API\Events\Handlers\FoundationFortuneNPCs.cs" />
     <Compile Include="API\Events\Handlers\FoundationFortunePerks.cs" />
     <Compile Include="API\FoundationFortuneAPI.cs" />
-    <Compile Include="API\HintSystem\ServerEvents\ServerBountySystem.cs" />
-    <Compile Include="API\HintSystem\ServerEvents\ServerExtractionSystem.cs" />
     <Compile Include="API\Items\CustomItems\DeathCoin.cs" />
     <Compile Include="API\Items\PerkItems\PerkBottle.cs" />
     <Compile Include="API\Items\PerkItems\ResurgenceBeacon.cs" />
     <Compile Include="API\Models\Classes\Hints\HintEntry.cs" />
     <Compile Include="API\Models\Classes\Items\BuyableItem.cs" />
     <Compile Include="API\Models\Classes\Items\ObjectInteractions.cs" />
-    <Compile Include="API\Models\Classes\Items\PerkItem.cs" />
+    <Compile Include="API\Models\Classes\Items\BuyablePerk.cs" />
     <Compile Include="API\Models\Classes\Items\SellableItem.cs" />
     <Compile Include="API\Models\Classes\NPCs\BuyingBotSpawn.cs" />
     <Compile Include="API\Models\Classes\NPCs\NPCVoiceChatSettings.cs" />
@@ -97,11 +115,15 @@
     <Compile Include="API\Models\Interfaces\IFoundationFortuneConfig.cs" />
     <Compile Include="API\NPCs\NPCHelperMethods.cs" />
     <Compile Include="API\Database\PlayerDataRepository.cs" />
-    <Compile Include="API\NPCs\BuyingBot.cs" />
-    <Compile Include="API\NPCs\MusicBot.cs" />
-    <Compile Include="API\NPCs\SellingBot.cs" />
-    <Compile Include="API\PerkSystem.cs" />
+    <Compile Include="API\NPCs\NpcTypes\BuyingBot.cs" />
+    <Compile Include="API\NPCs\NpcTypes\MusicBot.cs" />
+    <Compile Include="API\NPCs\NpcTypes\SellingBot.cs" />
+    <Compile Include="API\Systems\EventSystems\ServerBountySystem.cs" />
+    <Compile Include="API\Systems\EventSystems\ServerExtractionSystem.cs" />
+    <Compile Include="API\Systems\HintSystem.cs" />
+    <Compile Include="API\Systems\PerkSystem.cs" />
     <Compile Include="API\YamlConverters\VectorsConverter.cs" />
+    <Compile Include="BuddyHollyLyrics.cs" />
     <Compile Include="Commands\BuyCommand.cs" />
     <Compile Include="Commands\FortuneCommands\AdminCommands\AddAdmin.cs" />
     <Compile Include="Commands\FortuneCommands\AdminCommands\RemoveAdmin.cs" />
@@ -113,13 +135,8 @@
     <Compile Include="Commands\FortuneCommands\AdminCommands\DatabaseCommands\RemoveMoney.cs" />
     <Compile Include="Commands\FortuneCommands\AdminCommands\ExtractionCommands\AddExtraction.cs" />
     <Compile Include="Commands\FortuneCommands\AdminCommands\ExtractionCommands\RemoveExtraction.cs" />
-    <Compile Include="Commands\FortuneCommands\HintCommands\Local\HintAlignment.cs" />
-    <Compile Include="Commands\FortuneCommands\HintCommands\Local\HintAnimation.cs" />
-    <Compile Include="Commands\FortuneCommands\HintCommands\Local\HintDisable.cs" />
-    <Compile Include="Commands\FortuneCommands\HintCommands\Global\HintEnqueue.cs" />
-    <Compile Include="Commands\FortuneCommands\HintCommands\Local\HintLimit.cs" />
-    <Compile Include="Commands\FortuneCommands\HintCommands\Local\HintMinmode.cs" />
-    <Compile Include="Commands\FortuneCommands\HintCommands\Local\HintSize.cs" />
+    <Compile Include="Commands\FortuneCommands\HintCommands\HintEnqueue.cs" />
+    <Compile Include="Commands\FortuneCommands\HintCommands\SetHintProperty.cs" />
     <Compile Include="Commands\FortuneCommands\NpcCommands\NpcAdd.cs" />
     <Compile Include="Commands\FortuneCommands\NpcCommands\NpcFlush.cs" />
     <Compile Include="Commands\FortuneCommands\NpcCommands\NpcList.cs" />
@@ -130,9 +147,8 @@
     <Compile Include="Configs\FoundationFortuneNPCSettings.cs" />
     <Compile Include="Configs\MoneyExtractionSystemSettings.cs" />
     <Compile Include="Configs\PerkSystemSettings.cs" />
-    <Compile Include="API\HintSystem\HintSystem.cs" />
     <Compile Include="Configs\SellableItemsList.cs" />
-    <Compile Include="Configs\ServerEventSettings.cs" />
+    <Compile Include="Configs\MoneyXPRewards.cs" />
     <Compile Include="Configs\VoiceChatSettings.cs" />
     <Compile Include="EventHandlers.cs" />
     <Compile Include="Patches\Transpilers.cs" />
@@ -144,7 +160,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="EXILED">
-      <Version>8.3.9</Version>
+      <Version>8.4.1</Version>
     </PackageReference>
     <PackageReference Include="Lib.Harmony">
       <Version>2.2.2</Version>

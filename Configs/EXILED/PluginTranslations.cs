@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using Exiled.API.Interfaces;
 using FoundationFortune.API.Models.Enums.Perks;
@@ -8,8 +9,8 @@ namespace FoundationFortune.Configs.EXILED
 	public class PluginTranslations : ITranslation
 	{
 		[Description("Server Events")]
-		public string Kill { get; set; } = "<b><color=green>+$300</color> %victim%'s Termination.</b>";
-		public string Escape { get; set; } = "<b><color=green>+$300</color> Successfully Escaped.</b>";
+		public string Kill { get; set; } = "<b><color=green>+$%killMoneyReward%</color> <color=#FFA500>+%killXPReward% (%multiplier%) EXP</color> %victim%'s Termination.</b>";
+		public string Escape { get; set; } = "<b><color=green>+$%escapeReward%</color> Successfully Escaped.</b>";
 		public string Death { get; set; } = "<b><color=red>$-%moneyBeforeDeath%.</color> You died.</b>";
 		public string RoundEndWin { get; set; } = "<b><color=%winningFactionColor%>+$%winningAmount%</color> Winning Bonus.</b>\\n";
 		public string RoundEndDraw { get; set; } = "<b><color=%drawFactionColor%>+$%drawAmount%</color> Draw Bonus.</b>\\n";
@@ -17,28 +18,23 @@ namespace FoundationFortune.Configs.EXILED
 
 		[Description("Bot Proximity Hints")]
 		public string SellingWorkstation { get; set; } = "<b>You're on a Selling Workstation.</b>\\n";
-		public string BuyingBot { get; set; } = "<b>You're around a buying bot. Type .buy list in the console.</b>\\n";
-		public string SellingBot { get; set; } = "<b>You're around a Selling bot. Drop Items twice to sell them.</b>\\n";
+		public string BuyingBot { get; set; } = "\\n<b>You're around a buying bot. Type .buy list in the console.</b>";
+		public string SellingBot { get; set; } = "\\n<b>You're around a Selling bot. Drop Items twice to sell them.</b>";
 
 		[Description("Hint System Counters")]
-		public string MoneyCounterSaved { get; set; } = "<b>Money Saved: <color=%rolecolor%>$%moneySaved%</color></b>\\n";
+		public string MoneyCounterSaved { get; set; } = "<b>Money Saved: <color=%rolecolor%>$%moneySaved%</color></b> -- ";
 		public string MoneyCounterOnHold { get; set; } = "<b>Money On Hold: <color=%rolecolor%>$%moneyOnHold%</color></b>\\n";
-		public Dictionary<PerkType, string> PerkCounterEmojis { get; set; } = new Dictionary<PerkType, string>
-		{
-			{ PerkType.ViolentImpulses, "🔪" }, 
-			{ PerkType.EthericVitality, "❤️" },
-			{ PerkType.HyperactiveBehavior, "🏃" },
-			{ PerkType.BlissfulUnawareness, "💞" },
-			{ PerkType.ExtrasensoryPerception, "◎" },
-			{ PerkType.EtherealIntervention, "✚" } 
-		};
+		public string LevelCounter { get; set; } = " -- <b>Level: <color=%rolecolor%>$%curLevel%</color></b>";
+		public string EXPCounter { get; set; } = " (<b>EXP: <color=%rolecolor%>%expCounter%</color></b>";
+		public string PrestigeCounter { get; set; } = " <b>Prestige:<color=%rolecolor%> %prestigelevel%</color></b>)\\n";
 
 		[Description("Hint System Events")]
 		public string WrongBot { get; set; } = "<b><color=red>Wrong Bot.</color></b>\\n";
-		public string SaleCancelled { get; set; } = "<b><color=red>Item changed. Sale canceled.</color></b>\\n";
-		public string SellSuccess { get; set; } = "<b><color=green>+%price%$</color> Sold %itemName%.</color></b>\\n";
-		public string ItemConfirmation { get; set; } = "<b>This item is worth <color=green>%price%</color>, Confirm sale? (%time% seconds left)</b>\\n</align>";
-		public string BuyItemSuccess { get; set; } = "<b><color=red>-$%itemPrice%</color> Bought %itemAlias%.</b>\\n";
+		public string SaleCancelled { get; set; } = "\\n<b><color=red>Item changed. Sale canceled.</color></b>\\n";
+		public string ItemConfirmation { get; set; } = "\\n<b>This item is worth <color=green>%price%</color>, Confirm sale? (%time% seconds left)</b>\\n</align>";
+		public string BuyItemSuccess { get; set; } = "\\n<b><color=#FFA500>+%xpReward% (%multiplier%) EXP</color> <color=red>-$%itemPrice%</color> Bought Item: %itemAlias%.</b>";
+		public string BuyPerkSuccess { get; set; } = "\\n<b><color=#FFA500>+%xpReward% (%multiplier%) EXP</color> <color=red>-$%perkPrice%</color> Bought Perk: %perkAlias%.</b>\\n";
+		public string SellItemSuccess { get; set; } = "\\n<b><color=#FFA500>+%xpReward% (%multiplier%) EXP</color> <color=green>+%price%$</color> Sold %itemName%.</b>\\n";
 
 		[Description("Extraction Events")]
 		public string ExtractionEvent = "<b>A <color=green>Money</color> Extraction Zone has opened up. \\nRoom: %room% Time Left: %time%</b>\\n";
@@ -73,7 +69,7 @@ namespace FoundationFortune.Configs.EXILED
 		public string SteamIDRemoveMoney { get; set; } = "<b><color=red>-$%amount%.</color> Admin Command.</b>\\n";
 
 		[Description("Perk bottles")]
-		public string DrankPerkBottle { get; set; } = "<b>You drank a Perk bottle. [<color=#FFC0CB>%type%</color>]</b>";
+		public string DrankPerkBottle { get; set; } = "<b><color=#FFA500>+%xpReward% (%multiplier%) EXP</color> You drank a Perk bottle. [<color=#FFC0CB>%type%</color>]</b>";
 		public string HoldingPerkBottle { get; set; } = "<b>You are holding a Perk bottle. [<color=#FFC0CB>%type%</color>]</b>";
 	}
 }

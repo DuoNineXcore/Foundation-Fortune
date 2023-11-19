@@ -18,6 +18,7 @@ using UnityEngine;
 using VoiceChat;
 using FoundationFortune.API;
 using FoundationFortune.API.Models.Enums.NPCs;
+using PlayerRoles.Subroutines;
 
 namespace FoundationFortune.API.NPCs
 {
@@ -31,7 +32,7 @@ namespace FoundationFortune.API.NPCs
                    || FoundationFortune.Singleton.MusicBotPairs.Any(pair => pair.Player == targetPlayer);
         }
 
-        public static bool IsFoundationFortuneNPC(ScpSubroutineBase targetTrack) => targetTrack.Role.TryGetOwner(out ReferenceHub refHub) && IsFoundationFortuneNPC(refHub);
+        public static bool IsFoundationFortuneNPC(SubroutineBase targetTrack) => targetTrack.Role.TryGetOwner(out ReferenceHub refHub) && IsFoundationFortuneNPC(refHub);
         
         public static Npc GetNearestBuyingBot(Player player)
         {

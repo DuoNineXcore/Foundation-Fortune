@@ -1,17 +1,13 @@
-﻿using Exiled.API.Features;
-using UnityEngine;
-using MEC;
-using PlayerRoles;
+﻿using System.Collections.Generic;
 using System.Linq;
+using Exiled.API.Features;
 using Exiled.API.Features.Items;
-using Exiled.API.Enums;
-using Exiled.API.Extensions;
-using Exiled.API.Features.Components;
+using MEC;
 using Mirror;
-using System;
-using System.Collections.Generic;
+using PlayerRoles;
+using UnityEngine;
 
-namespace FoundationFortune.API.NPCs
+namespace FoundationFortune.API.NPCs.NpcTypes
 {
     public static class SellingBot
     {
@@ -25,6 +21,16 @@ namespace FoundationFortune.API.NPCs
             allowedSellingBotNameColors = allowedColors;
         }
 
+        /// <summary>
+        /// Spawns a selling bot with the specified parameters.
+        /// </summary>
+        /// <param name="target">The target user ID or name for the selling bot.</param>
+        /// <param name="Badge">The rank name for the selling bot.</param>
+        /// <param name="Color">The rank color for the selling bot.</param>
+        /// <param name="Role">The role type ID for the selling bot.</param>
+        /// <param name="HeldItem">The held item type for the selling bot (null for no item).</param>
+        /// <param name="scale">The scale vector for the selling bot.</param>
+        /// <returns>The spawned selling bot.</returns>
         public static Npc SpawnSellingBot(string target, string Badge, string Color, RoleTypeId Role, ItemType? HeldItem, Vector3 scale)
         {
             int indexation = 0;
@@ -47,7 +53,7 @@ namespace FoundationFortune.API.NPCs
             });
             return spawnedSellingBot;
         }
-        
+
         public static bool RemoveSellingBot(string target)
         {
             string botKey = $"SellingBot-{target}";

@@ -22,21 +22,9 @@ public class FoundationFortuneNPCSettings : IFoundationFortuneConfig
 
 	public List<BuyingBotSpawn> BuyingBotSpawnSettings { get; set; } = new List<BuyingBotSpawn>
 	{
-		new BuyingBotSpawn
-		{
-			Name = "Buying Bot 1", Badge = "Foundation Fortune", BadgeColor = "pumpkin", Role = RoleTypeId.ClassD,
-			HeldItem = ItemType.KeycardChaosInsurgency, Scale = new Vector3(1, 1, 1), Room = RoomType.HczNuke
-		},
-		new BuyingBotSpawn
-		{
-			Name = "Buying Bot 2", Badge = "Foundation Fortune", BadgeColor = "pumpkin", Role = RoleTypeId.ClassD,
-			HeldItem = ItemType.KeycardChaosInsurgency, Scale = new Vector3(1, 1, 1), Room = RoomType.Hcz079
-		},
-		new BuyingBotSpawn
-		{
-			Name = "Buying Bot 3", Badge = "Foundation Fortune", BadgeColor = "pumpkin", Role = RoleTypeId.ClassD,
-			HeldItem = ItemType.KeycardChaosInsurgency, Scale = new Vector3(1, 1, 1), Room = RoomType.HczArmory
-		}
+		new BuyingBotSpawn { Name = "Buying Bot 1", Badge = "Foundation Fortune", BadgeColor = "pumpkin", Role = RoleTypeId.ClassD, HeldItem = ItemType.KeycardChaosInsurgency, Scale = new Vector3(1, 1, 1), Room = RoomType.HczNuke },
+		new BuyingBotSpawn { Name = "Buying Bot 2", Badge = "Foundation Fortune", BadgeColor = "pumpkin", Role = RoleTypeId.ClassD, HeldItem = ItemType.KeycardChaosInsurgency, Scale = new Vector3(1, 1, 1), Room = RoomType.Hcz079 },
+		new BuyingBotSpawn { Name = "Buying Bot 3", Badge = "Foundation Fortune", BadgeColor = "pumpkin", Role = RoleTypeId.ClassD, HeldItem = ItemType.KeycardChaosInsurgency, Scale = new Vector3(1, 1, 1), Room = RoomType.HczArmory }
 	};
 
 	public List<RoomType> BuyingBotRandomRooms { get; set; } = new List<RoomType>()
@@ -56,16 +44,8 @@ public class FoundationFortuneNPCSettings : IFoundationFortuneConfig
 
 	public List<SellingBotSpawn> SellingBotSpawnSettings { get; set; } = new List<SellingBotSpawn>
 	{
-		new SellingBotSpawn
-		{
-			Name = "Selling Bot 1", Badge = "Foundation Fortune", BadgeColor = "yellow", Role = RoleTypeId.Scientist,
-			HeldItem = ItemType.KeycardChaosInsurgency, Scale = new Vector3(1, 1, 1), Room = RoomType.Hcz096
-		},
-		new SellingBotSpawn
-		{
-			Name = "Selling Bot 2", Badge = "Foundation Fortune", BadgeColor = "yellow", Role = RoleTypeId.Scientist,
-			HeldItem = ItemType.KeycardChaosInsurgency, Scale = new Vector3(1, 1, 1), Room = RoomType.Hcz939
-		},
+		new SellingBotSpawn { Name = "Selling Bot 1", Badge = "Foundation Fortune", BadgeColor = "yellow", Role = RoleTypeId.Scientist, HeldItem = ItemType.KeycardChaosInsurgency, Scale = new Vector3(1, 1, 1), Room = RoomType.Hcz096 },
+		new SellingBotSpawn { Name = "Selling Bot 2", Badge = "Foundation Fortune", BadgeColor = "yellow", Role = RoleTypeId.Scientist, HeldItem = ItemType.KeycardChaosInsurgency, Scale = new Vector3(1, 1, 1), Room = RoomType.Hcz939 },
 	};
 
 	public List<RoomType> SellingBotRandomRooms { get; set; } = new List<RoomType>()

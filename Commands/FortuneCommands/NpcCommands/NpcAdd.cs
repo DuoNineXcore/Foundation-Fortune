@@ -6,9 +6,11 @@ using System.Threading.Tasks;
 using CommandSystem;
 using Exiled.API.Features;
 using Exiled.Permissions.Extensions;
+using FoundationFortune.API;
 using FoundationFortune.API.Models;
 using FoundationFortune.API.NPCs;
 using FoundationFortune.API.Models.Enums.NPCs;
+using FoundationFortune.API.NPCs.NpcTypes;
 using MEC;
 using PlayerRoles;
 using RemoteAdmin;
@@ -91,7 +93,7 @@ namespace FoundationFortune.Commands.FortuneCommands.NpcCommands
                 Timing.CallDelayed(1f, delegate
                 {
                     bot.Teleport(self.ReferenceHub.gameObject.transform.position);
-                    FoundationFortune.Singleton.FoundationFortuneAPI.buyingBotPositions.Add(bot, bot.Position);
+                    FoundationFortuneAPI.buyingBotPositions.Add(bot, bot.Position);
                 });
 
                 response = $"BuyingBot '{name}' added successfully and teleported to your position.";

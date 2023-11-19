@@ -34,7 +34,7 @@ namespace FoundationFortune.Commands.FortuneCommands.AdminCommands.DatabaseComma
                 string FlushedDatabase = pluginTranslations.FlushedDatabase
                     .Replace("%moneyOnHold%", moneyOnHold.ToString())
                     .Replace("%moneySaved%", moneySaved.ToString());
-                FoundationFortune.Singleton.FoundationFortuneAPI.EnqueueHint(player, $"{FlushedDatabase}", 5f);
+                FoundationFortune.Singleton.FoundationFortuneAPI.EnqueueHint(player, $"{FlushedDatabase}");
                 PlayerDataRepository.EmptyMoney(player.UserId, true, true);
             }
 

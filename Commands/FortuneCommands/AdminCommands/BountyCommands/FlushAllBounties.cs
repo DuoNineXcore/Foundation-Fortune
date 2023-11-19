@@ -3,6 +3,7 @@ using CommandSystem;
 using Exiled.API.Features;
 using Exiled.Permissions.Extensions;
 using FoundationFortune.API.Database;
+using FoundationFortune.API.EventSystems;
 
 namespace FoundationFortune.Commands.FortuneCommands.AdminCommands.BountyCommands
 {
@@ -24,7 +25,7 @@ namespace FoundationFortune.Commands.FortuneCommands.AdminCommands.BountyCommand
                 return false;
             }
 
-            FoundationFortune.Singleton.FoundationFortuneAPI.BountiedPlayers.Clear();
+            ServerBountySystem.BountiedPlayers.Clear();
             response = "All bounties have been flushed.";
             return true;
         }

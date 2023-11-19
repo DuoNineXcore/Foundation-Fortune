@@ -1,18 +1,19 @@
-﻿using Exiled.API.Features;
-using UnityEngine;
-using MEC;
-using PlayerRoles;
-using System.Linq;
-using Exiled.API.Extensions;
-using Exiled.API.Features.Components;
-using Mirror;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using CentralAuth;
-using FoundationFortune.API.Models;
+using Discord;
+using Exiled.API.Extensions;
+using Exiled.API.Features;
+using Exiled.API.Features.Components;
 using FoundationFortune.API.Models.Classes.NPCs;
+using MEC;
+using Mirror;
+using PlayerRoles;
+using UnityEngine;
+using NetworkManager = Mirror.NetworkManager;
 
-namespace FoundationFortune.API.NPCs
+namespace FoundationFortune.API.NPCs.NpcTypes
 {
     public static class MusicBot
     {
@@ -26,13 +27,17 @@ namespace FoundationFortune.API.NPCs
             allowedMusicBotNameColors = allowedColors;
         }
 
+        /// <summary>
+        /// Spawns a music bot associated with the specified player.
+        /// </summary>
+        /// <param name="target">The player for whom the music bot is spawned.</param>
         public static void SpawnMusicBot(Player target)
         {
             Npc spawnedMusicBot = SpawnFix(target.Nickname, RoleTypeId.Spectator);
-            
+    
             PlayerMusicBotPair pair = new PlayerMusicBotPair(target, spawnedMusicBot);
             FoundationFortune.Singleton.MusicBotPairs.Add(pair);
-            Log.Debug($"Generated Music Bot for player {target.Nickname} / Bot: {spawnedMusicBot.Nickname ?? "Null"}");
+            FoundationFortune.Log($"Generated Music Bot for player {target.Nickname} / Bot: {spawnedMusicBot.Nickname ?? "Null"}", LogLevel.Debug);
 
             Round.IgnoredPlayers.Add(spawnedMusicBot.ReferenceHub);
         }

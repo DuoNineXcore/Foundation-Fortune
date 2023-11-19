@@ -17,9 +17,6 @@ namespace FoundationFortune.Configs.EXILED
 		public float AnimatedHintUpdateRate { get; set; } = 0.5f;
 		public float NPCLookatUpdateRate { get; set; } = 0.01f;
 
-		[Description("Amount of Death Coins to drop. NOTE: the value of the coins will be divided by the amount of coins. so if there's 10 coins a coin will be worth a tenth of the player's on hold money account.")]
-		public int DeathCoinsToDrop { get; set; } = 10;
-
 		[Description("Selling Workstation Settings.")]
 		public bool UseSellingWorkstation { get; set; } = false;
 		public float SellingWorkstationRadius { get; set; } = 3f;

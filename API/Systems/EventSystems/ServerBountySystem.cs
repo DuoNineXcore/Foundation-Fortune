@@ -11,38 +11,33 @@ using FoundationFortune.API.Models.Classes.Player;
 using FoundationFortune.API.Models.Enums;
 using FoundationFortune.API.Models.Enums.Player;
 
-// ReSharper disable once CheckNamespace
-// STFU!!!!!!!!!!!!!!!!
-namespace FoundationFortune.API
+namespace FoundationFortune.API.EventSystems
 {
-	public partial class FoundationFortuneAPI
+	public static class ServerBountySystem
 	{
-		public List<Bounty> BountiedPlayers { get; } = new List<Bounty>();
+		public static List<Bounty> BountiedPlayers { get; } = new List<Bounty>();
 
-		public void AddBounty(Player player, int bountyPrice, TimeSpan duration)
+		public static void AddBounty(Player player, int bountyPrice, TimeSpan duration)
 		{
-			PlayerVoiceChatSettings hunted = FoundationFortune.VoiceChatSettings.PlayerVoiceChatSettings
-				.FirstOrDefault(settings => settings.VoiceChatUsageType == PlayerVoiceChatUsageType.Hunted);
-			PlayerVoiceChatSettings hunter = FoundationFortune.VoiceChatSettings.PlayerVoiceChatSettings
-				.FirstOrDefault(settings => settings.VoiceChatUsageType == PlayerVoiceChatUsageType.Hunter);
+			PlayerVoiceChatSettings hunted = FoundationFortune.VoiceChatSettings.PlayerVoiceChatSettings.FirstOrDefault(settings => settings.VoiceChatUsageType == PlayerVoiceChatUsageType.Hunted);
+			PlayerVoiceChatSettings hunter = FoundationFortune.VoiceChatSettings.PlayerVoiceChatSettings.FirstOrDefault(settings => settings.VoiceChatUsageType == PlayerVoiceChatUsageType.Hunter);
 			
 			DateTime expirationTime = DateTime.Now.Add(duration);
 			BountiedPlayers.Add(new Bounty(player, true, bountyPrice, expirationTime));
 			
 			if (hunted != null) AudioPlayer.PlayTo(player, hunted.AudioFile, hunted.Volume, hunted.Loop, true);
-			foreach (Player ply in Player.List.Where(p => !p.IsNPC && p != player)) 
-				if (hunter != null) AudioPlayer.PlayTo(ply, hunter.AudioFile, hunter.Volume, hunter.Loop, true);
+			foreach (Player ply in Player.List.Where(p => !p.IsNPC && p != player)) if (hunter != null) AudioPlayer.PlayTo(ply, hunter.AudioFile, hunter.Volume, hunter.Loop, true);
 
 			Timing.CallDelayed((float)duration.TotalSeconds, () => StopBounty(player));
 		}
 
-		public void StopBounty(Player player)
+		public static void StopBounty(Player player)
 		{
 			Bounty bounty = BountiedPlayers.FirstOrDefault(b => b.Player == player);
 			if (bounty != null) BountiedPlayers.Remove(bounty);
 		}
 
-        private void UpdateBountyMessages(Player ply, ref StringBuilder hintMessage)
+        public static void UpdateBountyMessages(Player ply, ref StringBuilder hintMessage)
         {
             Bounty bounty = BountiedPlayers.FirstOrDefault(b => b.Player == ply);
             if (bounty == null) return;

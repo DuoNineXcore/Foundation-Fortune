@@ -1,36 +1,42 @@
-﻿using Exiled.API.Features;
+﻿using System;
+using Exiled.API.Features;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using InventorySystem.Items.Firearms.Attachments;
 using Random = UnityEngine.Random;
 using System.Text;
+using Discord;
 using Exiled.API.Enums;
 using Exiled.API.Features.Doors;
 using FoundationFortune.API.Models.Classes.Items;
 using FoundationFortune.API.Models.Classes.NPCs;
 using FoundationFortune.API.NPCs;
+using FoundationFortune.API.NPCs.NpcTypes;
+using FoundationFortune.API.Systems;
 using MEC;
 
 // ReSharper disable once CheckNamespace
 namespace FoundationFortune.API
 {
-	public partial class FoundationFortuneAPI
+    public partial class FoundationFortuneAPI
 	{
         #region NPCs
-        public readonly Dictionary<Npc, Vector3> buyingBotPositions = new();
-        public readonly Dictionary<Npc, Vector3> sellingBotPositions = new();
+        public static readonly Dictionary<Npc, Vector3> buyingBotPositions = new();
+        public static readonly Dictionary<Npc, Vector3> sellingBotPositions = new();
 
-        private void InitializeFoundationFortuneNPCs()
+        public static void InitializeFoundationFortuneNPCs()
         {
-            Log.Debug($"Initializing Foundation Fortune NPCs.");
-            if (!FoundationFortune.FoundationFortuneNpcSettings.BuyingBots) Log.Debug("Buying bots are turned off");
+            try
+            { 
+                FoundationFortune.Log($"Initializing Foundation Fortune NPCs.", LogLevel.Debug);
+            if (!FoundationFortune.FoundationFortuneNpcSettings.BuyingBots) FoundationFortune.Log("Buying bots are turned off", LogLevel.Debug);
             else
             {
-                Log.Debug($"Initializing Buying Bot NPCs.");
+                FoundationFortune.Log($"Initializing Buying Bot NPCs.", LogLevel.Debug);
                 foreach (BuyingBotSpawn spawn in FoundationFortune.FoundationFortuneNpcSettings.BuyingBotSpawnSettings)
                 {
-                    Log.Debug($"Spawning Bot: {spawn.Name}");
+                    FoundationFortune.Log($"Spawning Bot: {spawn.Name}", LogLevel.Debug);
                     BuyingBot.SpawnBuyingBot(spawn.Name, spawn.Badge, spawn.BadgeColor, spawn.Role, spawn.HeldItem, spawn.Scale);
                 }
 
@@ -53,10 +59,10 @@ namespace FoundationFortune.API
                                 bot.Teleport(Position);
                                 buyingBotPositions[bot] = bot.Position;
                                 bot.IsGodModeEnabled = true;
-                                Log.Debug($"Teleported Buying Bot with indexation {indexation} to room {roomType}, Pos: {bot.Position}, Rot: {bot.Rotation}");
+                                FoundationFortune.Log($"Teleported Buying Bot with indexation {indexation} to room {roomType}, Pos: {bot.Position}, Rot: {bot.Rotation}", LogLevel.Debug);
                             });
                         }
-                        else Log.Warn($"Invalid indexation {indexation + 1} for BuyingBot");
+                        else FoundationFortune.Log($"Invalid indexation {indexation + 1} for BuyingBot", LogLevel.Error);
                     }
                 }
                 else
@@ -84,30 +90,30 @@ namespace FoundationFortune.API
                                 bot.Teleport(position);
                                 buyingBotPositions[bot] = bot.Position;
                                 bot.IsGodModeEnabled = true;
-                                Log.Debug($"Teleported Buying Bot to room {roomType}, Pos: {bot.Position}, Rot: {bot.Rotation}");
+                                FoundationFortune.Log($"Teleported Buying Bot to room {roomType}, Pos: {bot.Position}, Rot: {bot.Rotation}", LogLevel.Debug);
                             });
                         }
-                        else Log.Warn($"No available rooms for Buying Bots.");
+                        else FoundationFortune.Log($"No available rooms for Buying Bots.", LogLevel.Error);
                     }
                 }
             }
 
-            if (!FoundationFortune.FoundationFortuneNpcSettings.SellingBots) Log.Debug($"Selling bots are turned off");
+            if (!FoundationFortune.FoundationFortuneNpcSettings.SellingBots) FoundationFortune.Log($"Selling bots are turned off", LogLevel.Debug);
             else
             {
-                Log.Debug($"Initializing Selling Bot NPCs.");
+                FoundationFortune.Log($"Initializing Selling Bot NPCs.", LogLevel.Debug);
 
                 sellingBotPositions.Clear();
 
                 foreach (SellingBotSpawn spawn in FoundationFortune.FoundationFortuneNpcSettings.SellingBotSpawnSettings)
                 {
-                    Log.Debug($"Selling Bot Spawned: {spawn.Name}");
+                    FoundationFortune.Log($"Selling Bot Spawned: {spawn.Name}", LogLevel.Debug);
                     SellingBot.SpawnSellingBot(spawn.Name, spawn.Badge, spawn.BadgeColor, spawn.Role, spawn.HeldItem, spawn.Scale);
                 }
 
                 if (FoundationFortune.FoundationFortuneNpcSettings.SellingBotFixedLocation)
                 {
-                    Log.Debug($"Bots spawned.");
+                    FoundationFortune.Log($"Bots spawned.", LogLevel.Info);
                     var rooms = FoundationFortune.FoundationFortuneNpcSettings.SellingBotSpawnSettings.Select(location => location.Room).ToList();
 
                     foreach (var kvp in FoundationFortune.Singleton.SellingBots)
@@ -125,15 +131,15 @@ namespace FoundationFortune.API
                                 bot.Teleport(Position);
                                 bot.IsGodModeEnabled = true;
                                 sellingBotPositions[bot] = bot.Position;
-                                Log.Debug($"Teleported Selling Bot with indexation {indexation} to room {roomType}, Pos: {bot.Position}, Rot: {bot.Rotation}");
+                                FoundationFortune.Log($"Teleported Selling Bot with indexation {indexation} to room {roomType}, Pos: {bot.Position}, Rot: {bot.Rotation}", LogLevel.Debug);
                             });
                         }
-                        else Log.Warn($"Invalid indexation {indexation + 1} for Selling Bot");
+                        else FoundationFortune.Log($"Invalid indexation {indexation + 1} for Selling Bot", LogLevel.Error);
                     }
                 }
                 else
                 {
-                    Log.Debug($"Bots spawned randomly.");
+                    FoundationFortune.Log($"Bots spawned randomly.", LogLevel.Info);
                     var rooms = Room.List.Where(r => FoundationFortune.FoundationFortuneNpcSettings.SellingBotRandomRooms.Contains(r.Type)).ToList();
                     var availableIndexes = Enumerable.Range(0, rooms.Count).ToList();
 
@@ -157,12 +163,17 @@ namespace FoundationFortune.API
                                 bot.Teleport(position);
                                 bot.IsGodModeEnabled = true;
                                 sellingBotPositions[bot] = bot.Position;
-                                Log.Debug($"Teleported Selling Bot to room {roomType}, Pos: {bot.Position}, Rot: {bot.Rotation}");
+                                FoundationFortune.Log($"Teleported Selling Bot to room {roomType}, Pos: {bot.Position}, Rot: {bot.Rotation}", LogLevel.Debug);
                             });
                         }
-                        else Log.Warn($"No available rooms for Selling Bots.");
+                        else FoundationFortune.Log($"No available rooms for Selling Bots.", LogLevel.Error);
                     }
                 }
+            }
+            }
+            catch (Exception ex)
+            {
+                Log.Debug(ex);
             }
         }
 
@@ -199,7 +210,7 @@ namespace FoundationFortune.API
         }
         #endregion
         
-        private void ClearIndexations()
+        public static void ClearIndexations()
         {
             foreach (var botData in FoundationFortune.Singleton.BuyingBots.Values.ToList()) BuyingBot.RemoveBuyingBot(botData.bot.Nickname);
             foreach (var botData in FoundationFortune.Singleton.SellingBots.Values.ToList()) SellingBot.RemoveSellingBot(botData.bot.Nickname);
@@ -207,11 +218,12 @@ namespace FoundationFortune.API
             PerkSystem.PerkPlayers.Clear();
             FoundationFortune.Singleton.ConsumedPerks.Clear();
             FoundationFortune.PlayerPurchaseLimits.Clear();
+            sellingBotPositions.Clear();
             buyingBotPositions.Clear();
             workstationPositions.Clear();
         }
 
-        public static void AddToPlayerLimits(Player player, PerkItem perkItem)
+        public static void AddToPlayerLimits(Player player, BuyablePerk buyablePerk)
 		{
 			var playerLimit = FoundationFortune.PlayerPurchaseLimits.FirstOrDefault(p => p.Player.UserId == player.UserId);
 			if (playerLimit == null)
@@ -220,8 +232,8 @@ namespace FoundationFortune.API
 				FoundationFortune.PlayerPurchaseLimits.Add(playerLimit);
 			}
 
-			if (playerLimit.BoughtPerks.ContainsKey(perkItem)) playerLimit.BoughtPerks[perkItem]++;
-			else playerLimit.BoughtPerks[perkItem] = 1;
+			if (playerLimit.BoughtPerks.ContainsKey(buyablePerk)) playerLimit.BoughtPerks[buyablePerk]++;
+			else playerLimit.BoughtPerks[buyablePerk] = 1;
 		}
 
 		public static void AddToPlayerLimits(Player player, BuyableItem buyItem)
@@ -237,7 +249,7 @@ namespace FoundationFortune.API
             else playerLimit.BoughtItems[buyItem] = 1;
         }
 
-        private static void AddToPlayerLimits(Player player, SellableItem sellItem)
+        public static void AddToPlayerLimits(Player player, SellableItem sellItem)
 		{
 			var playerLimit = FoundationFortune.PlayerPurchaseLimits.FirstOrDefault(p => p.Player.UserId == player.UserId);
 			if (playerLimit == null)
@@ -251,17 +263,16 @@ namespace FoundationFortune.API
 		}
         
         #region Workstations
-        private Dictionary<WorkstationController, Vector3> workstationPositions = new();
+        private static Dictionary<WorkstationController, Vector3> workstationPositions = new();
         
-        public bool IsPlayerOnSellingWorkstation(Player player) => workstationPositions.Count != 0 && workstationPositions.Values.Select(workstationPosition => 
-            Vector3.Distance(player.Position, workstationPosition)).Any(distance => distance <= FoundationFortune.Singleton.Config.SellingWorkstationRadius);
+        public bool IsPlayerOnSellingWorkstation(Player player) => workstationPositions.Count != 0 && workstationPositions.Values.Select(workstationPosition => Vector3.Distance(player.Position, workstationPosition)).Any(distance => distance <= FoundationFortune.Singleton.Config.SellingWorkstationRadius);
         
-        private void InitializeWorkstationPositions()
+        public static void InitializeWorkstationPositions()
         {
-            Log.Debug($"Initializing Selling workstations.");
+            FoundationFortune.Log($"Initializing Selling workstations.", LogLevel.Debug);
             if (!FoundationFortune.Singleton.Config.UseSellingWorkstation)
             {
-                Log.Debug($"no workstations they're turned off nvm");
+                FoundationFortune.Log($"no workstations they're turned off nvm", LogLevel.Debug);
                 return;
             }
 
@@ -277,8 +288,7 @@ namespace FoundationFortune.API
         {
             if (!IsPlayerOnSellingWorkstation(ply)) return;
 	        
-            if (!confirmSell.ContainsKey(ply.UserId))
-                hintMessage.Append($"{FoundationFortune.Singleton.Translation.SellingWorkstation}");
+            if (!confirmSell.ContainsKey(ply.UserId)) hintMessage.Append($"{FoundationFortune.Singleton.Translation.SellingWorkstation}");
             else if (confirmSell[ply.UserId])
             {
                 hintMessage.Append($"{FoundationFortune.Singleton.Translation.SellingWorkstation}");

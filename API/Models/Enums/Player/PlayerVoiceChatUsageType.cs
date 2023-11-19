@@ -5,6 +5,8 @@
         Hunted, 
         Hunter, 
         BlissfulUnawareness, 
+        EthericVitality,
+        ViolentImpulses,
         ResurgenceBeacon, 
         EtherealIntervention,
         HyperactiveBehaviorOn,

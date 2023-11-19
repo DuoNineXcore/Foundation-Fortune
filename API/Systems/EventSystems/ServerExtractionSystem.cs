@@ -6,22 +6,20 @@ using UnityEngine;
 using System.Collections.Generic;
 using FoundationFortune.API.Database;
 using System.Text;
-using FoundationFortune.API.Models;
+using Discord;
 using FoundationFortune.API.Models.Classes.Events;
 
-// ReSharper disable once CheckNamespace
-// STFU!!!!!!!!!!!!!!!!
-namespace FoundationFortune.API
+namespace FoundationFortune.API.EventSystems
 {
-	public partial class FoundationFortuneAPI
+	public static class ServerExtractionSystem
 	{
-		private bool isExtractionPointActive;
-		public bool limitReached;
-		private RoomType activeExtractionRoom;
-		private int extractionCount;
-		private int nextExtractionTime;
-		private float extractionStartTime;
-		private Dictionary<Player, ExtractionTimerData> extractionTimers = new();
+		public static bool isExtractionPointActive;
+		public static bool limitReached;
+		public static RoomType activeExtractionRoom;
+		public static int extractionCount;
+		public static int nextExtractionTime;
+		public static float extractionStartTime;
+		public static Dictionary<Player, ExtractionTimerData> extractionTimers = new();
 
 		private static bool IsPlayerInExtractionRoom(Player player, RoomType roomType)
 		{
@@ -29,7 +27,7 @@ namespace FoundationFortune.API
 			return false;
 		}
 
-		private void StartExtractionEvent()
+		public static void StartExtractionEvent()
 		{
 			if (!FoundationFortune.MoneyExtractionSystemSettings.MoneyExtractionSystem) return;
 			if (extractionCount >= FoundationFortune.MoneyExtractionSystemSettings.ExtractionLimit)
@@ -42,24 +40,24 @@ namespace FoundationFortune.API
 			activeExtractionRoom = FoundationFortune.MoneyExtractionSystemSettings.ExtractionPointRooms[UnityEngine.Random.Range(0, FoundationFortune.MoneyExtractionSystemSettings.ExtractionPointRooms.Count)];
 
 			isExtractionPointActive = true;
-			Log.Debug($"Extraction point activated in room: {activeExtractionRoom}. It will be active for {FoundationFortune.MoneyExtractionSystemSettings.ExtractionPointDuration} seconds.");
+			FoundationFortune.Log($"Extraction point activated in room: {activeExtractionRoom}. It will be active for {FoundationFortune.MoneyExtractionSystemSettings.ExtractionPointDuration} seconds.", LogLevel.Debug);
 
 			extractionCount++;
 			CoroutineManager.Coroutines.Add(Timing.CallDelayed(FoundationFortune.MoneyExtractionSystemSettings.ExtractionPointDuration, () => DeactivateExtractionPoint(true)));
 		}
 
-		public void StartExtractionEvent(RoomType room, float duration)
+		public static void StartExtractionEvent(RoomType room, float duration)
 		{
 			extractionStartTime = Time.time;
 			activeExtractionRoom = room;
 
 			isExtractionPointActive = true;
-			Log.Debug($"Extraction point activated in room: {activeExtractionRoom}. It will be active for T-{duration} seconds.");
+			FoundationFortune.Log($"Extraction point activated in room: {activeExtractionRoom}. It will be active for T-{duration} seconds.", LogLevel.Debug);
 
 			CoroutineManager.Coroutines.Add(Timing.CallDelayed(duration, () => DeactivateExtractionPoint(false)));
 		}
 
-		public void DeactivateExtractionPoint(bool restart)
+		public static void DeactivateExtractionPoint(bool restart)
 		{
 			if (!isExtractionPointActive) return;
 
@@ -68,13 +66,13 @@ namespace FoundationFortune.API
 				isExtractionPointActive = false;
 				if (extractionCount >= FoundationFortune.MoneyExtractionSystemSettings.ExtractionLimit) return;
 				nextExtractionTime = UnityEngine.Random.Range(FoundationFortune.MoneyExtractionSystemSettings.MinExtractionPointGenerationTime, FoundationFortune.MoneyExtractionSystemSettings.MaxExtractionPointGenerationTime + 1);
-				Log.Debug($"Extraction point in room {activeExtractionRoom} deactivated. Next extraction in T-{nextExtractionTime} Seconds.");
+				FoundationFortune.Log($"Extraction point in room {activeExtractionRoom} deactivated. Next extraction in T-{nextExtractionTime} Seconds.", LogLevel.Debug);
 				CoroutineManager.Coroutines.Add(Timing.CallDelayed(nextExtractionTime, StartExtractionEvent));
 			}
             else isExtractionPointActive = false;
         }
 
-		private void UpdateExtractionMessages(Player ply, ref StringBuilder hintMessage)
+		public static void UpdateExtractionMessages(Player ply, ref StringBuilder hintMessage)
 		{
 			if (!isExtractionPointActive) return;
 			
@@ -107,7 +105,7 @@ namespace FoundationFortune.API
 			}
 		}
 
-		private void StartExtractionTimer(Player player)
+		private static void StartExtractionTimer(Player player)
 		{
 			CoroutineHandle timerHandle = Timing.RunCoroutine(ExtractionTimerCoroutine(player));
 			CoroutineManager.Coroutines.Add(timerHandle);
@@ -119,14 +117,14 @@ namespace FoundationFortune.API
 			extractionTimers[player] = timerData;
 		}
 
-		private IEnumerator<float> ExtractionTimerCoroutine(Player player)
+		private static IEnumerator<float> ExtractionTimerCoroutine(Player player)
 		{
 			float startTime = Time.time;
 			while (Time.time - startTime < 10f)
 			{
 				if (!IsPlayerInExtractionRoom(player, activeExtractionRoom))
 				{
-					Log.Debug($"Extraction timer canceled for player {player.UserId}");
+					FoundationFortune.Log($"Extraction timer canceled for player {player.UserId}", LogLevel.Debug);
 					CancelExtractionTimer(player);
 					yield break;
 				}
@@ -141,10 +139,10 @@ namespace FoundationFortune.API
 			if (totalMoneyOnHold <= 0) return;
 			
 			PlayerDataRepository.TransferMoney(player.UserId, true);
-			Log.Debug($"Transferred {totalMoneyOnHold} money to player {player.UserId}");
+			FoundationFortune.Log($"Transferred {totalMoneyOnHold} money to player {player.UserId}", LogLevel.Debug);
 		}
 
-		private void CancelExtractionTimer(Player player)
+		private static void CancelExtractionTimer(Player player)
 		{
 			if (!extractionTimers.ContainsKey(player)) return;
 			Timing.KillCoroutines(extractionTimers[player].CoroutineHandle);

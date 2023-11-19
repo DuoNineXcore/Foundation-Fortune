@@ -12,7 +12,14 @@ namespace FoundationFortune.API.YamlConverters;
 
 public sealed class VectorsConverter : IYamlTypeConverter
 {
-    public bool Accepts(Type type) => type == typeof(Vector2) || type == typeof(Vector3) || type == typeof(Vector4);
+    private static readonly Dictionary<Type, Func<List<float>, object>> VectorConstructors = new Dictionary<Type, Func<List<float>, object>>
+    {
+        { typeof(Vector2), coords => new Vector2(coords[0], coords[1]) },
+        { typeof(Vector3), coords => new Vector3(coords[0], coords[1], coords[2]) },
+        { typeof(Vector4), coords => new Vector4(coords[0], coords[1], coords[2], coords[3]) }
+    };
+
+    public bool Accepts(Type type) => VectorConstructors.ContainsKey(type);
 
     public object ReadYaml(IParser parser, Type type)
     {
@@ -23,22 +30,13 @@ public sealed class VectorsConverter : IYamlTypeConverter
 
         while (!parser.TryConsume<MappingEnd>(out _))
         {
-            if (!parser.TryConsume<Scalar>(out var key) || !parser.TryConsume<Scalar>(out var value) || !float.TryParse(value.Value, NumberStyles.Float, CultureInfo.GetCultureInfo("en-US"), out float coordinate))
-            {
+            if (!parser.TryConsume<Scalar>(out var key) || !parser.TryConsume<Scalar>(out var value) || !float.TryParse(value.Value, NumberStyles.Float, CultureInfo.GetCultureInfo("en-US"), out float coordinate)) 
                 throw new InvalidDataException($"Invalid float value.");
-            }
-
             coordinates.Add(coordinate);
         }
 
-        object vector;
-        
-        if (type == typeof(Vector2) && coordinates.Count >= 2) vector = new Vector2(coordinates[0], coordinates[1]);
-        else if (type == typeof(Vector3) && coordinates.Count >= 3) vector = new Vector3(coordinates[0], coordinates[1], coordinates[2]);
-        else if (type == typeof(Vector4) && coordinates.Count >= 4) vector = new Vector4(coordinates[0], coordinates[1], coordinates[2], coordinates[3]);
-        else throw new InvalidDataException($"Invalid number of coordinates for {type.FullName}.");
-
-        return vector;
+        if (VectorConstructors.TryGetValue(type, out var constructor) && coordinates.Count >= constructor.Method.GetParameters().Length) return constructor(coordinates);
+        throw new InvalidDataException($"Invalid number of coordinates for {type.FullName}.");
     }
 
     public void WriteYaml(IEmitter emitter, object value, Type type)

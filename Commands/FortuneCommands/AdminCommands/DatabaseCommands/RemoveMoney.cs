@@ -59,12 +59,12 @@ namespace FoundationFortune.Commands.FortuneCommands.AdminCommands.DatabaseComma
 
                         var ply = Player.Get(self);
 
-                        if (subtractSaved) PlayerDataRepository.ModifyMoney(ply.UserId, amount, true, false, true);
+                        if (subtractSaved) PlayerDataRepository.ModifyMoney(ply.UserId, amount, true);
                         if (subtractOnHold) PlayerDataRepository.ModifyMoney(ply.UserId, amount, true, true, false);
 
                         string SelfRemoveMoney = pluginTranslations.SelfRemoveMoney.Replace("%amount%", amount.ToString());
 
-                        FoundationFortune.Singleton.FoundationFortuneAPI.EnqueueHint(ply, $"{SelfRemoveMoney}", 5f);
+                        FoundationFortune.Singleton.FoundationFortuneAPI.EnqueueHint(ply, $"{SelfRemoveMoney}");
                         response = $"Removed {amount} money from player '{ply}' (Saved: {subtractSaved}, On-Hold: {subtractOnHold}).";
                         return true;
 
@@ -80,8 +80,8 @@ namespace FoundationFortune.Commands.FortuneCommands.AdminCommands.DatabaseComma
                             foreach (var player in Player.List)
                             {
                                 string AllRemoveMoney = pluginTranslations.AllRemoveMoney.Replace("%amount%", allAmount.ToString());
-                                FoundationFortune.Singleton.FoundationFortuneAPI.EnqueueHint(player, $"{AllRemoveMoney}", 5f);
-                                PlayerDataRepository.ModifyMoney(player.UserId, allAmount, true, false, true);
+                                FoundationFortune.Singleton.FoundationFortuneAPI.EnqueueHint(player, $"{AllRemoveMoney}");
+                                PlayerDataRepository.ModifyMoney(player.UserId, allAmount, true);
                             }
                         }
 
@@ -96,7 +96,7 @@ namespace FoundationFortune.Commands.FortuneCommands.AdminCommands.DatabaseComma
                             foreach (var player in Player.List)
                             {
                                 string AllRemoveMoney = pluginTranslations.AllRemoveMoney.Replace("%amount%", allAmount.ToString());
-                                FoundationFortune.Singleton.FoundationFortuneAPI.EnqueueHint(player, $"{AllRemoveMoney}", 5f);
+                                FoundationFortune.Singleton.FoundationFortuneAPI.EnqueueHint(player, $"{AllRemoveMoney}");
                                 PlayerDataRepository.ModifyMoney(player.UserId, allAmount, true, true, false);
                             }
                         }
@@ -105,24 +105,23 @@ namespace FoundationFortune.Commands.FortuneCommands.AdminCommands.DatabaseComma
                         return true;
 
                     default:
-                        if (target != null)
+                    {
+                        if (!int.TryParse(args.At(1), out int steamIdAmount))
                         {
-                            if (!int.TryParse(args.At(1), out int steamIdAmount))
-                            {
-                                response = "Invalid amount. Please provide a valid number.";
-                                return false;
-                            }
-
-                            var targetPlayer = Player.Get(target);
-                            if (targetPlayer != null)
-                            {
-                                if (subtractSaved) PlayerDataRepository.ModifyMoney(targetPlayer.UserId, steamIdAmount, true, false, false);
-                                if (subtractOnHold) PlayerDataRepository.ModifyMoney(targetPlayer.UserId, steamIdAmount, true, false, true);
-
-                                string SteamIdRemoveMoney = pluginTranslations.SteamIDRemoveMoney.Replace("%amount%", steamIdAmount.ToString());
-                                FoundationFortune.Singleton.FoundationFortuneAPI.EnqueueHint(targetPlayer, $"{SteamIdRemoveMoney}", 5f);
-                            }
+                            response = "Invalid amount. Please provide a valid number.";
+                            return false;
                         }
+
+                        var targetPlayer = Player.Get(target);
+                        if (targetPlayer != null)
+                        {
+                            if (subtractSaved) PlayerDataRepository.ModifyMoney(targetPlayer.UserId, steamIdAmount, true, false, false);
+                            if (subtractOnHold) PlayerDataRepository.ModifyMoney(targetPlayer.UserId, steamIdAmount, true, saved:true);
+
+                            string SteamIdRemoveMoney = pluginTranslations.SteamIDRemoveMoney.Replace("%amount%", steamIdAmount.ToString());
+                            FoundationFortune.Singleton.FoundationFortuneAPI.EnqueueHint(targetPlayer, $"{SteamIdRemoveMoney}");
+                        }
+                    }
 
                         response = $"Removed {args.At(1)} money from player '{target}' (Saved: {subtractSaved}, On-Hold: {subtractOnHold}).";
                         return true;

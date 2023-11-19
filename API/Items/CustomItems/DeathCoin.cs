@@ -7,7 +7,9 @@ using Exiled.Events.EventArgs.Player;
 using FoundationFortune.API.Database;
 using Exiled.API.Features.Items;
 using System.Collections.Generic;
+using Discord;
 using FoundationFortune.API.Models.Enums.Perks;
+using FoundationFortune.API.Systems;
 
 namespace FoundationFortune.API.Items.CustomItems
 {
@@ -39,14 +41,14 @@ namespace FoundationFortune.API.Items.CustomItems
 
 			int moneyBeforeDeath = PlayerDataRepository.GetMoneyOnHold(ev.Player.UserId);
 			if (moneyBeforeDeath <= 0 || PlayerDataRepository.GetPluginAdmin(ev.Player.UserId)) return;
-			FoundationFortune.Singleton.FoundationFortuneAPI.EnqueueHint(ev.Player, FoundationFortune.Singleton.Translation.Death.Replace("%moneyBeforeDeath%", moneyBeforeDeath.ToString()), 5f);
+			FoundationFortune.Singleton.FoundationFortuneAPI.EnqueueHint(ev.Player, FoundationFortune.Singleton.Translation.Death.Replace("%moneyBeforeDeath%", moneyBeforeDeath.ToString()));
 			PlayerDataRepository.EmptyMoney(ev.Player.UserId, true);
-			int coinValue = moneyBeforeDeath / FoundationFortune.Singleton.Config.DeathCoinsToDrop;
-			for (int i = 0; i < FoundationFortune.Singleton.Config.DeathCoinsToDrop; i++)
+			int coinValue = moneyBeforeDeath / FoundationFortune.SellableItemsList.DeathCoinsToDrop;
+			for (int i = 0; i < FoundationFortune.SellableItemsList.DeathCoinsToDrop; i++)
 			{
 				if (!TrySpawn(Id, ev.Player.Position, out Pickup coin)) continue;
 				if (coin == null) continue;
-				Log.Debug($"Spawned coin at Pos:{coin.Position} Rotation:{coin.Rotation}, Serial: {coin.Serial}, Value: {coinValue}");
+				FoundationFortune.Log($"Spawned coin at Pos:{coin.Position} Rotation:{coin.Rotation}, Serial: {coin.Serial}, Value: {coinValue}", LogLevel.Debug);
 				droppedCoins[coin.Serial] = (coinValue, ev.Player);
 			}
 		}
@@ -58,7 +60,7 @@ namespace FoundationFortune.API.Items.CustomItems
 			if (droppedCoins.TryGetValue(item.Serial, out var coinData))
 			{
 				int coinValue = coinData.coinValue;
-				FoundationFortune.Singleton.FoundationFortuneAPI.EnqueueHint(player, FoundationFortune.Singleton.Translation.DeathCoinPickup.Replace("%coinValue%", coinValue.ToString()), 3f);
+				FoundationFortune.Singleton.FoundationFortuneAPI.EnqueueHint(player, FoundationFortune.Singleton.Translation.DeathCoinPickup.Replace("%coinValue%", coinValue.ToString()));
 				PlayerDataRepository.ModifyMoney(player.UserId, coinValue, false, true, false);
 				droppedCoins.Remove(item.Serial);
 			}

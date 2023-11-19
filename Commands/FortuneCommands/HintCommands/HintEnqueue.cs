@@ -1,14 +1,10 @@
-﻿using CommandSystem;
-using Exiled.API.Features;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using FoundationFortune.API.Models;
+using CommandSystem;
+using Exiled.API.Features;
 using FoundationFortune.API.Models.Enums;
 
-namespace FoundationFortune.Commands.FortuneCommands.HintCommands.Global
+namespace FoundationFortune.Commands.FortuneCommands.HintCommands
 {
     [CommandHandler(typeof(ClientCommandHandler))]
     [CommandHandler(typeof(RemoteAdminCommandHandler))]
@@ -30,7 +26,7 @@ namespace FoundationFortune.Commands.FortuneCommands.HintCommands.Global
             string target = args.At(0).ToLower();
             string hint = args.At(1);
 
-            if (!float.TryParse(args.At(2), out float duration))
+            if (!int.TryParse(args.At(2), out int duration))
             {
                 response = "Invalid duration. Please enter a valid number.";
                 return false;

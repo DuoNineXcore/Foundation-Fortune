@@ -2,7 +2,7 @@
 
 namespace FoundationFortune.API.Models.Classes.Items
 {
-    public class PerkItem
+    public class BuyablePerk
     {
         public PerkType PerkType { get; set; }
         public int Price { get; set; }

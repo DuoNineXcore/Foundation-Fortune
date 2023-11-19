@@ -4,6 +4,7 @@ using CommandSystem;
 using Exiled.API.Features;
 using Exiled.Permissions.Extensions;
 using FoundationFortune.API.Database;
+using FoundationFortune.API.EventSystems;
 
 namespace FoundationFortune.Commands.FortuneCommands.AdminCommands.BountyCommands
 {
@@ -39,10 +40,10 @@ namespace FoundationFortune.Commands.FortuneCommands.AdminCommands.BountyCommand
                 return false;
             }
 
-            var bountiedPlayer = FoundationFortune.Singleton.FoundationFortuneAPI.BountiedPlayers.FirstOrDefault(bounty => bounty.Player == player && bounty.IsBountied);
+            var bountiedPlayer = ServerBountySystem.BountiedPlayers.FirstOrDefault(bounty => bounty.Player == player && bounty.IsBountied);
             if (bountiedPlayer != null)
             {
-                FoundationFortune.Singleton.FoundationFortuneAPI.StopBounty(player);
+                ServerBountySystem.StopBounty(player);
                 response = $"Bounty removed from {player.Nickname}.";
                 return true;
             }

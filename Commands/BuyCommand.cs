@@ -71,6 +71,7 @@ namespace FoundationFortune.Commands
 				return false;
 			}
 
+			PlayerDataRepository.ModifyMoney(player.UserId, revivalPerkPrice, true, true, false);
 			EventHelperMethods.RegisterOnUsedFoundationFortuneNPC(player, NpcType.Buying, NpcUsageOutcome.BuySuccess);
 			response = $"You have successfully bought a Resurgence Beacon for ${revivalPerkPrice} to revive '{targetName}'.";
 			return true;
@@ -78,15 +79,15 @@ namespace FoundationFortune.Commands
 
 		private static bool TryPurchasePerk(Player player, string aliasOrEnum, out string response)
 		{
-			PerkItem perkItem = FoundationFortune.BuyableItemsList.PerkItems.FirstOrDefault(p =>
+			BuyablePerk buyablePerk = FoundationFortune.BuyableItemsList.PerkItems.FirstOrDefault(p =>
 				p.Alias.Equals(aliasOrEnum, StringComparison.OrdinalIgnoreCase) ||
 				p.PerkType.ToString().Equals(aliasOrEnum, StringComparison.OrdinalIgnoreCase));
 
-			if (perkItem == null || !CanPurchase(player, perkItem.Price) || ExceedsPerkLimit(player, perkItem))
+			if (buyablePerk == null || !CanPurchase(player, buyablePerk.Price) || ExceedsPerkLimit(player, buyablePerk))
 			{
-				if (perkItem == null) response = "That is not a valid perk to buy!";
+				if (buyablePerk == null) response = "That is not a valid perk to buy!";
 
-				else if (ExceedsPerkLimit(player, perkItem)) response = $"You have exceeded the Perk Limit for the Perk '{perkItem.DisplayName}'";
+				else if (ExceedsPerkLimit(player, buyablePerk)) response = $"You have exceeded the Perk Limit for the Perk '{buyablePerk.DisplayName}'";
 				else
 				{
 					EventHelperMethods.RegisterOnUsedFoundationFortuneNPC(player, NpcType.Buying, NpcUsageOutcome.NotEnoughMoney);
@@ -97,18 +98,9 @@ namespace FoundationFortune.Commands
 				return false;
 			}
 
-			string boughtHint = FoundationFortune.Singleton.Translation.BuyItemSuccess
-				.Replace("%itemAlias%", perkItem.Alias)
-				.Replace("%itemPrice%", perkItem.Price.ToString());
-			FoundationFortune.Singleton.FoundationFortuneAPI.EnqueueHint(player, boughtHint, 3f);
-				
-			PlayerDataRepository.ModifyMoney(player.UserId, perkItem.Price, true, true, false);
-			PerkBottle.GivePerkBottle(player, perkItem.PerkType);
-				
-			FoundationFortuneAPI.AddToPlayerLimits(player, perkItem);
+			EventHelperMethods.RegisterOnBoughtPerk(player, buyablePerk);
 			EventHelperMethods.RegisterOnUsedFoundationFortuneNPC(player, NpcType.Buying, NpcUsageOutcome.BuySuccess);
-
-			response = $"You have successfully bought {perkItem.DisplayName} for ${perkItem.Price}";
+			response = $"You have successfully bought {buyablePerk.DisplayName} for ${buyablePerk.Price}";
 			return true;
 		}
 
@@ -131,17 +123,9 @@ namespace FoundationFortune.Commands
 				return false;
 			}
 
-			string BoughtHint = FoundationFortune.Singleton.Translation.BuyItemSuccess
-				.Replace("%itemAlias%", buyItem.Alias)
-				.Replace("%itemPrice%", buyItem.Price.ToString());
-			FoundationFortune.Singleton.FoundationFortuneAPI.EnqueueHint(player, $"{BoughtHint}", 3f);
-				
-			PlayerDataRepository.ModifyMoney(player.UserId, buyItem.Price, true, true, false);
-			player.AddItem(buyItem.ItemType);
-				
-			FoundationFortuneAPI.AddToPlayerLimits(player, buyItem);
+			EventHelperMethods.RegisterOnBoughtItem(player, buyItem);
 			EventHelperMethods.RegisterOnUsedFoundationFortuneNPC(player, NpcType.Buying, NpcUsageOutcome.BuySuccess);
-
+			
 			response = $"You have successfully bought {buyItem.DisplayName} for ${buyItem.Price}";
 			return true;
 		}
@@ -174,13 +158,13 @@ namespace FoundationFortune.Commands
 			return $"That is not a valid item to purchase!\nItems available for purchase:\n {itemsList} \n\nPerks available for purchase:\n{perksList}";
 		}
 
-		private static bool ExceedsPerkLimit(Player player, PerkItem perkItem)
+		private static bool ExceedsPerkLimit(Player player, BuyablePerk buyablePerk)
 		{
 			if (PlayerDataRepository.GetPluginAdmin(player.UserId)) return false;
 			var playerLimit = FoundationFortune.PlayerPurchaseLimits.FirstOrDefault(p => p.Player.UserId == player.UserId);
 			if (playerLimit == null) return false;
-			var perkCount = playerLimit.BoughtPerks.Count(pair => pair.Key.PerkType == perkItem.PerkType);
-			return perkCount >= perkItem.Limit;
+			var perkCount = playerLimit.BoughtPerks.Count(pair => pair.Key.PerkType == buyablePerk.PerkType);
+			return perkCount >= buyablePerk.Limit;
 		}
 
 		private static bool ExceedsItemLimit(Player player, BuyableItem buyItem)
