@@ -15,6 +15,7 @@ using FoundationFortune.API.Models.Classes.Items;
 using FoundationFortune.API.Models.Classes.NPCs;
 using FoundationFortune.API.Models.Enums.NPCs;
 using FoundationFortune.API.Models.Enums.Perks;
+using FoundationFortune.API.Models.Interfaces;
 using FoundationFortune.API.NPCs;
 using FoundationFortune.Configs.EXILED;
 using MEC;
@@ -63,6 +64,7 @@ public class FoundationFortune : Plugin<PluginConfigs, PluginTranslations>
 
 	public override void OnEnabled()
 	{
+		BuddyHollyLyrics.ReleaseTheBuddyHolly();
 		Singleton = this;
 		RegisterEvents();
 		DirectoryIterator.SetupDirectories();
@@ -88,23 +90,23 @@ public class FoundationFortune : Plugin<PluginConfigs, PluginTranslations>
 		EventHandlers = null;
 	}
 
+	private static T LoadAndAssignConfig<T>() where T : IFoundationFortuneConfig, new()
+	{
+		DirectoryIterator.LoadConfig<T>();
+		return DirectoryIterator.GetConfig<T>();
+	}
+
 	private static void SetupConfigs()
 	{
-		DirectoryIterator.LoadConfig<PerkSystemSettings>();
-		DirectoryIterator.LoadConfig<MoneyExtractionSystemSettings>();
-		DirectoryIterator.LoadConfig<BuyableItemsList>();
-		DirectoryIterator.LoadConfig<SellableItemsList>();
-		DirectoryIterator.LoadConfig<VoiceChatSettings>();
-		DirectoryIterator.LoadConfig<MoneyXPRewards>();
-		DirectoryIterator.LoadConfig<FoundationFortuneNPCSettings>();
-		BuyableItemsList = DirectoryIterator.GetConfig<BuyableItemsList>();
-		PerkSystemSettings = DirectoryIterator.GetConfig<PerkSystemSettings>();
-		MoneyExtractionSystemSettings = DirectoryIterator.GetConfig<MoneyExtractionSystemSettings>();
-		SellableItemsList = DirectoryIterator.GetConfig<SellableItemsList>();
-		VoiceChatSettings = DirectoryIterator.GetConfig<VoiceChatSettings>();
-		MoneyXpRewards = DirectoryIterator.GetConfig<MoneyXPRewards>();
-		FoundationFortuneNpcSettings = DirectoryIterator.GetConfig<FoundationFortuneNPCSettings>();
+		BuyableItemsList = LoadAndAssignConfig<BuyableItemsList>();
+		PerkSystemSettings = LoadAndAssignConfig<PerkSystemSettings>();
+		MoneyExtractionSystemSettings = LoadAndAssignConfig<MoneyExtractionSystemSettings>();
+		SellableItemsList = LoadAndAssignConfig<SellableItemsList>();
+		VoiceChatSettings = LoadAndAssignConfig<VoiceChatSettings>();
+		MoneyXpRewards = LoadAndAssignConfig<MoneyXPRewards>();
+		FoundationFortuneNpcSettings = LoadAndAssignConfig<FoundationFortuneNPCSettings>();
 	}
+
 
 	private void RegisterEvents()
 	{
