@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using Exiled.API.Enums;
-using FoundationFortune.API.Models.Interfaces;
+using FoundationFortune.API.Core.Models.Interfaces;
 using YamlDotNet.Serialization;
 
 namespace FoundationFortune.Configs;

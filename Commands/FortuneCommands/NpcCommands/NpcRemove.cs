@@ -1,15 +1,13 @@
 ﻿using CommandSystem;
 using Exiled.API.Features;
 using Exiled.Permissions.Extensions;
-using FoundationFortune.API.NPCs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using FoundationFortune.API.Models.Enums.NPCs;
 using System.Threading.Tasks;
-using FoundationFortune.API.Models;
-using FoundationFortune.API.NPCs.NpcTypes;
+using FoundationFortune.API.Core.Models.Enums.NPCs;
+using FoundationFortune.API.Features.NPCs.NpcTypes;
 
 namespace FoundationFortune.Commands.FortuneCommands.NpcCommands
 {

@@ -2,7 +2,7 @@
 using System.Linq;
 using CommandSystem;
 using Exiled.API.Features;
-using FoundationFortune.API.Models.Enums;
+using FoundationFortune.API.Core.Models.Enums.Hints;
 
 namespace FoundationFortune.Commands.FortuneCommands.HintCommands
 {
@@ -50,20 +50,20 @@ namespace FoundationFortune.Commands.FortuneCommands.HintCommands
                 case "self":
                 {
                     Player player = Player.Get(sender);
-                    FoundationFortune.Singleton.FoundationFortuneAPI.EnqueueHint(player, hint, duration, alignment);
+                    FoundationFortune.Singleton.HintSystem.EnqueueHint(player, hint, duration, alignment);
                     response = "Hint broadcasted successfully.";
                     break;
                 }
                 case "all":
                 {
-                    foreach (Player ply in Player.List.Where(p => !p.IsNPC)) FoundationFortune.Singleton.FoundationFortuneAPI.EnqueueHint(ply, hint, duration, alignment);
+                    foreach (Player ply in Player.List.Where(p => !p.IsNPC)) FoundationFortune.Singleton.HintSystem.EnqueueHint(ply, hint, duration, alignment);
                     response = "Hint broadcasted successfully.";
                     break;
                 }
                 default:
                 {
                     Player steamId = Player.Get(target);
-                    FoundationFortune.Singleton.FoundationFortuneAPI.EnqueueHint(steamId, hint, duration, alignment);
+                    FoundationFortune.Singleton.HintSystem.EnqueueHint(steamId, hint, duration, alignment);
                     response = $"Hint broadcasted successfully.";
                     break;
                 }

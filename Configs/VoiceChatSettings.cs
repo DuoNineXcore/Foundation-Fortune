@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
-using FoundationFortune.API.Models.Classes.NPCs;
-using FoundationFortune.API.Models.Classes.Player;
-using FoundationFortune.API.Models.Enums.NPCs;
-using FoundationFortune.API.Models.Enums.Player;
-using FoundationFortune.API.Models.Interfaces;
+using FoundationFortune.API.Core.Models.Classes.NPCs;
+using FoundationFortune.API.Core.Models.Classes.Player;
+using FoundationFortune.API.Core.Models.Enums.NPCs;
+using FoundationFortune.API.Core.Models.Enums.Player;
+using FoundationFortune.API.Core.Models.Interfaces;
 using VoiceChat;
 using YamlDotNet.Serialization;
 

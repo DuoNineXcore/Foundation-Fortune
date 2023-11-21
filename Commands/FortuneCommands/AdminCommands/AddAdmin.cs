@@ -1,12 +1,12 @@
 ﻿using CommandSystem;
 using Exiled.API.Features;
 using Exiled.Permissions.Extensions;
-using FoundationFortune.API.Database;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using FoundationFortune.API.Core.Database;
 
 namespace FoundationFortune.Commands.FortuneCommands.AdminCommands
 {

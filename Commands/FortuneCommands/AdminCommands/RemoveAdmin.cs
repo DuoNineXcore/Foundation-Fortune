@@ -1,8 +1,8 @@
 ﻿using CommandSystem;
 using Exiled.API.Features;
-using FoundationFortune.API.Database;
 using System;
 using Exiled.Permissions.Extensions;
+using FoundationFortune.API.Core.Database;
 
 namespace FoundationFortune.Commands.FortuneCommands.AdminCommands
 {

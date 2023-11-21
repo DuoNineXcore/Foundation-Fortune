@@ -3,7 +3,7 @@ using System.Linq;
 using CommandSystem;
 using Exiled.API.Features;
 using Exiled.Permissions.Extensions;
-using FoundationFortune.API.Database;
+using FoundationFortune.API.Core.Database;
 
 namespace FoundationFortune.Commands.FortuneCommands.AdminCommands.DatabaseCommands
 {
@@ -34,7 +34,7 @@ namespace FoundationFortune.Commands.FortuneCommands.AdminCommands.DatabaseComma
                 string FlushedDatabase = pluginTranslations.FlushedDatabase
                     .Replace("%moneyOnHold%", moneyOnHold.ToString())
                     .Replace("%moneySaved%", moneySaved.ToString());
-                FoundationFortune.Singleton.FoundationFortuneAPI.EnqueueHint(player, $"{FlushedDatabase}");
+                FoundationFortune.Singleton.HintSystem.EnqueueHint(player, $"{FlushedDatabase}");
                 PlayerDataRepository.EmptyMoney(player.UserId, true, true);
             }
 

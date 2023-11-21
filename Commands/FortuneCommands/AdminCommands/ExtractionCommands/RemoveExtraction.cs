@@ -2,8 +2,8 @@
 using CommandSystem;
 using Exiled.API.Features;
 using Exiled.Permissions.Extensions;
-using FoundationFortune.API.Database;
-using FoundationFortune.API.EventSystems;
+using FoundationFortune.API.Core.Database;
+using FoundationFortune.API.Features.Systems.EventSystems;
 
 namespace FoundationFortune.Commands.FortuneCommands.AdminCommands.ExtractionCommands
 {

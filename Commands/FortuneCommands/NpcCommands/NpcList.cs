@@ -33,33 +33,16 @@ namespace FoundationFortune.Commands.FortuneCommands.NpcCommands
 
             StringBuilder sb = new();
             sb.AppendLine("Foundation Fortune NPCs:");
-            AppendBotList(sb, "Buying Bots", FoundationFortune.Singleton.BuyingBots);
-            AppendBotList(sb, "Selling Bots", FoundationFortune.Singleton.SellingBots);
-            AppendBotList(sb, "Music Bots", FoundationFortune.Singleton.MusicBotPairs);
+            AppendBotList(sb, "Selling Bots", FoundationFortune.Singleton.SellingBots.Values);
+            AppendBotList(sb, "Buying Bots", FoundationFortune.Singleton.BuyingBots.Values);
             response = sb.ToString();
             return true;
         }
 
-        private static void AppendBotList<T>(StringBuilder sb, string title, IEnumerable<T> collection)
+        private static void AppendBotList(StringBuilder sb, string title, IEnumerable<(Npc bot, int indexation)> collection)
         {
             sb.AppendLine(title + ":");
-            foreach (var item in collection)
-            {
-                var botProperty = item.GetType().GetProperty("bot");
-                var indexationProperty = item.GetType().GetProperty("indexation");
-
-                if (botProperty != null && indexationProperty != null)
-                {
-                    var bot = botProperty.GetValue(item);
-                    var indexation = indexationProperty.GetValue(item);
-
-                    sb.AppendLine($"Name: {(bot?.GetType().GetProperty("Nickname")?.GetValue(bot) ?? "Null Nickname")}, Indexation: {indexation}");
-                }
-                else
-                {
-                    sb.AppendLine("Invalid item format.");
-                }
-            }
+            foreach (var (bot, indexation) in collection) sb.AppendLine(bot != null ? $"{bot.Nickname} {indexation} - Position: {bot.Position} - Room: {bot.CurrentRoom.Type}" : "Invalid bot format.");
         }
     }
 }

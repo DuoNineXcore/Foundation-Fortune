@@ -2,14 +2,16 @@
 using System.Linq;
 using CommandSystem;
 using Exiled.API.Features;
-using FoundationFortune.API.Database;
 using FoundationFortune.API;
-using FoundationFortune.API.Events;
+using FoundationFortune.API.Core.Database;
+using FoundationFortune.API.Core.Events;
+using FoundationFortune.API.Core.Models.Classes.Items;
+using FoundationFortune.API.Core.Models.Enums.NPCs;
+using FoundationFortune.API.Core.Models.Enums.Perks;
+using FoundationFortune.API.Features;
+using FoundationFortune.API.Features.Items.World;
+using FoundationFortune.API.Features.NPCs;
 using FoundationFortune.API.Items.PerkItems;
-using FoundationFortune.API.Models.Classes.Items;
-using FoundationFortune.API.Models.Enums.NPCs;
-using FoundationFortune.API.Models.Enums.Perks;
-using FoundationFortune.API.NPCs;
 using Utils.NonAllocLINQ;
 
 namespace FoundationFortune.Commands
@@ -27,7 +29,7 @@ namespace FoundationFortune.Commands
 		{
 			Player player = Player.Get(sender);
 
-			if (!FoundationFortune.Singleton.FoundationFortuneAPI.IsPlayerOnSellingWorkstation(player) && !NPCHelperMethods.IsPlayerNearBuyingBot(player))
+			if (!SellingWorkstations.IsPlayerOnSellingWorkstation(player) && !NPCHelperMethods.IsPlayerNearBuyingBot(player))
 			{
 				response = "You must be at a Selling Workstation / Buying Bot to buy an item.";
 				return false;

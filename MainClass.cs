@@ -9,23 +9,19 @@ using System.Collections.Generic;
 using System.IO;
 using Discord;
 using FoundationFortune.API;
-using FoundationFortune.API.Events;
-using FoundationFortune.API.Events.EventArgs;
-using FoundationFortune.API.Models.Classes.Items;
-using FoundationFortune.API.Models.Classes.NPCs;
-using FoundationFortune.API.Models.Enums.NPCs;
-using FoundationFortune.API.Models.Enums.Perks;
-using FoundationFortune.API.Models.Interfaces;
-using FoundationFortune.API.NPCs;
+using FoundationFortune.API.Core.Events.Handlers;
+using FoundationFortune.API.Core.Models.Classes.Items;
+using FoundationFortune.API.Core.Models.Classes.NPCs;
+using FoundationFortune.API.Core.Models.Enums.Perks;
+using FoundationFortune.API.Features.Systems;
 using FoundationFortune.Configs.EXILED;
+using FoundationFortune.EventHandlers;
 using MEC;
-using PluginAPI.Enums;
-using YamlDotNet.Serialization;
 
 namespace FoundationFortune;
-
-// ReSharper disable once ClassNeverInstantiated.Global
-// IM NOT MAKING THIS SHIT ABSTRACT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+/// <summary>
+/// the leg
+/// </summary>
 public class FoundationFortune : Plugin<PluginConfigs, PluginTranslations>
 {
 	public override string Author => "DuoNineXcore & Misfiy";
@@ -51,8 +47,9 @@ public class FoundationFortune : Plugin<PluginConfigs, PluginTranslations>
 
 	public static FoundationFortune Singleton;
 	public static List<ObjectInteractions> PlayerPurchaseLimits = new();
-	public FoundationFortuneAPI FoundationFortuneAPI = new();
-	public EventHandlers EventHandlers = new();
+	public HintSystem HintSystem = new();
+	private FoundationFortuneEventHandlers FoundationFortuneEventHandlers = new();
+	private EXILEDEventHandlers ExiledEventHandlers = new();
 	public LiteDatabase db;
 	
 	public Dictionary<Player, Dictionary<PerkType, int>> ConsumedPerks = new();
@@ -64,7 +61,7 @@ public class FoundationFortune : Plugin<PluginConfigs, PluginTranslations>
 
 	public override void OnEnabled()
 	{
-		BuddyHollyLyrics.ReleaseTheBuddyHolly();
+		BuddyHollyLyrics.WelcomeText();
 		Singleton = this;
 		RegisterEvents();
 		DirectoryIterator.SetupDirectories();
@@ -86,85 +83,80 @@ public class FoundationFortune : Plugin<PluginConfigs, PluginTranslations>
 		CustomItem.UnregisterItems();
 		harmony?.UnpatchAll(harmony.Id);
 		harmony = null!;
-		FoundationFortuneAPI = null;
-		EventHandlers = null;
-	}
-
-	private static T LoadAndAssignConfig<T>() where T : IFoundationFortuneConfig, new()
-	{
-		DirectoryIterator.LoadConfig<T>();
-		return DirectoryIterator.GetConfig<T>();
+		ExiledEventHandlers = null;
+		FoundationFortuneEventHandlers = null;
+		HintSystem = null;
 	}
 
 	private static void SetupConfigs()
 	{
-		BuyableItemsList = LoadAndAssignConfig<BuyableItemsList>();
-		PerkSystemSettings = LoadAndAssignConfig<PerkSystemSettings>();
-		MoneyExtractionSystemSettings = LoadAndAssignConfig<MoneyExtractionSystemSettings>();
-		SellableItemsList = LoadAndAssignConfig<SellableItemsList>();
-		VoiceChatSettings = LoadAndAssignConfig<VoiceChatSettings>();
-		MoneyXpRewards = LoadAndAssignConfig<MoneyXPRewards>();
-		FoundationFortuneNpcSettings = LoadAndAssignConfig<FoundationFortuneNPCSettings>();
+		BuyableItemsList = DirectoryIterator.LoadAndAssignConfig<BuyableItemsList>();
+		PerkSystemSettings = DirectoryIterator.LoadAndAssignConfig<PerkSystemSettings>();
+		MoneyExtractionSystemSettings = DirectoryIterator.LoadAndAssignConfig<MoneyExtractionSystemSettings>();
+		SellableItemsList = DirectoryIterator.LoadAndAssignConfig<SellableItemsList>();
+		VoiceChatSettings = DirectoryIterator.LoadAndAssignConfig<VoiceChatSettings>();
+		MoneyXpRewards = DirectoryIterator.LoadAndAssignConfig<MoneyXPRewards>();
+		FoundationFortuneNpcSettings = DirectoryIterator.LoadAndAssignConfig<FoundationFortuneNPCSettings>();
 	}
-
-
+	
 	private void RegisterEvents()
 	{
-		Exiled.Events.Handlers.Player.Verified += EventHandlers.RegisterInDatabase;
-		Exiled.Events.Handlers.Player.Dying += EventHandlers.DyingEvent;
-		Exiled.Events.Handlers.Player.Spawned += EventHandlers.EtherealInterventionSpawn;
-		Exiled.Events.Handlers.Player.Died += EventHandlers.KillingReward;
-		Exiled.Events.Handlers.Player.Escaping += EventHandlers.EscapingReward;
-		Exiled.Events.Handlers.Player.DroppingItem += EventHandlers.SellingItem;
-		Exiled.Events.Handlers.Player.Left += EventHandlers.DestroyMusicBots;
-		Exiled.Events.Handlers.Player.Hurting += EventHandlers.HurtingPlayer;
-		Exiled.Events.Handlers.Player.Shooting += EventHandlers.ShootingWeapon;
-		Exiled.Events.Handlers.Server.RoundStarted += EventHandlers.RoundStart;
-		Exiled.Events.Handlers.Server.RestartingRound += EventHandlers.RoundRestart;
-		Exiled.Events.Handlers.Server.RoundEnded += EventHandlers.RoundEnded;
-		Exiled.Events.Handlers.Server.RespawningTeam += EventHandlers.PreventBotsFromSpawningInWaves;
-		Exiled.Events.Handlers.Scp049.ActivatingSense += EventHandlers.FuckYourAbility;
-		Exiled.Events.Handlers.Scp0492.TriggeringBloodlust += EventHandlers.FuckYourOtherAbility;
+		Exiled.Events.Handlers.Player.Verified += ExiledEventHandlers.RegisterInDatabase;
+		Exiled.Events.Handlers.Player.Dying += ExiledEventHandlers.DyingEvent;
+		Exiled.Events.Handlers.Player.Spawned += ExiledEventHandlers.EtherealInterventionSpawn;
+		Exiled.Events.Handlers.Player.Died += ExiledEventHandlers.KillingReward;
+		Exiled.Events.Handlers.Player.Escaping += ExiledEventHandlers.EscapingReward;
+		Exiled.Events.Handlers.Player.DroppingItem += ExiledEventHandlers.SellingItem;
+		Exiled.Events.Handlers.Player.Left += ExiledEventHandlers.DestroyMusicBots;
+		Exiled.Events.Handlers.Player.Hurting += ExiledEventHandlers.HurtingPlayer;
+		Exiled.Events.Handlers.Player.Shooting += ExiledEventHandlers.ShootingWeapon;
+		Exiled.Events.Handlers.Server.RoundStarted += ExiledEventHandlers.RoundStart;
+		Exiled.Events.Handlers.Server.RestartingRound += ExiledEventHandlers.RoundRestart;
+		Exiled.Events.Handlers.Server.RoundEnded += ExiledEventHandlers.RoundEnded;
+		Exiled.Events.Handlers.Server.RespawningTeam += ExiledEventHandlers.PreventBotsFromSpawningInWaves;
+		Exiled.Events.Handlers.Scp049.ActivatingSense += ExiledEventHandlers.FuckYourAbility;
+		Exiled.Events.Handlers.Scp0492.TriggeringBloodlust += ExiledEventHandlers.FuckYourOtherAbility;
 		
-		API.Events.Handlers.FoundationFortuneNPCs.SoldItem += EventHandlers.SoldItem;
-		API.Events.Handlers.FoundationFortuneNPCs.BoughtItem += EventHandlers.BoughtItem;
-		API.Events.Handlers.FoundationFortuneNPCs.BoughtPerk += EventHandlers.BoughtPerk;
-		API.Events.Handlers.FoundationFortuneNPCs.UsedFoundationFortuneNPC += EventHandlers.UsedFoundationFortuneNPC;
-		API.Events.Handlers.FoundationFortunePerks.UsedFoundationFortunePerk += EventHandlers.UsedFoundationFortunePerk;
+		FoundationFortuneNPCs.SoldItem += FoundationFortuneEventHandlers.SoldItem;
+		FoundationFortuneNPCs.BoughtItem += FoundationFortuneEventHandlers.BoughtItem;
+		FoundationFortuneNPCs.BoughtPerk += FoundationFortuneEventHandlers.BoughtPerk;
+		FoundationFortuneNPCs.UsedFoundationFortuneNPC += FoundationFortuneEventHandlers.UsedFoundationFortuneNPC;
+		FoundationFortunePerks.UsedFoundationFortunePerk += FoundationFortuneEventHandlers.UsedFoundationFortunePerk;
 	}
 
 	private void UnregisterEvents()
 	{
-		Exiled.Events.Handlers.Player.Verified -= EventHandlers.RegisterInDatabase;
-		Exiled.Events.Handlers.Player.Dying -= EventHandlers.DyingEvent;
-		Exiled.Events.Handlers.Player.Spawned -= EventHandlers.EtherealInterventionSpawn;
-		Exiled.Events.Handlers.Player.Died -= EventHandlers.KillingReward;
-		Exiled.Events.Handlers.Player.Escaping -= EventHandlers.EscapingReward;
-		Exiled.Events.Handlers.Player.DroppingItem -= EventHandlers.SellingItem;
-		Exiled.Events.Handlers.Player.Left -= EventHandlers.DestroyMusicBots;
-		Exiled.Events.Handlers.Player.Hurting -= EventHandlers.HurtingPlayer;
-		Exiled.Events.Handlers.Player.Shooting -= EventHandlers.ShootingWeapon;
-		Exiled.Events.Handlers.Server.RoundStarted -= EventHandlers.RoundStart;
-		Exiled.Events.Handlers.Server.RestartingRound -= EventHandlers.RoundRestart;
-		Exiled.Events.Handlers.Server.RoundEnded -= EventHandlers.RoundEnded;
-		Exiled.Events.Handlers.Server.RespawningTeam -= EventHandlers.PreventBotsFromSpawningInWaves;
-		Exiled.Events.Handlers.Scp049.ActivatingSense -= EventHandlers.FuckYourAbility;
-		Exiled.Events.Handlers.Scp0492.TriggeringBloodlust -= EventHandlers.FuckYourOtherAbility;
+		Exiled.Events.Handlers.Player.Verified -= ExiledEventHandlers.RegisterInDatabase;
+		Exiled.Events.Handlers.Player.Dying -= ExiledEventHandlers.DyingEvent;
+		Exiled.Events.Handlers.Player.Spawned -= ExiledEventHandlers.EtherealInterventionSpawn;
+		Exiled.Events.Handlers.Player.Died -= ExiledEventHandlers.KillingReward;
+		Exiled.Events.Handlers.Player.Escaping -= ExiledEventHandlers.EscapingReward;
+		Exiled.Events.Handlers.Player.DroppingItem -= ExiledEventHandlers.SellingItem;
+		Exiled.Events.Handlers.Player.Left -= ExiledEventHandlers.DestroyMusicBots;
+		Exiled.Events.Handlers.Player.Hurting -= ExiledEventHandlers.HurtingPlayer;
+		Exiled.Events.Handlers.Player.Shooting -= ExiledEventHandlers.ShootingWeapon;
+		Exiled.Events.Handlers.Server.RoundStarted -= ExiledEventHandlers.RoundStart;
+		Exiled.Events.Handlers.Server.RestartingRound -= ExiledEventHandlers.RoundRestart;
+		Exiled.Events.Handlers.Server.RoundEnded -= ExiledEventHandlers.RoundEnded;
+		Exiled.Events.Handlers.Server.RespawningTeam -= ExiledEventHandlers.PreventBotsFromSpawningInWaves;
+		Exiled.Events.Handlers.Scp049.ActivatingSense -= ExiledEventHandlers.FuckYourAbility;
+		Exiled.Events.Handlers.Scp0492.TriggeringBloodlust -= ExiledEventHandlers.FuckYourOtherAbility;
 
-		API.Events.Handlers.FoundationFortuneNPCs.SoldItem -= EventHandlers.SoldItem;
-		API.Events.Handlers.FoundationFortuneNPCs.BoughtItem -= EventHandlers.BoughtItem;
-		API.Events.Handlers.FoundationFortuneNPCs.BoughtPerk -= EventHandlers.BoughtPerk;
-		API.Events.Handlers.FoundationFortuneNPCs.UsedFoundationFortuneNPC -= EventHandlers.UsedFoundationFortuneNPC;
-		API.Events.Handlers.FoundationFortunePerks.UsedFoundationFortunePerk -= EventHandlers.UsedFoundationFortunePerk;
+		FoundationFortuneNPCs.SoldItem -= FoundationFortuneEventHandlers.SoldItem;
+		FoundationFortuneNPCs.BoughtItem -= FoundationFortuneEventHandlers.BoughtItem;
+		FoundationFortuneNPCs.BoughtPerk -= FoundationFortuneEventHandlers.BoughtPerk;
+		FoundationFortuneNPCs.UsedFoundationFortuneNPC -= FoundationFortuneEventHandlers.UsedFoundationFortuneNPC;
+		FoundationFortunePerks.UsedFoundationFortunePerk -= FoundationFortuneEventHandlers.UsedFoundationFortunePerk;
 	}
 	
 	public static void Log(string message, LogLevel severity)
 	{
 		var declaringType = new System.Diagnostics.StackTrace().GetFrame(1).GetMethod().DeclaringType;
 		if (declaringType == null) return;
+		string className = declaringType.Name;
 		string methodName = new System.Diagnostics.StackTrace().GetFrame(1).GetMethod().Name;
-        
-		string logEntry = $"[Foundation Fortune 1.0 - {severity.ToString().ToUpper()}] [{methodName}] {message}";
+
+		string logEntry = $"[Foundation Fortune 1.0 - {severity.ToString().ToUpper()}] {className}::{methodName} -> {message}";
 		switch (severity)
 		{
 			case LogLevel.Debug: Exiled.API.Features.Log.SendRaw(logEntry, ConsoleColor.DarkCyan); break;
@@ -173,6 +165,17 @@ public class FoundationFortune : Plugin<PluginConfigs, PluginTranslations>
 			case LogLevel.Info: Exiled.API.Features.Log.SendRaw(logEntry, ConsoleColor.Cyan); break;
 			default: throw new ArgumentOutOfRangeException(nameof(severity), severity, null);
 		}
+	}
+	
+	public static void Log(string message, ConsoleColor color)
+	{
+		var declaringType = new System.Diagnostics.StackTrace().GetFrame(1).GetMethod().DeclaringType;
+		if (declaringType == null) return;
+		string className = declaringType.Name;
+		string methodName = new System.Diagnostics.StackTrace().GetFrame(1).GetMethod().Name;
+
+		string logEntry = $"[Foundation Fortune 1.0] {className}::{methodName} -> {message}";
+		Exiled.API.Features.Log.SendRaw(logEntry, color);
 	}
 }
 

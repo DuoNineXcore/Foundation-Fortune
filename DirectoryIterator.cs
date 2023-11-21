@@ -6,8 +6,8 @@ using System.IO.Compression;
 using System.Linq;
 using System.Net;
 using Discord;
-using FoundationFortune.API.Models.Classes.Player;
-using FoundationFortune.API.Models.Interfaces;
+using FoundationFortune.API.Core.Models.Classes.Player;
+using FoundationFortune.API.Core.Models.Interfaces;
 using FoundationFortune.API.YamlConverters;
 using LiteDB;
 using MEC;
@@ -17,7 +17,7 @@ using YamlDotNet.Serialization.NamingConventions;
 namespace FoundationFortune;
 
 /// <summary>
-/// five pebbles hellloooooooooooo five peeeblesssssssssssssssssss
+/// underhang
 /// </summary>
 public static class DirectoryIterator
 {
@@ -151,7 +151,7 @@ public static class DirectoryIterator
     #endregion
 
     #region Multiple Configs Deserializer
-    public static void LoadConfig<T>() where T : IFoundationFortuneConfig, new()
+    private static void LoadConfig<T>() where T : IFoundationFortuneConfig, new()
     {
         var fileName = typeof(T).Name;
         if (_configs.ContainsKey(fileName)) return;
@@ -204,10 +204,12 @@ public static class DirectoryIterator
         FoundationFortune.Log($"Saved configuration: {fileName}.yml", LogLevel.Info);
     }
 
-    public static T GetConfig<T>() where T : IFoundationFortuneConfig, new()
+    public static T LoadAndAssignConfig<T>() where T : IFoundationFortuneConfig, new()
     {
         var fileName = typeof(T).Name;
-        if (!_configs.TryGetValue(fileName, out var config)) throw new KeyNotFoundException($"Configuration for class '{typeof(T).Name}' not found.");
+        LoadConfig<T>();
+        if (!_configs.TryGetValue(fileName, out var config))
+            throw new KeyNotFoundException($"Configuration for class '{typeof(T).Name}' not found.");
         FoundationFortune.Log($"Retrieved configuration: {fileName}.yml", LogLevel.Debug);
         return (T)config;
     }
@@ -224,8 +226,7 @@ public static class DirectoryIterator
             var collection = FoundationFortune.Singleton.db.GetCollection<PlayerData>();
             collection.EnsureIndex(x => x.UserId);
 
-            if (!File.Exists(databaseFilePath)) FoundationFortune.Log($"Database created successfully at {databaseFilePath}", LogLevel.Info);
-            else FoundationFortune.Log($"Database loaded successfully at {databaseFilePath}.", LogLevel.Info);
+            FoundationFortune.Log(!File.Exists(databaseFilePath) ? $"Database created successfully at {databaseFilePath}" : $"Database loaded successfully at {databaseFilePath}.", LogLevel.Info);
         }
         catch (Exception ex)
         {

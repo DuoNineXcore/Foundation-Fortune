@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using Exiled.API.Interfaces;
-using FoundationFortune.API.Models.Enums.Perks;
 
 namespace FoundationFortune.Configs.EXILED
 {

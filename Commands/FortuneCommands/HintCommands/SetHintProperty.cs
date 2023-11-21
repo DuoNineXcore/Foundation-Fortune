@@ -1,8 +1,8 @@
 ﻿using System;
 using CommandSystem;
 using Exiled.API.Features;
-using FoundationFortune.API.Database;
-using FoundationFortune.API.Models.Enums;
+using FoundationFortune.API.Core.Database;
+using FoundationFortune.API.Core.Models.Enums.Hints;
 using RemoteAdmin;
 
 namespace FoundationFortune.Commands.FortuneCommands.HintCommands

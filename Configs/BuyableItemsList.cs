@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
-using FoundationFortune.API.Models.Classes.Items;
-using FoundationFortune.API.Models.Enums.Perks;
-using FoundationFortune.API.Models.Interfaces;
+using FoundationFortune.API.Core.Models.Classes.Items;
+using FoundationFortune.API.Core.Models.Enums.Perks;
+using FoundationFortune.API.Core.Models.Interfaces;
 using YamlDotNet.Serialization;
 
 namespace FoundationFortune.Configs;

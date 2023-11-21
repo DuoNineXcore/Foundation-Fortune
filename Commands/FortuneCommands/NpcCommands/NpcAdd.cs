@@ -7,10 +7,10 @@ using CommandSystem;
 using Exiled.API.Features;
 using Exiled.Permissions.Extensions;
 using FoundationFortune.API;
-using FoundationFortune.API.Models;
-using FoundationFortune.API.NPCs;
-using FoundationFortune.API.Models.Enums.NPCs;
-using FoundationFortune.API.NPCs.NpcTypes;
+using FoundationFortune.API.Core;
+using FoundationFortune.API.Core.Models.Enums.NPCs;
+using FoundationFortune.API.Features.NPCs;
+using FoundationFortune.API.Features.NPCs.NpcTypes;
 using MEC;
 using PlayerRoles;
 using RemoteAdmin;
@@ -68,7 +68,7 @@ namespace FoundationFortune.Commands.FortuneCommands.NpcCommands
 
             Vector3 scale = new(scaleX, scaleY, scaleZ);
 
-            Npc bot = null;
+            Npc bot;
             switch (NpcType)
             {
                 case NpcType.Buying:
@@ -77,6 +77,7 @@ namespace FoundationFortune.Commands.FortuneCommands.NpcCommands
                 case NpcType.Selling:
                     bot = SellingBot.SpawnSellingBot(name, badge, color, role, heldItem, scale);
                     break;
+                case NpcType.Music:
                 default:
                     response = "Invalid NpcType specified.";
                     return false;
@@ -84,7 +85,7 @@ namespace FoundationFortune.Commands.FortuneCommands.NpcCommands
 
             if (bot != null)
             {
-                if (!(sender is PlayerCommandSender self))
+                if (sender is not PlayerCommandSender self)
                 {
                     response = "Only players can use this command.";
                     return false;
@@ -93,7 +94,7 @@ namespace FoundationFortune.Commands.FortuneCommands.NpcCommands
                 Timing.CallDelayed(1f, delegate
                 {
                     bot.Teleport(self.ReferenceHub.gameObject.transform.position);
-                    FoundationFortuneAPI.buyingBotPositions.Add(bot, bot.Position);
+                    NPCInitialization.buyingBotPositions.Add(bot, bot.Position);
                 });
 
                 response = $"BuyingBot '{name}' added successfully and teleported to your position.";

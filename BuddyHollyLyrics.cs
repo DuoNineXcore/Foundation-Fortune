@@ -1,10 +1,14 @@
-﻿using Discord;
-using UnityEngine;
+﻿using System;
+using Discord;
+using Random = UnityEngine.Random;
 
 namespace FoundationFortune;
+/// <summary>
+/// the wall
+/// </summary>
 public static class BuddyHollyLyrics
 {
-    public static void ReleaseTheBuddyHolly()
+    public static void WelcomeText()
     {
         int randomNumber = Random.Range(1, 100001);
         if (randomNumber == 1) FoundationFortune.Log(@" 
@@ -66,7 +70,29 @@ public static class BuddyHollyLyrics
             I don't care 'bout that
             I don't care 'bout that
             I don't care 'bout that
-            I don't care 'bout that"
+            I don't care 'bout that
+
+	   Welcome to Foundation Fortune 1.0"
         ,LogLevel.Debug);
+        else FoundationFortune.Log(@"
+	   Welcome to Foundation Fortune 1.0
+                 #%%%%%%%%%%%%%%%,                
+            /%%%%%%%%%#######%%%%%%%%%.           
+         /%%%%%#.                 /%%%%%%         
+       (%%%%%%%                    *%%%%%%%       
+      %%%%#.%%%%%*               #%%%%(*%%%%(     
+    .%%%%(    (%%%%#          ,%%%%%.    %%%%(    
+    #%%%(       .%%%%%,     (%%%%(        %%%%*   
+   ,%%%%.          (%%%%(.%%%%%,          (%%%%   
+   /%%%%             ,%%%%%%#             *%%%%   
+   /%%%%            .%%%%%%%%(            *%%%%   
+   .%%%%.         /%%%%%  *%%%%%.         #%%%#   
+    #%%%%       %%%%%/       #%%%%(      *%%%%    
+     %%%%%   *%%%%%.           *%%%%%.  *%%%%,    
+      (%%%%%%%%%(                 #%%%%%%%%%      
+        %%%%%%.                     /%%%%%*       
+          (%%%%%%(              ,#%%%%%%.         
+             ,%%%%%%%%%%%%%%%%%%%%%%(             
+                   ,#%%%%%%%%%/                   ", ConsoleColor.DarkYellow);
     }
 }

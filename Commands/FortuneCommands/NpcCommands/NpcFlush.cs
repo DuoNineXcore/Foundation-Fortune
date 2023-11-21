@@ -1,15 +1,13 @@
 ﻿using CommandSystem;
 using Exiled.API.Features;
 using Exiled.Permissions.Extensions;
-using FoundationFortune.API.NPCs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using FoundationFortune.API.Models.Enums.NPCs;
 using System.Text;
 using System.Threading.Tasks;
-using FoundationFortune.API.Models;
-using FoundationFortune.API.NPCs.NpcTypes;
+using FoundationFortune.API.Core.Models.Enums.NPCs;
+using FoundationFortune.API.Features.NPCs.NpcTypes;
 
 namespace FoundationFortune.Commands.FortuneCommands.NpcCommands
 {
@@ -29,13 +27,13 @@ namespace FoundationFortune.Commands.FortuneCommands.NpcCommands
                 return false;
             }
 
-            int count;
             if (args.Array != null)
             {
                 string NpcTypeString = args.Count > 0 ? args.Array[args.Offset] : null;
 
                 if (Enum.TryParse(NpcTypeString, true, out NpcType NpcType))
                 {
+                    int count;
                     switch (NpcType)
                     {
                         case NpcType.Buying:
@@ -46,24 +44,20 @@ namespace FoundationFortune.Commands.FortuneCommands.NpcCommands
                             count = RemoveBots(FoundationFortune.Singleton.SellingBots, SellingBot.RemoveSellingBot);
                             response = $"Flushed {count} SellingBots from the server.";
                             return true;
+                        case NpcType.Music:
                         default:
                             response = "Invalid bot type.";
                             return false;
                     }
                 }
-                else
-                {
-                    response = "Invalid bot type.";
-                    return false;
-                }
+
+                response = "Invalid bot type.";
+                return false;
             }
             response = string.Empty;
             return false;
         }
 
-        private static int RemoveBots(Dictionary<string, (Npc bot, int indexation)> bots, Func<string, bool> removeBotFunc)
-        {
-            return bots.Values.Count(botInfo => removeBotFunc(botInfo.bot.Nickname));
-        }
+        private static int RemoveBots(Dictionary<string, (Npc bot, int indexation)> bots, Func<string, bool> removeBotFunc) => bots.Values.Count(botInfo => removeBotFunc(botInfo.bot.Nickname));
     }
 }
