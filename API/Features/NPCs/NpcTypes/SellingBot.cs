@@ -11,45 +11,45 @@ namespace FoundationFortune.API.Features.NPCs.NpcTypes
 {
     public static class SellingBot
     {
-        public static readonly IReadOnlyList<string> allowedSellingBotNameColors;
+        public static readonly IReadOnlyList<string> AllowedSellingBotNameColors;
 
         static SellingBot()
         {
             ServerRoles serverRoles = NetworkManager.singleton.playerPrefab.GetComponent<ServerRoles>();
             List<string> allowedColors = new(serverRoles.NamedColors.Length);
             allowedColors.AddRange(from namedColor in serverRoles.NamedColors where !namedColor.Restricted select namedColor.Name);
-            allowedSellingBotNameColors = allowedColors;
+            AllowedSellingBotNameColors = allowedColors;
         }
 
         /// <summary>
         /// Spawns a selling bot with the specified parameters.
         /// </summary>
         /// <param name="target">The target user ID or name for the selling bot.</param>
-        /// <param name="Badge">The rank name for the selling bot.</param>
-        /// <param name="Color">The rank color for the selling bot.</param>
-        /// <param name="Role">The role type ID for the selling bot.</param>
-        /// <param name="HeldItem">The held item type for the selling bot (null for no item).</param>
+        /// <param name="badge">The rank name for the selling bot.</param>
+        /// <param name="color">The rank color for the selling bot.</param>
+        /// <param name="role">The role type ID for the selling bot.</param>
+        /// <param name="heldItem">The held item type for the selling bot (null for no item).</param>
         /// <param name="scale">The scale vector for the selling bot.</param>
         /// <returns>The spawned selling bot.</returns>
-        public static Npc SpawnSellingBot(string target, string Badge, string Color, RoleTypeId Role, ItemType? HeldItem, Vector3 scale)
+        public static Npc SpawnSellingBot(string target, string badge, string color, RoleTypeId role, ItemType? heldItem, Vector3 scale)
         {
             int indexation = 0;
-            while (FoundationFortune.Singleton.SellingBots.Values.Any(data => data.indexation == indexation)) indexation++;
+            while (FoundationFortune.Instance.SellingBots.Values.Any(data => data.indexation == indexation)) indexation++;
 
-            Npc spawnedSellingBot = NPCHelperMethods.SpawnFix(target, Role, indexation);
+            Npc spawnedSellingBot = NpcHelperMethods.SpawnFix(target, role, indexation);
             string botKey = $"SellingBot-{target}";
-            FoundationFortune.Singleton.SellingBots[botKey] = (spawnedSellingBot, indexation);
+            FoundationFortune.Instance.SellingBots[botKey] = (spawnedSellingBot, indexation);
 
-            spawnedSellingBot.RankName = Badge;
-            spawnedSellingBot.RankColor = Color;
+            spawnedSellingBot.RankName = badge;
+            spawnedSellingBot.RankColor = color;
             spawnedSellingBot.Scale = scale;
 
             Round.IgnoredPlayers.Add(spawnedSellingBot.ReferenceHub);
             Timing.CallDelayed(0.5f, () =>
             {
-                if (!HeldItem.HasValue) return;
+                if (!heldItem.HasValue) return;
                 spawnedSellingBot.ClearInventory();
-                spawnedSellingBot.CurrentItem = Item.Create((ItemType)HeldItem, spawnedSellingBot);
+                spawnedSellingBot.CurrentItem = Item.Create((ItemType)heldItem, spawnedSellingBot);
             });
             return spawnedSellingBot;
         }
@@ -57,7 +57,7 @@ namespace FoundationFortune.API.Features.NPCs.NpcTypes
         public static bool RemoveSellingBot(string target)
         {
             string botKey = $"SellingBot-{target}";
-            if (!FoundationFortune.Singleton.SellingBots.TryGetValue(botKey, out var botData)) return false;
+            if (!FoundationFortune.Instance.SellingBots.TryGetValue(botKey, out var botData)) return false;
             var (bot, _) = botData;
             if (bot != null)
             {
@@ -68,7 +68,7 @@ namespace FoundationFortune.API.Features.NPCs.NpcTypes
                     CustomNetworkManager.TypedSingleton.OnServerDisconnect(bot.NetworkIdentity.connectionToClient);
                 });
             }
-            FoundationFortune.Singleton.SellingBots.Remove(botKey);
+            FoundationFortune.Instance.SellingBots.Remove(botKey);
             return true;
         }
     }

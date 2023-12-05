@@ -17,14 +17,14 @@ namespace FoundationFortune.API.Features.NPCs.NpcTypes
 {
     public static class MusicBot
     {
-        public static readonly IReadOnlyList<string> allowedMusicBotNameColors;
+        public static readonly IReadOnlyList<string> AllowedMusicBotNameColors;
 
         static MusicBot()
         {
             ServerRoles serverRoles = NetworkManager.singleton.playerPrefab.GetComponent<ServerRoles>();
             List<string> allowedColors = new(serverRoles.NamedColors.Length);
             allowedColors.AddRange(from namedColor in serverRoles.NamedColors where !namedColor.Restricted select namedColor.Name);
-            allowedMusicBotNameColors = allowedColors;
+            AllowedMusicBotNameColors = allowedColors;
         }
 
         /// <summary>
@@ -36,27 +36,27 @@ namespace FoundationFortune.API.Features.NPCs.NpcTypes
             Npc spawnedMusicBot = SpawnFix(target.Nickname, RoleTypeId.Spectator);
     
             PlayerMusicBotPair pair = new PlayerMusicBotPair(target, spawnedMusicBot);
-            FoundationFortune.Singleton.MusicBotPairs.Add(pair);
-            FoundationFortune.Log($"Generated Music Bot for player {target.Nickname} / Bot: {spawnedMusicBot.Nickname ?? "Null"}", LogLevel.Debug);
+            FoundationFortune.Instance.MusicBotPairs.Add(pair);
+            DirectoryIterator.Log($"Generated Music Bot for player {target.Nickname} / Bot: {spawnedMusicBot.Nickname ?? "Null"}", LogLevel.Debug);
 
             Round.IgnoredPlayers.Add(spawnedMusicBot.ReferenceHub);
         }
 
         public static Npc GetMusicBotByPlayer(Player player)
         {
-            var pair = FoundationFortune.Singleton.MusicBotPairs.Find(p => p.Player == player);
+            var pair = FoundationFortune.Instance.MusicBotPairs.Find(p => p.Player == player);
             return pair?.MusicBot;
         }
 
         public static bool RemoveMusicBot(string target)
         {
-            var pairToRemove = FoundationFortune.Singleton.MusicBotPairs.Find(pair => pair.Player.Nickname == target);
+            var pairToRemove = FoundationFortune.Instance.MusicBotPairs.Find(pair => pair.Player.Nickname == target);
             if (pairToRemove == null) return false;
             Timing.CallDelayed(0.3f, () =>
             {
                 CustomNetworkManager.TypedSingleton.OnServerDisconnect(pairToRemove.MusicBot.NetworkIdentity.connectionToClient);
             });
-            FoundationFortune.Singleton.MusicBotPairs.Remove(pairToRemove);
+            FoundationFortune.Instance.MusicBotPairs.Remove(pairToRemove);
             return true;
         }
         

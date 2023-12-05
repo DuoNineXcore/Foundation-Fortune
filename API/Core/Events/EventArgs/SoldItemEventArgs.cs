@@ -3,20 +3,21 @@ using Exiled.API.Features.Items;
 using Exiled.Events.EventArgs.Interfaces;
 using FoundationFortune.API.Core.Models.Classes.Items;
 
-namespace FoundationFortune.API.Core.Events.EventArgs;
-
-public class SoldItemEventArgs : IExiledEvent
+namespace FoundationFortune.API.Core.Events.EventArgs
 {
-    public SoldItemEventArgs(Player player, Npc npc, SellableItem sellableItem, Item item)
+    public class SoldItemEventArgs : IExiledEvent
     {
-        Player = player;
-        NPC = npc;
-        SellableItem = sellableItem;
-        Item = item;
-    }
+        public SoldItemEventArgs(Player player, Npc npc, SellableItem sellableItem, Item item)
+        {
+            Player = player;
+            Npc = npc;
+            SellableItem = sellableItem;
+            Item = item;
+        }
     
-    public SellableItem SellableItem { get; }
-    public Item Item { get; }
-    public Npc NPC { get; }
-    public Player Player { get; }
+        public SellableItem SellableItem { get; }
+        public Item Item { get; }
+        public Npc Npc { get; }
+        public Player Player { get; }
+    }
 }

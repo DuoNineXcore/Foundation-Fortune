@@ -1,20 +1,20 @@
 ﻿using Exiled.API.Features;
 using Exiled.API.Features.Items;
 using Exiled.Events.EventArgs.Interfaces;
-using FoundationFortune.API.Core.Models.Enums.Perks;
+using FoundationFortune.API.Core.Models.Interfaces.Perks;
 
 namespace FoundationFortune.API.Core.Events.EventArgs
 {
     public class UsedFoundationFortunePerkEventArgs : IExiledEvent
     {
-        public UsedFoundationFortunePerkEventArgs(Player player, PerkType perkType, Item item)
+        public UsedFoundationFortunePerkEventArgs(Player player, IPerk perk, Item item)
         {
             Player = player;
-            PerkType = perkType;
+            Perk = perk;
             Item = item;
         }
     
-        public PerkType PerkType { get; }
+        public IPerk Perk { get; }
         public Item Item { get; }
         public Player Player { get; }
     }

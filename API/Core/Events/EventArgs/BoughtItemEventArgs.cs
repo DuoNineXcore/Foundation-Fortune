@@ -2,18 +2,19 @@
 using Exiled.Events.EventArgs.Interfaces;
 using FoundationFortune.API.Core.Models.Classes.Items;
 
-namespace FoundationFortune.API.Core.Events.EventArgs;
-
-public class BoughtItemEventArgs : IExiledEvent
+namespace FoundationFortune.API.Core.Events.EventArgs
 {
-    public BoughtItemEventArgs(Player player, Npc npc, BuyableItem item)
+    public class BoughtItemEventArgs : IExiledEvent
     {
-        Player = player;
-        NPC = npc;
-        BuyableItem = item;
-    }
+        public BoughtItemEventArgs(Player player, Npc npc, BuyableItem item)
+        {
+            Player = player;
+            Npc = npc;
+            BuyableItem = item;
+        }
     
-    public BuyableItem BuyableItem { get; }
-    public Npc NPC { get; }
-    public Player Player { get; }
+        public BuyableItem BuyableItem { get; }
+        public Npc Npc { get; }
+        public Player Player { get; }
+    }
 }

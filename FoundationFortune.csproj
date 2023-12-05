@@ -77,8 +77,12 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="API\Core\AudioPlayer.cs" />
     <Compile Include="API\Core\CoroutineManager.cs" />
     <Compile Include="API\Core\Database\PlayerDataRepository.cs" />
+    <Compile Include="API\Core\Database\QuestRotation.cs" />
+    <Compile Include="API\Core\EventHandlers\EXILEDEventHandlers.cs" />
+    <Compile Include="API\Core\EventHandlers\FoundationFortuneEventHandlers.cs" />
     <Compile Include="API\Core\Events\EventArgs\BoughtItemEventArgs.cs" />
     <Compile Include="API\Core\Events\EventArgs\BoughtPerkEventArgs.cs" />
     <Compile Include="API\Core\Events\EventArgs\SoldItemEventArgs.cs" />
@@ -90,6 +94,7 @@
     <Compile Include="API\Core\IndexationMethods.cs" />
     <Compile Include="API\Core\Models\Classes\Events\Bounty.cs" />
     <Compile Include="API\Core\Models\Classes\Events\ExtractionTimerData.cs" />
+    <Compile Include="API\Core\Models\Classes\Events\QuestProgress.cs" />
     <Compile Include="API\Core\Models\Classes\Hints\HintEntry.cs" />
     <Compile Include="API\Core\Models\Classes\Items\BuyableItem.cs" />
     <Compile Include="API\Core\Models\Classes\Items\BuyablePerk.cs" />
@@ -101,51 +106,68 @@
     <Compile Include="API\Core\Models\Classes\NPCs\SellingBotSpawn.cs" />
     <Compile Include="API\Core\Models\Classes\Player\PlayerData.cs" />
     <Compile Include="API\Core\Models\Classes\Player\PlayerVoiceChatSettings.cs" />
-    <Compile Include="API\Core\Models\Enums\Hints\HintAlign.cs" />
-    <Compile Include="API\Core\Models\Enums\Hints\HintAnim.cs" />
     <Compile Include="API\Core\Models\Enums\NPCs\NpcType.cs" />
     <Compile Include="API\Core\Models\Enums\NPCs\NpcUsageOutcome.cs" />
     <Compile Include="API\Core\Models\Enums\NPCs\NpcVoiceChatUsageType.cs" />
-    <Compile Include="API\Core\Models\Enums\Perks\PerkType.cs" />
     <Compile Include="API\Core\Models\Enums\Player\PlayerTeamConditions.cs" />
     <Compile Include="API\Core\Models\Enums\Player\PlayerVoiceChatUsageType.cs" />
+    <Compile Include="API\Core\Models\Enums\Systems\HintSystem\HintAlign.cs" />
+    <Compile Include="API\Core\Models\Enums\Systems\HintSystem\HintAnim.cs" />
+    <Compile Include="API\Core\Models\Enums\Systems\PerkSystem\PerkType.cs" />
+    <Compile Include="API\Core\Models\Enums\Systems\QuestSystem\QuestType.cs" />
     <Compile Include="API\Core\Models\Interfaces\IFoundationFortuneConfig.cs" />
-    <Compile Include="API\Core\Patches\Postfixes.cs" />
-    <Compile Include="API\Core\Patches\Prefixes.cs" />
-    <Compile Include="API\Core\Patches\Transpilers.cs" />
+    <Compile Include="API\Core\Models\Interfaces\Perks\IActivePerk.cs" />
+    <Compile Include="API\Core\Models\Interfaces\Perks\IPassivePerk.cs" />
+    <Compile Include="API\Core\Models\Interfaces\Perks\IPerk.cs" />
+    <Compile Include="API\Core\Patches\Postfixes\CountTeam.cs" />
+    <Compile Include="API\Core\Patches\Postfixes\CountRole.cs" />
+    <Compile Include="API\Core\Patches\Prefixes\AddTarget.cs" />
+    <Compile Include="API\Core\Patches\Prefixes\AnnounceScpTerminationPatch.cs" />
+    <Compile Include="API\Core\Patches\Prefixes\AntiSCP207.cs" />
+    <Compile Include="API\Core\Patches\Prefixes\Scp079RecontainPatch.cs" />
+    <Compile Include="API\Core\Patches\Transpilers\OnFootstepPlayed.cs" />
+    <Compile Include="API\Core\Patches\Transpilers\SCP173UpdateObservers.cs" />
+    <Compile Include="API\Core\Patches\Transpilers\Update096Target.cs" />
     <Compile Include="API\Core\YamlConverters\VectorsConverter.cs" />
-    <Compile Include="API\Features\AudioPlayer.cs" />
     <Compile Include="API\Features\Items\CustomItems\DeathCoin.cs" />
+    <Compile Include="API\Features\Items\CustomItems\ResurgenceBeacon.cs" />
     <Compile Include="API\Features\Items\PerkItems\PerkBottle.cs" />
-    <Compile Include="API\Features\Items\PerkItems\ResurgenceBeacon.cs" />
     <Compile Include="API\Features\Items\World\SellingWorkstations.cs" />
     <Compile Include="API\Features\NPCs\NPCHelperMethods.cs" />
     <Compile Include="API\Features\NPCs\NPCInitialization.cs" />
     <Compile Include="API\Features\NPCs\NpcTypes\BuyingBot.cs" />
     <Compile Include="API\Features\NPCs\NpcTypes\MusicBot.cs" />
     <Compile Include="API\Features\NPCs\NpcTypes\SellingBot.cs" />
-    <Compile Include="API\Features\Systems\EventSystems\ServerBountySystem.cs" />
-    <Compile Include="API\Features\Systems\EventSystems\ServerExtractionSystem.cs" />
+    <Compile Include="API\Features\Perks\Active\BlissfulUnawareness.cs" />
+    <Compile Include="API\Features\Perks\Active\EthericVitality.cs" />
+    <Compile Include="API\Features\Perks\Active\HyperactiveBehavior.cs" />
+    <Compile Include="API\Features\Perks\Passive\EtherealIntervention.cs" />
+    <Compile Include="API\Features\Perks\Passive\ViolentImpulses.cs" />
+    <Compile Include="API\Features\Systems\EventBasedSystems\BountySystem.cs" />
+    <Compile Include="API\Features\Systems\EventBasedSystems\ExtractionSystem.cs" />
+    <Compile Include="API\Features\Systems\EventBasedSystems\QuestSystem.cs" />
     <Compile Include="API\Features\Systems\HintSystem.cs" />
     <Compile Include="API\Features\Systems\PerkSystem.cs" />
-    <Compile Include="BuddyHollyLyrics.cs" />
-    <Compile Include="Commands\BuyCommand.cs" />
-    <Compile Include="Commands\FortuneCommands\AdminCommands\AddAdmin.cs" />
-    <Compile Include="Commands\FortuneCommands\AdminCommands\RemoveAdmin.cs" />
-    <Compile Include="Commands\FortuneCommands\AdminCommands\BountyCommands\AddBounty.cs" />
-    <Compile Include="Commands\FortuneCommands\AdminCommands\BountyCommands\FlushAllBounties.cs" />
-    <Compile Include="Commands\FortuneCommands\AdminCommands\BountyCommands\RemoveBounty.cs" />
-    <Compile Include="Commands\FortuneCommands\AdminCommands\DatabaseCommands\AddMoney.cs" />
-    <Compile Include="Commands\FortuneCommands\AdminCommands\DatabaseCommands\FlushDatabase.cs" />
-    <Compile Include="Commands\FortuneCommands\AdminCommands\DatabaseCommands\RemoveMoney.cs" />
-    <Compile Include="Commands\FortuneCommands\AdminCommands\ExtractionCommands\AddExtraction.cs" />
-    <Compile Include="Commands\FortuneCommands\AdminCommands\ExtractionCommands\RemoveExtraction.cs" />
-    <Compile Include="Commands\FortuneCommands\HintCommands\HintEnqueue.cs" />
-    <Compile Include="Commands\FortuneCommands\HintCommands\SetHintProperty.cs" />
-    <Compile Include="Commands\FortuneCommands\NpcCommands\NpcAdd.cs" />
-    <Compile Include="Commands\FortuneCommands\NpcCommands\NpcFlush.cs" />
-    <Compile Include="Commands\FortuneCommands\NpcCommands\NpcList.cs" />
-    <Compile Include="Commands\FortuneCommands\NpcCommands\NpcRemove.cs" />
+    <Compile Include="Commands\FortuneAdminCommands\HintCommands\HintEnqueue.cs" />
+    <Compile Include="Commands\FortuneCommands\Buy.cs" />
+    <Compile Include="Commands\FortuneCommands\Level.cs" />
+    <Compile Include="Commands\FortuneCommands\Quest.cs" />
+    <Compile Include="Commands\FortuneCommands\Settings.cs" />
+    <Compile Include="WelcomeText.cs" />
+    <Compile Include="Commands\FortuneAdminCommands\AdminCommands\AddAdmin.cs" />
+    <Compile Include="Commands\FortuneAdminCommands\AdminCommands\RemoveAdmin.cs" />
+    <Compile Include="Commands\FortuneAdminCommands\AdminCommands\BountyCommands\AddBounty.cs" />
+    <Compile Include="Commands\FortuneAdminCommands\AdminCommands\BountyCommands\FlushAllBounties.cs" />
+    <Compile Include="Commands\FortuneAdminCommands\AdminCommands\BountyCommands\RemoveBounty.cs" />
+    <Compile Include="Commands\FortuneAdminCommands\AdminCommands\DatabaseCommands\AddMoney.cs" />
+    <Compile Include="Commands\FortuneAdminCommands\AdminCommands\DatabaseCommands\FlushDatabase.cs" />
+    <Compile Include="Commands\FortuneAdminCommands\AdminCommands\DatabaseCommands\RemoveMoney.cs" />
+    <Compile Include="Commands\FortuneAdminCommands\AdminCommands\ExtractionCommands\AddExtraction.cs" />
+    <Compile Include="Commands\FortuneAdminCommands\AdminCommands\ExtractionCommands\RemoveExtraction.cs" />
+    <Compile Include="Commands\FortuneAdminCommands\NpcCommands\NpcAdd.cs" />
+    <Compile Include="Commands\FortuneAdminCommands\NpcCommands\NpcFlush.cs" />
+    <Compile Include="Commands\FortuneAdminCommands\NpcCommands\NpcList.cs" />
+    <Compile Include="Commands\FortuneAdminCommands\NpcCommands\NpcRemove.cs" />
     <Compile Include="Configs\BuyableItemsList.cs" />
     <Compile Include="Configs\EXILED\PluginConfigs.cs" />
     <Compile Include="Configs\EXILED\PluginTranslations.cs" />
@@ -155,15 +177,13 @@
     <Compile Include="Configs\SellableItemsList.cs" />
     <Compile Include="Configs\MoneyXPRewards.cs" />
     <Compile Include="Configs\VoiceChatSettings.cs" />
-    <Compile Include="EventHandlers\EXILEDEventHandlers.cs" />
-    <Compile Include="EventHandlers\FoundationFortuneEventHandlers.cs" />
-    <Compile Include="MainClass.cs" />
+    <Compile Include="FoundationFortune.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="DirectoryIterator.cs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="EXILED">
-      <Version>8.4.2</Version>
+      <Version>8.4.3</Version>
     </PackageReference>
     <PackageReference Include="Lib.Harmony">
       <Version>2.2.2</Version>
@@ -173,9 +193,6 @@
     </PackageReference>
     <PackageReference Include="System.Collections">
       <Version>4.3.0</Version>
-    </PackageReference>
-    <PackageReference Include="Tomlyn">
-      <Version>0.16.2</Version>
     </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

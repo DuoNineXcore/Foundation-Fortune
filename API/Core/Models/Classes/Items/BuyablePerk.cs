@@ -1,4 +1,4 @@
-﻿using FoundationFortune.API.Core.Models.Enums.Perks;
+﻿using FoundationFortune.API.Core.Models.Enums.Systems.PerkSystem;
 
 namespace FoundationFortune.API.Core.Models.Classes.Items
 {

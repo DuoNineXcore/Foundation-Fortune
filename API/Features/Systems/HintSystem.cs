@@ -1,15 +1,17 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Discord;
 using Exiled.API.Features;
 using Exiled.API.Features.Items;
 using FoundationFortune.API.Core.Database;
 using FoundationFortune.API.Core.Models.Classes.Hints;
-using FoundationFortune.API.Core.Models.Enums.Hints;
+using FoundationFortune.API.Core.Models.Enums.Systems.HintSystem;
 using FoundationFortune.API.Features.Items.PerkItems;
 using FoundationFortune.API.Features.Items.World;
 using FoundationFortune.API.Features.NPCs;
-using FoundationFortune.API.Features.Systems.EventSystems;
+using FoundationFortune.API.Features.Systems.EventBasedSystems;
 using MEC;
 using UnityEngine;
 
@@ -17,18 +19,18 @@ namespace FoundationFortune.API.Features.Systems
 {
 	public class HintSystem
 	{
-		private Dictionary<string, Queue<HintEntry>> recentHints = new();
-		public Dictionary<string, bool> confirmSell = new();
-		public Dictionary<string, float> dropTimestamp = new();
-		public Dictionary<string, (Item item, int price)> itemsBeingSold = new();
+		public readonly Dictionary<string, (Item item, int price)> ItemsBeingSold = new();
+		public readonly Dictionary<string, bool> ConfirmSell = new();
+		public readonly Dictionary<string, float> DropTimestamp = new();
+		public readonly Dictionary<string, bool> ConfirmActivatePerk = new();
+		public readonly Dictionary<string, float> ActivatePerkTimestamp = new();
+		private readonly Dictionary<string, Queue<HintEntry>> _recentHints = new();
 
-        public IEnumerator<float> HintSystemCoroutine()
+		public IEnumerator<float> HintSystemCoroutine()
         {
             while (true)
             {
-                float updateRate = recentHints.Any(entry => entry.Value.Any(hint => hint.IsAnimated)) ? FoundationFortune.Singleton.Config.AnimatedHintUpdateRate : FoundationFortune.Singleton.Config.HintSystemUpdateRate;
-
-                foreach (Player ply in Player.List.Where(p => !p.IsDead && !p.IsNPC))
+	            foreach (Player ply in Player.List.Where(p => !p.IsDead && !p.IsNPC))
                 {
                     if (!PlayerDataRepository.GetHintDisable(ply.UserId)) continue;
 
@@ -41,9 +43,9 @@ namespace FoundationFortune.API.Features.Systems
                     int hintSize = PlayerDataRepository.GetHintSize(ply.UserId);
 
                     StringBuilder hintMessageBuilder = new();
-                    PerkSystem.UpdatePerkIndicator(FoundationFortune.Singleton.ConsumedPerks, ref hintMessageBuilder);
+                    PerkSystem.UpdatePerkIndicator(PerkSystem.ConsumedPerks, ref hintMessageBuilder);
 
-                    if ((!PlayerDataRepository.GetHintMinmode(ply.UserId)) || (NPCHelperMethods.IsPlayerNearSellingBot(ply) || NPCHelperMethods.IsPlayerNearBuyingBot(ply)))
+                    if ((!PlayerDataRepository.GetHintMinmode(ply.UserId)) || (NpcHelperMethods.IsPlayerNearSellingBot(ply) || NpcHelperMethods.IsPlayerNearBuyingBot(ply)))
                     {
 	                    bool isPluginAdmin = PlayerDataRepository.GetPluginAdmin(ply.UserId);
 	                    bool isHintExtended = PlayerDataRepository.GetHintExtension(ply.UserId);
@@ -53,11 +55,11 @@ namespace FoundationFortune.API.Features.Systems
 	                    string levelCounterValue = isPluginAdmin ? "inf" : levelCounter.ToString();
 	                    string prestigeLevelCounterValue = isPluginAdmin ? "inf" : prestigeLevelCounter.ToString();
 
-	                    string moneySavedString = FoundationFortune.Singleton.Translation.MoneyCounterSaved
+	                    string moneySavedString = FoundationFortune.Instance.Translation.MoneyCounterSaved
 		                    .Replace("%rolecolor%", ply.Role.Color.ToHex())
 		                    .Replace("%moneySaved%", moneySavedValue);
 
-	                    string moneyHoldString = FoundationFortune.Singleton.Translation.MoneyCounterOnHold
+	                    string moneyHoldString = FoundationFortune.Instance.Translation.MoneyCounterOnHold
 		                    .Replace("%rolecolor%", ply.Role.Color.ToHex())
 		                    .Replace("%moneyOnHold%", moneyOnHoldValue);
 
@@ -65,15 +67,15 @@ namespace FoundationFortune.API.Features.Systems
 
 	                    if (isHintExtended)
 	                    {
-		                    string expCounterString = FoundationFortune.Singleton.Translation.EXPCounter
+		                    string expCounterString = FoundationFortune.Instance.Translation.ExpCounter
 			                    .Replace("%rolecolor%", ply.Role.Color.ToHex())
 			                    .Replace("%expCounter%", expCounterValue);
 
-		                    string levelCounterString = FoundationFortune.Singleton.Translation.LevelCounter
+		                    string levelCounterString = FoundationFortune.Instance.Translation.LevelCounter
 			                    .Replace("%rolecolor%", ply.Role.Color.ToHex())
 			                    .Replace("%curLevel%", levelCounterValue);
 
-		                    string prestigeCounterString = FoundationFortune.Singleton.Translation.PrestigeCounter
+		                    string prestigeCounterString = FoundationFortune.Instance.Translation.PrestigeCounter
 			                    .Replace("%rolecolor%", ply.Role.Color.ToHex())
 			                    .Replace("%prestigelevel%", prestigeLevelCounterValue);
 
@@ -81,115 +83,103 @@ namespace FoundationFortune.API.Features.Systems
 	                    }
                     }
 
-                    ServerBountySystem.UpdateBountyMessages(ply, ref hintMessageBuilder);
-                    ServerExtractionSystem.UpdateExtractionMessages(ply, ref hintMessageBuilder);
-                    UpdateNpcProximityMessages(ply, ref hintMessageBuilder);
+                    BountySystem.UpdateBountyMessages(ply, ref hintMessageBuilder);
+                    ExtractionSystem.UpdateExtractionMessages(ply, ref hintMessageBuilder);
+                    NpcHelperMethods.UpdateNpcProximityMessages(ply, ref hintMessageBuilder);
+                    QuestSystem.UpdateQuestMessages(ply, ref hintMessageBuilder);
                     SellingWorkstations.UpdateWorkstationMessages(ply, ref hintMessageBuilder);
+                    PerkSystem.UpdateActivePerkMessages(ply, ref hintMessageBuilder);
                     PerkBottle.GetHeldBottle(ply, ref hintMessageBuilder);
 
                     string recentHintsText = GetRecentHints(ply.UserId);
                     if (!string.IsNullOrEmpty(recentHintsText)) hintMessageBuilder.Append(recentHintsText);
 
-                    string recentAnimatedHintsText = GetAnimatedHints(ply.UserId);
-                    if (!string.IsNullOrEmpty(recentAnimatedHintsText)) hintMessageBuilder.Append(recentAnimatedHintsText);
+                    //string recentAnimatedHintsText = GetAnimatedHints(ply.UserId);
+                    //if (!string.IsNullOrEmpty(recentAnimatedHintsText)) hintMessageBuilder.Append(recentAnimatedHintsText);
 
                     ply.ShowHint($"<size={hintSize}><align={hintAlignment}>{hintMessageBuilder}</align>", 2);
 
-                    if (!confirmSell.ContainsKey(ply.UserId) || !(Time.time - dropTimestamp[ply.UserId] >= FoundationFortune.SellableItemsList.SellingConfirmationTime)) continue;
-                    confirmSell.Remove(ply.UserId);
-                    dropTimestamp.Remove(ply.UserId);
-                }
-
-                yield return Timing.WaitForSeconds(updateRate);
-            }
-        }
-        
-        private void UpdateNpcProximityMessages(Player ply, ref StringBuilder hintMessage)
-        {
-	        if (NPCHelperMethods.IsPlayerNearBuyingBot(ply)) hintMessage.Append($"{FoundationFortune.Singleton.Translation.BuyingBot}");
-	        else if (NPCHelperMethods.IsPlayerNearSellingBot(ply))
-	        {
-		        if (!confirmSell.ContainsKey(ply.UserId)) hintMessage.Append($"{FoundationFortune.Singleton.Translation.SellingBot}");
-		        else if (confirmSell[ply.UserId])
-		        {
-			        hintMessage.Append($"{FoundationFortune.Singleton.Translation.SellingBot}");
-
-			        if (!itemsBeingSold.TryGetValue(ply.UserId, out var soldItemData)) return;
+                    if (!ConfirmSell.ContainsKey(ply.UserId) || !(Time.time - DropTimestamp[ply.UserId] >= PlayerDataRepository.GetSellingConfirmationTime(ply.UserId))) continue;
+                    ConfirmSell.Remove(ply.UserId);
+                    DropTimestamp.Remove(ply.UserId);
                     
-			        int price = soldItemData.price;
-			        string confirmationHint = FoundationFortune.Singleton.Translation.ItemConfirmation
-				        .Replace("%price%", price.ToString())
-				        .Replace("%time%", GetConfirmationTimeLeft(ply));
-
-			        hintMessage.Append($"{confirmationHint}");
-		        }
-	        }
+                    if (!ConfirmActivatePerk.ContainsKey(ply.UserId) || !(Time.time - ActivatePerkTimestamp[ply.UserId] >= PlayerDataRepository.GetSellingConfirmationTime(ply.UserId))) continue;
+                    ConfirmActivatePerk.Remove(ply.UserId);
+                    ActivatePerkTimestamp.Remove(ply.UserId);
+                }
+	            yield return Timing.WaitForSeconds(FoundationFortune.Instance.Config.HintSystemUpdateRate);
+            }
+            // ReSharper disable once IteratorNeverReturns
+            // rain world ruined me i cant stop looking at this error without thinking of five pebbles
         }
-    
+
         public string GetConfirmationTimeLeft(Player ply)
         {
-	        if (!dropTimestamp.ContainsKey(ply.UserId)) return "0";
-	        float timeLeft = FoundationFortune.SellableItemsList.SellingConfirmationTime - (Time.time - dropTimestamp[ply.UserId]);
+	        if (!DropTimestamp.ContainsKey(ply.UserId)) return "0";
+	        float timeLeft = PlayerDataRepository.GetSellingConfirmationTime(ply.UserId) - (Time.time - DropTimestamp[ply.UserId]);
 	        return timeLeft > 0 ? timeLeft.ToString("F0") : "0";
         }
-
+        
+        public string GetPerkActivationTimeLeft(Player ply)
+        {
+	        if (!ActivatePerkTimestamp.ContainsKey(ply.UserId)) return "0";
+	        float timeLeft = PlayerDataRepository.GetActiveAbilityActivationTime(ply.UserId) - (Time.time - ActivatePerkTimestamp[ply.UserId]);
+	        return timeLeft > 0 ? timeLeft.ToString("F0") : "0";
+        }
+        
         private string GetRecentHints(string userId)
-		{
-			if (!recentHints.TryGetValue(userId, out var hint)) return string.Empty;
-			var currentHints = hint
-				.Where(entry => !entry.IsAnimated && (Time.time - entry.Timestamp) <= PlayerDataRepository.GetHintSeconds(userId))
-				.Select(entry => entry.Text);
+        {
+	        if (!_recentHints.TryGetValue(userId, out Queue<HintEntry> hintQueue)) return string.Empty;
 
-			return string.Join("\n", currentHints);
-		}
+	        StringBuilder hintBuilder = new();
+	        while (hintQueue.Count > 0)
+	        {
+		        HintEntry hintEntry = hintQueue.Dequeue();
+		        hintBuilder.Append(hintEntry.Text);
+	        }
 
-        private string GetAnimatedHints(string userId)
-		{
-			if (!recentHints.TryGetValue(userId, out var hint)) return string.Empty;
-			var currentHints = hint
-				.Where(entry => entry.IsAnimated && (Time.time - entry.Timestamp) <= PlayerDataRepository.GetHintSeconds(userId))
-				.Select(entry => entry.Text);
+	        return hintBuilder.ToString();
+        }
 
-			return string.Join("\n", currentHints);
-		}
-
-		public void EnqueueHint(Player player, string hint)
+        public void EnqueueHint(Player player, string hint)
 		{
-			float expirationTime = Time.time + PlayerDataRepository.GetHintSeconds(player.UserId);
-			if (!recentHints.ContainsKey(player.UserId)) recentHints[player.UserId] = new Queue<HintEntry>();
-			recentHints[player.UserId].Enqueue(new HintEntry(hint, expirationTime, false));
-			while (recentHints[player.UserId].Count > PlayerDataRepository.GetHintLimit(player.UserId)) recentHints[player.UserId].Dequeue();
-		}
-		
-		public void EnqueueHint(Player player, string hint, int duration)
-		{
-			float expirationTime = Time.time + duration;
-			if (!recentHints.ContainsKey(player.UserId)) recentHints[player.UserId] = new Queue<HintEntry>();
-			recentHints[player.UserId].Enqueue(new HintEntry(hint, expirationTime, false));
-			while (recentHints[player.UserId].Count > PlayerDataRepository.GetHintLimit(player.UserId)) recentHints[player.UserId].Dequeue();
-		}
-
-		public void EnqueueHint(Player player, string hint, int duration, HintAnim align)
-		{
-			if (!recentHints.TryGetValue(player.UserId, out Queue<HintEntry> hintQueue))
+			try
 			{
-				hintQueue = new Queue<HintEntry>();
-				recentHints[player.UserId] = hintQueue;
+				float expirationTime = Time.time + PlayerDataRepository.GetHintAgeSeconds(player.UserId);
+				if (!_recentHints.ContainsKey(player.UserId)) _recentHints[player.UserId] = new Queue<HintEntry>();
+				_recentHints[player.UserId].Enqueue(new HintEntry(hint, expirationTime, false));
+				while (_recentHints[player.UserId].Count > PlayerDataRepository.GetHintLimit(player.UserId)) _recentHints[player.UserId].Dequeue();
+				DirectoryIterator.Log(hint, LogLevel.Debug);
 			}
-
-			Timing.RunCoroutine(AnimateHintText(player.UserId, hint, duration, align));
-			while (hintQueue.Count > PlayerDataRepository.GetHintLimit(player.UserId)) hintQueue.Dequeue();
+			catch (Exception ex)
+			{
+				DirectoryIterator.Log(ex.ToString(), LogLevel.Error);
+			}
+			//you break too much
 		}
-		
+        
+        //fuck hint anims in general for now
+        /*
+        private string GetAnimatedHints(string userId)
+        {
+	        if (!_recentHints.TryGetValue(userId, out var hint)) return string.Empty;
+	        var currentHints = hint
+		        .Where(entry =>
+			        entry.IsAnimated && (Time.time - entry.Timestamp) <= PlayerDataRepository.GetHintAgeSeconds(userId))
+		        .Select(entry => entry.Text);
+
+	        return string.Join("\n", currentHints);
+        }
+
 		public void EnqueueHint(Player player, string hint, HintAnim align)
 		{
-			if (!recentHints.TryGetValue(player.UserId, out Queue<HintEntry> hintQueue))
+			if (!_recentHints.TryGetValue(player.UserId, out Queue<HintEntry> hintQueue))
 			{
 				hintQueue = new Queue<HintEntry>();
-				recentHints[player.UserId] = hintQueue;
+				_recentHints[player.UserId] = hintQueue;
 			}
 
-			Timing.RunCoroutine(AnimateHintText(player.UserId, hint, PlayerDataRepository.GetHintSeconds(player.UserId), align));
+			Timing.RunCoroutine(AnimateHintText(player.UserId, hint, PlayerDataRepository.GetHintAgeSeconds(player.UserId), align));
 			while (hintQueue.Count > PlayerDataRepository.GetHintLimit(player.UserId)) hintQueue.Dequeue();
 		}
 
@@ -217,11 +207,15 @@ namespace FoundationFortune.API.Features.Systems
 						startIndex = Mathf.Clamp(center - endIndex, 0, hint.Length - endIndex);
 						endIndex = Mathf.Clamp(center + endIndex, startIndex, hint.Length);
 						break;
+					case HintAnim.None:
+						break;
+					default:
+						throw new ArgumentOutOfRangeException(nameof(animAlignment), animAlignment, null);
 				}
 
 				string animatedText = hint.Substring(startIndex, endIndex - startIndex);
 
-				if (recentHints.TryGetValue(userId, out Queue<HintEntry> hintQueue) && hintQueue.Count > 0)
+				if (_recentHints.TryGetValue(userId, out Queue<HintEntry> hintQueue) && hintQueue.Count > 0)
 				{
 					var lastEntry = hintQueue.Last();
 					if (lastEntry is { IsAnimated: true })
@@ -235,13 +229,14 @@ namespace FoundationFortune.API.Features.Systems
 					if (hintQueue == null)
 					{
 						hintQueue = new Queue<HintEntry>();
-						recentHints[userId] = hintQueue;
+						_recentHints[userId] = hintQueue;
 					}
 					hintQueue.Enqueue(new HintEntry(animatedText, Time.time, true));
 				}
 
-				yield return Timing.WaitForSeconds(FoundationFortune.Singleton.Config.AnimatedHintUpdateRate);
+				yield return Timing.WaitForSeconds(FoundationFortune.Instance.Config.AnimatedHintUpdateRate);
 			}
 		}
+		*/
 	}
 }

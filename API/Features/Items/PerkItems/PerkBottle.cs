@@ -8,7 +8,7 @@ using Exiled.API.Features.Spawn;
 using Exiled.CustomItems.API.Features;
 using Exiled.Events.EventArgs.Player;
 using FoundationFortune.API.Core.Events;
-using FoundationFortune.API.Core.Models.Enums.Perks;
+using FoundationFortune.API.Core.Models.Interfaces.Perks;
 
 namespace FoundationFortune.API.Features.Items.PerkItems
 {
@@ -23,7 +23,7 @@ namespace FoundationFortune.API.Features.Items.PerkItems
 		public override string Description { get; set; } = "";
 		public override float Weight { get; set; } = 0f;
 		public override SpawnProperties SpawnProperties { get; set; }
-		public static Dictionary<ushort, (PerkType perkType, Player player)> PerkBottles = new();
+		public static readonly Dictionary<ushort, (IPerk perk, Player player)> PerkBottles = new();
 
 		protected override void SubscribeEvents()
 		{
@@ -40,18 +40,18 @@ namespace FoundationFortune.API.Features.Items.PerkItems
 		private void UsedPerkBottle(UsedItemEventArgs ev)
 		{
 			if (!PerkBottles.TryGetValue(ev.Item.Serial, out var perkBottleData)) return;
-			EventHelperMethods.RegisterOnUsedFoundationFortunePerk(ev.Player, perkBottleData.perkType, ev.Item);
+			EventHelperMethods.RegisterOnUsedFoundationFortunePerk(ev.Player, perkBottleData.perk, ev.Item);
 		}
 		
-        public static void GivePerkBottle(Player player, PerkType perkType)
+        public static void GivePerkBottle(Player player, IPerk perk)
         {
 	        CustomItem customItem = new PerkBottle();
 	        var item = Item.Create(ItemType.AntiSCP207, player);
 
 	        customItem.Give(player, item,false);
 	        
-	        FoundationFortune.Log($"Spawned Perk Bottle at {item.Serial}", LogLevel.Debug);
-	        PerkBottles[item.Serial] = (perkType, player);
+	        DirectoryIterator.Log($"Given Perk Bottle [Type: {perk.PerkType} Item Serial: {item.Serial}] to Player: {player.Nickname}", LogLevel.Debug);
+	        PerkBottles[item.Serial] = (perk, player);
         }
 
         protected override void OnAcquired(Player player, Item item, bool displayMessage)
@@ -62,7 +62,7 @@ namespace FoundationFortune.API.Features.Items.PerkItems
         public static void GetHeldBottle(Player player, ref StringBuilder stringbuilder)
 		{
 			if (player.CurrentItem == null) return;
-			if (PerkBottles.TryGetValue(player.CurrentItem.Serial, out var perkBottleData)) stringbuilder.AppendLine(FoundationFortune.Singleton.Translation.HoldingPerkBottle.Replace("%type%", perkBottleData.perkType.ToString()));
+			if (PerkBottles.TryGetValue(player.CurrentItem.Serial, out var perkBottleData)) stringbuilder.AppendLine(FoundationFortune.Instance.Translation.HoldingPerkBottle.Replace("%type%", perkBottleData.perk.PerkType.ToString()));
 		}
 	}
 }

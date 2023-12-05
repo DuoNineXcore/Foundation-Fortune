@@ -4,19 +4,19 @@ using FoundationFortune.API.Core.Models.Enums.NPCs;
 
 namespace FoundationFortune.API.Core.Events.EventArgs
 {
-    public class UsedFoundationFortuneNPCEventArgs : IExiledEvent
+    public class UsedFoundationFortuneNpcEventArgs : IExiledEvent
     {
-        public UsedFoundationFortuneNPCEventArgs(Player player, Npc npc, NpcType type, NpcUsageOutcome outcome)
+        public UsedFoundationFortuneNpcEventArgs(Player player, Npc npc, NpcType type, NpcUsageOutcome outcome)
         {
             Player = player;
-            NPC = npc;
+            Npc = npc;
             Type = type;
             Outcome = outcome;
         }
 
         public NpcUsageOutcome Outcome { get; }
         public NpcType Type { get; }
-        public Npc NPC { get; }
+        public Npc Npc { get; }
         public Player Player { get; }
     }
 }

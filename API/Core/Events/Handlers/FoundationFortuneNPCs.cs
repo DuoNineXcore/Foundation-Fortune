@@ -8,8 +8,8 @@ namespace FoundationFortune.API.Core.Events.Handlers
         /// <summary>
         /// Event invoked after using a Foundation Fortune NPC.
         /// </summary>
-        public static Event<UsedFoundationFortuneNPCEventArgs> UsedFoundationFortuneNPC { get; set; } = new();
-        public static void OnUsedFoundationFortuneNPC(UsedFoundationFortuneNPCEventArgs ev) => UsedFoundationFortuneNPC.InvokeSafely(ev);
+        public static Event<UsedFoundationFortuneNpcEventArgs> UsedFoundationFortuneNpc { get; set; } = new();
+        public static void OnUsedFoundationFortuneNPC(UsedFoundationFortuneNpcEventArgs ev) => UsedFoundationFortuneNpc.InvokeSafely(ev);
 
         /// <summary>
         /// Event invoked after buying a perk item with a Buying Bot NPC.
