@@ -23,6 +23,7 @@ using FoundationFortune.API.Core.Models.Enums.Systems.HintSystem;
 using FoundationFortune.API.Core.Models.Enums.Systems.PerkSystem;
 using FoundationFortune.API.Core.Models.Enums.Systems.QuestSystem;
 using FoundationFortune.API.Core.Models.Interfaces.Perks;
+using FoundationFortune.API.Features;
 using FoundationFortune.API.Features.Items.World;
 using FoundationFortune.API.Features.NPCs;
 using FoundationFortune.API.Features.NPCs.NpcTypes;
@@ -54,12 +55,12 @@ namespace FoundationFortune.API.Core.EventHandlers
 		#region EXILED Events
 		public void RoundStart()
 		{
-			if (FoundationFortune.FoundationFortuneNpcSettings.FoundationFortuneNpCs) NpcInitialization.Start();
+			if (FoundationFortune.FoundationFortuneNpcSettings.FoundationFortuneNpCs) NPCInitialization.Start();
 			if (FoundationFortune.SellableItemsList.UseSellingWorkstation) SellingWorkstations.Start();
 		
 			CoroutineManager.StopAllCoroutines();
 			CoroutineManager.Coroutines.Add(Timing.RunCoroutine(FoundationFortune.Instance.HintSystem.HintSystemCoroutine()));
-			CoroutineManager.Coroutines.Add(Timing.RunCoroutine(NpcHelperMethods.UpdateNpcDirection()));
+			CoroutineManager.Coroutines.Add(Timing.RunCoroutine(NPCHelperMethods.UpdateNpcDirection()));
 
 			if (!FoundationFortune.MoneyExtractionSystemSettings.MoneyExtractionSystem) return;
 			int extractionTime = Random.Range(FoundationFortune.MoneyExtractionSystemSettings.MinExtractionPointGenerationTime, FoundationFortune.MoneyExtractionSystemSettings.MaxExtractionPointGenerationTime + 1);
@@ -69,7 +70,7 @@ namespace FoundationFortune.API.Core.EventHandlers
 
 		public void RegisterInDatabase(VerifiedEventArgs ev)
 		{
-			if (FoundationFortune.Instance.MusicBotPairs.All(pair => pair.Player.UserId != ev.Player.UserId) && !ev.Player.IsNPC) MusicBot.SpawnMusicBot(ev.Player);
+			if (NPCHelperMethods.MusicBotPairs.All(pair => pair.Player.UserId != ev.Player.UserId) && !ev.Player.IsNPC) MusicBot.SpawnMusicBot(ev.Player);
 			if (!ev.Player.IsNPC) QuestRotation.GetShuffledQuestsForUser(ev.Player.UserId);
 			var existingPlayer = PlayerDataRepository.GetPlayerById(ev.Player.UserId);
 			if (existingPlayer == null && !ev.Player.IsNPC)
@@ -84,11 +85,12 @@ namespace FoundationFortune.API.Core.EventHandlers
 					PrestigeLevel = 0,
 					HintAgeSeconds = 5,
 					SellingConfirmationTime = 5,
+					ActiveAbilityActivationTime = 5,
+					HintLimit = 5,
 					HintMinmode = true,
 					HintSystem = true,
 					HintAdmin = false,
 					HintSize = 20,
-					//HintAnim = HintAnim.None,
 					HintAlign = HintAlign.Center
 				};
 				PlayerDataRepository.InsertPlayer(newPlayer);
@@ -110,7 +112,7 @@ namespace FoundationFortune.API.Core.EventHandlers
 						.Replace("%victimcolor%", ev.Player.Role.Color.ToHex())
 						.Replace("%attackercolor%", ev.Attacker.Role.Color.ToHex())
 						.Replace("%bountyPrice%", bountiedPlayer.Value.ToString());
-					FoundationFortune.Instance.HintSystem.EnqueueHint(ply, globalKillHint);
+					FoundationFortune.Instance.HintSystem.BroadcastHint(ply, globalKillHint);
 				}
 
 				if (ev.Attacker != null && ev.Attacker != ev.Player)
@@ -119,7 +121,7 @@ namespace FoundationFortune.API.Core.EventHandlers
 						.Replace("%victim%", ev.Player.Nickname)
 						.Replace("%bountyPrice%", bountiedPlayer.Value.ToString());
 
-					FoundationFortune.Instance.HintSystem.EnqueueHint(ev.Attacker, killHint);
+					FoundationFortune.Instance.HintSystem.BroadcastHint(ev.Attacker, killHint);
 					PlayerDataRepository.ModifyMoney(ev.Attacker.UserId, bountiedPlayer.Value, false, true, false);
 				}
 
@@ -131,7 +133,7 @@ namespace FoundationFortune.API.Core.EventHandlers
 				var killHint = FoundationFortune.Instance.Translation.BountyPlayerDied
 					.Replace("%victim%", ev.Player.Nickname);
 
-				foreach (Player ply in Player.List.Where(p => !p.IsNPC)) FoundationFortune.Instance.HintSystem.EnqueueHint(ply, killHint);
+				foreach (Player ply in Player.List.Where(p => !p.IsNPC)) FoundationFortune.Instance.HintSystem.BroadcastHint(ply, killHint);
 				BountySystem.StopBounty(ev.Player);
 			}
 		
@@ -169,7 +171,6 @@ namespace FoundationFortune.API.Core.EventHandlers
 			}
 		}
 
-
 		public void KillingReward(DiedEventArgs ev)
 		{
 			PerkSystem.ClearConsumedPerks(ev.Player);
@@ -189,7 +190,7 @@ namespace FoundationFortune.API.Core.EventHandlers
 			
 				PlayerDataRepository.ModifyMoney(ev.Attacker.UserId, FoundationFortune.MoneyXPRewards.KillEventMoneyRewards, false, true, false);
 				PlayerDataRepository.SetExperience(ev.Attacker.UserId, FoundationFortune.MoneyXPRewards.KillEventXpRewards);
-				FoundationFortune.Instance.HintSystem.EnqueueHint(ev.Attacker, killHint);
+				FoundationFortune.Instance.HintSystem.BroadcastHint(ev.Attacker, killHint);
 			}
 		}
 
@@ -206,19 +207,19 @@ namespace FoundationFortune.API.Core.EventHandlers
 				PlayerDataRepository.TransferMoney(ev.Player.UserId, true);
 				PlayerDataRepository.ModifyMoney(ev.Player.UserId, FoundationFortune.MoneyXPRewards.EscapeEventMoneyRewards);
 				PlayerDataRepository.SetExperience(ev.Player.UserId, FoundationFortune.MoneyXPRewards.EscapeEventXpRewards);
-				FoundationFortune.Instance.HintSystem.EnqueueHint(ev.Player, escapeHint);
+				FoundationFortune.Instance.HintSystem.BroadcastHint(ev.Player, escapeHint);
 			}
 		}
 
 		public void SellingItem(DroppingItemEventArgs ev)
 		{
-			if (!SellingWorkstations.IsPlayerOnSellingWorkstation(ev.Player) && !NpcHelperMethods.IsPlayerNearSellingBot(ev.Player))
+			if (!SellingWorkstations.IsPlayerOnSellingWorkstation(ev.Player) && !NPCHelperMethods.IsPlayerNearSellingBot(ev.Player))
 			{
 				ev.IsAllowed = true;
 				return;
 			}
 		
-			if (NpcHelperMethods.IsPlayerNearSellingBot(ev.Player))
+			if (NPCHelperMethods.IsPlayerNearSellingBot(ev.Player))
 			{
 				if (!FoundationFortune.Instance.HintSystem.ConfirmSell.ContainsKey(ev.Player.UserId))
 				{
@@ -246,7 +247,7 @@ namespace FoundationFortune.API.Core.EventHandlers
 								EventHelperMethods.RegisterOnSoldItem(ev.Player, sellableItem, ev.Item);
 								EventHelperMethods.RegisterOnUsedFoundationFortuneNPC(ev.Player, NpcType.Selling, NpcUsageOutcome.SellSuccess);
 							}
-							else FoundationFortune.Instance.HintSystem.EnqueueHint(ev.Player, FoundationFortune.Instance.Translation.SaleCancelled);
+							else FoundationFortune.Instance.HintSystem.BroadcastHint(ev.Player, FoundationFortune.Instance.Translation.SaleCancelled);
 
 							FoundationFortune.Instance.HintSystem.ItemsBeingSold.Remove(ev.Player.UserId);
 							ev.IsAllowed = true;
@@ -259,7 +260,7 @@ namespace FoundationFortune.API.Core.EventHandlers
 			{
 				ev.IsAllowed = true;
 				EventHelperMethods.RegisterOnUsedFoundationFortuneNPC(ev.Player, NpcType.Selling, NpcUsageOutcome.WrongBot);
-				FoundationFortune.Instance.HintSystem.EnqueueHint(ev.Player, FoundationFortune.Instance.Translation.WrongBot);
+				FoundationFortune.Instance.HintSystem.BroadcastHint(ev.Player, FoundationFortune.Instance.Translation.WrongBot);
 			}
 
 			ev.IsAllowed = true;
@@ -291,7 +292,7 @@ namespace FoundationFortune.API.Core.EventHandlers
 					case PlayerTeamConditions.Winning:
 						PlayerDataRepository.ModifyMoney(ply.UserId, winningAmount);
 						PlayerDataRepository.SetExperience(ply.UserId, winningAmount);
-						FoundationFortune.Instance.HintSystem.EnqueueHint(ply, FoundationFortune.Instance.Translation.RoundEndWin
+						FoundationFortune.Instance.HintSystem.BroadcastHint(ply, FoundationFortune.Instance.Translation.RoundEndWin
 							.Replace("%winningFactionColor%", teamColor)
 							.Replace("%winningAmount%", winningAmount.ToString())
 							.Replace("%expReward%", winningAmount.ToString())
@@ -300,7 +301,7 @@ namespace FoundationFortune.API.Core.EventHandlers
 					case PlayerTeamConditions.Losing:
 						PlayerDataRepository.ModifyMoney(ply.UserId, losingAmount);
 						PlayerDataRepository.SetExperience(ply.UserId, losingAmount);
-						FoundationFortune.Instance.HintSystem.EnqueueHint(ply, FoundationFortune.Instance.Translation.RoundEndLoss
+						FoundationFortune.Instance.HintSystem.BroadcastHint(ply, FoundationFortune.Instance.Translation.RoundEndLoss
 							.Replace("%losingFactionColor%", teamColor)
 							.Replace("%losingAmount%", losingAmount.ToString())
 							.Replace("%expReward%", losingAmount.ToString())
@@ -309,7 +310,7 @@ namespace FoundationFortune.API.Core.EventHandlers
 					case PlayerTeamConditions.Draw:
 						PlayerDataRepository.ModifyMoney(ply.UserId, drawAmount);
 						PlayerDataRepository.SetExperience(ply.UserId, drawAmount);
-						FoundationFortune.Instance.HintSystem.EnqueueHint(ply, FoundationFortune.Instance.Translation.RoundEndDraw
+						FoundationFortune.Instance.HintSystem.BroadcastHint(ply, FoundationFortune.Instance.Translation.RoundEndDraw
 							.Replace("%drawFactionColor%", teamColor)
 							.Replace("%drawAmount%", drawAmount.ToString())
 							.Replace("%expReward%", drawAmount.ToString())
@@ -352,7 +353,7 @@ namespace FoundationFortune.API.Core.EventHandlers
 		
 		public void AddingTargetEvent(AddingTargetEventArgs ev)
 		{
-			if (NpcHelperMethods.IsFoundationFortuneNpc(ev.Target.ReferenceHub)) ev.IsAllowed = false;
+			if (NPCHelperMethods.IsFoundationFortuneNpc(ev.Target.ReferenceHub)) ev.IsAllowed = false;
 		}
 
 		public void ShootingWeapon(ShootingEventArgs ev)
@@ -362,7 +363,7 @@ namespace FoundationFortune.API.Core.EventHandlers
 
 		public void DestroyMusicBots(LeftEventArgs ev)
 		{
-			if (FoundationFortune.Instance.MusicBotPairs.Find(pair => pair.Player.Nickname == ev.Player.Nickname) != null) MusicBot.RemoveMusicBot(ev.Player.Nickname);
+			if (NPCHelperMethods.MusicBotPairs.Find(pair => pair.Player.Nickname == ev.Player.Nickname) != null) MusicBot.RemoveMusicBot(ev.Player.Nickname);
 		}
 
 		public void HurtingPlayer(HurtingEventArgs ev)
@@ -382,7 +383,7 @@ namespace FoundationFortune.API.Core.EventHandlers
 
 		public void PreventBotsFromSpawningInWaves(RespawningTeamEventArgs ev)
 		{
-			foreach (Player player in ev.Players.Where(p => NpcHelperMethods.IsFoundationFortuneNpc(p.ReferenceHub))) ev.Players.Remove(player);
+			foreach (Player player in ev.Players.Where(p => NPCHelperMethods.IsFoundationFortuneNpc(p.ReferenceHub))) ev.Players.Remove(player);
 		}
 
 		public void RoundRestart()

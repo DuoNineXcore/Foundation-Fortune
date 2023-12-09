@@ -10,6 +10,6 @@ internal static class Scp079RecontainPatch
     private static bool Prefix(Scp079Recontainer __instance, ReferenceHub hub)
     {
         if (hub == null) return true;
-        return !NpcHelperMethods.IsFoundationFortuneNpc(hub);
+        return !NPCHelperMethods.IsFoundationFortuneNpc(hub);
     }
 }

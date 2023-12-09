@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using FoundationFortune.API.Core.Models.Classes.Items;
 using FoundationFortune.API.Core.Models.Interfaces;
+using FoundationFortune.API.Core.Models.Interfaces.Configs;
 using YamlDotNet.Serialization;
 
 namespace FoundationFortune.Configs

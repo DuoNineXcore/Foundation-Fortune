@@ -13,11 +13,13 @@ using Random = UnityEngine.Random;
 
 namespace FoundationFortune.API.Features.NPCs
 {
-    public static class NpcInitialization
+    public static class NPCInitialization
     {
         public static readonly Dictionary<Npc, Vector3> BuyingBotPositions = new();
         public static readonly Dictionary<Npc, Vector3> SellingBotPositions = new();
-
+        public static readonly Dictionary<string, (Npc bot, int indexation)> BuyingBots = new();
+        public static readonly Dictionary<string, (Npc bot, int indexation)> SellingBots = new();
+        
         public static void Start()
         {
             try
@@ -37,7 +39,7 @@ namespace FoundationFortune.API.Features.NPCs
                     {
                         var rooms = FoundationFortune.FoundationFortuneNpcSettings.BuyingBotSpawnSettings.Select(location => location.Room).ToList();
 
-                        foreach (var kvp in FoundationFortune.Instance.BuyingBots)
+                        foreach (var kvp in BuyingBots)
                         {
                             var indexation = kvp.Value.indexation;
                             var bot = kvp.Value.bot;
@@ -66,7 +68,7 @@ namespace FoundationFortune.API.Features.NPCs
                         availableIndexes.Clear();
                         availableIndexes.AddRange(Enumerable.Range(0, rooms.Count));
 
-                        foreach (var bot in FoundationFortune.Instance.BuyingBots.Select(kvp => kvp.Value.bot))
+                        foreach (var bot in NPCInitialization.BuyingBots.Select(kvp => kvp.Value.bot))
                         {
                             if (availableIndexes.Count > 0)
                             {
@@ -107,7 +109,7 @@ namespace FoundationFortune.API.Features.NPCs
                         DirectoryIterator.Log($"Bots spawned.", LogLevel.Info);
                         var rooms = FoundationFortune.FoundationFortuneNpcSettings.SellingBotSpawnSettings.Select(location => location.Room).ToList();
 
-                        foreach (var kvp in FoundationFortune.Instance.SellingBots)
+                        foreach (var kvp in NPCInitialization.SellingBots)
                         {
                             var indexation = kvp.Value.indexation;
                             var bot = kvp.Value.bot;
@@ -136,7 +138,7 @@ namespace FoundationFortune.API.Features.NPCs
                         availableIndexes.Clear();
                         availableIndexes.AddRange(Enumerable.Range(0, rooms.Count));
 
-                        foreach (var bot in FoundationFortune.Instance.SellingBots.Select(kvp => kvp.Value.bot))
+                        foreach (var bot in NPCInitialization.SellingBots.Select(kvp => kvp.Value.bot))
                         {
                             if (availableIndexes.Count > 0)
                             {

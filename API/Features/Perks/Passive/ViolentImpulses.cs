@@ -22,5 +22,6 @@ namespace FoundationFortune.API.Features.Perks.Passive
         }
 
         public PerkType PerkType { get; } = PerkType.ViolentImpulses;
+        public string Alias { get; } = "Violent Impulses";
     }
 }

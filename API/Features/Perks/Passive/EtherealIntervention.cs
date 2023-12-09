@@ -15,5 +15,6 @@ namespace FoundationFortune.API.Features.Perks.Passive
         }
 
         public PerkType PerkType { get; } = PerkType.EtherealIntervention;
+        public string Alias { get; } = "Ethereal Intervention";
     }
 }

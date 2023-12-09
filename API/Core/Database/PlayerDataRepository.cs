@@ -23,7 +23,7 @@ namespace FoundationFortune.API.Core.Database
         public static bool GetHintExtension(string userId) => PlayersCollection.FindOne(p => p.UserId == userId)?.HintExtension ?? false;
         public static int GetHintLimit(string userId) => PlayersCollection.FindOne(p => p.UserId == userId)?.HintLimit ?? 5;
         public static int GetHintSize(string userId) => PlayersCollection.FindOne(p => p.UserId == userId)?.HintSize ?? 25;
-        public static int GetHintAgeSeconds(string userId) => PlayersCollection.FindOne(p => p.UserId == userId)?.HintAgeSeconds ?? 5;
+        public static float GetHintAgeSeconds(string userId) => PlayersCollection.FindOne(p => p.UserId == userId)?.HintAgeSeconds ?? 5;
         //public static HintAnim GetHintAnim(string userId) => PlayersCollection.FindOne(p => p.UserId == userId)?.HintAnim ?? HintAnim.None;
         public static HintAlign GetHintAlign(string userId) => PlayersCollection.FindOne(p => p.UserId == userId)?.HintAlign ?? HintAlign.Center;
 

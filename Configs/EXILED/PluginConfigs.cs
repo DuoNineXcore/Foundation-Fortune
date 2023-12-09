@@ -17,7 +17,6 @@ namespace FoundationFortune.Configs.EXILED
 
 		[Description("Update Rate Settings")] 
 		public float HintSystemUpdateRate { get; set; } = 0.5f;
-		public float AnimatedHintUpdateRate { get; set; } = 0.5f;
 		public float NpcLookatUpdateRate { get; set; } = 0.01f;
 	}
 }

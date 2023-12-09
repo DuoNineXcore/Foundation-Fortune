@@ -21,7 +21,7 @@ internal static class OnFootstepPlayed
         {
             new CodeInstruction(OpCodes.Ldarg_1),
             new CodeInstruction(OpCodes.Callvirt, AccessTools.PropertyGetter(typeof(CharacterModel), nameof(CharacterModel.OwnerHub))),
-            new CodeInstruction(OpCodes.Callvirt, AccessTools.Method(typeof(NpcHelperMethods), nameof(NpcHelperMethods.IsFoundationFortuneNpc), new[] { typeof(ReferenceHub) })),
+            new CodeInstruction(OpCodes.Callvirt, AccessTools.Method(typeof(NPCHelperMethods), nameof(NPCHelperMethods.IsFoundationFortuneNpc), new[] { typeof(ReferenceHub) })),
             new CodeInstruction(OpCodes.Brfalse_S, skip),
             new CodeInstruction(OpCodes.Ret)
         });

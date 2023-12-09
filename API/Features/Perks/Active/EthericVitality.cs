@@ -54,5 +54,6 @@ namespace FoundationFortune.API.Features.Perks.Active
         }
 
         public PerkType PerkType { get; } = PerkType.EthericVitality;
+        public string Alias { get; } = "Etheric Vitality";
     }
 }

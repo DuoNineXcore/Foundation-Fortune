@@ -44,7 +44,7 @@ namespace FoundationFortune.API.Features.Items.CustomItems
 
 			int moneyBeforeDeath = PlayerDataRepository.GetMoneyOnHold(ev.Player.UserId);
 			if (moneyBeforeDeath <= 0 || PlayerDataRepository.GetPluginAdmin(ev.Player.UserId)) return;
-			FoundationFortune.Instance.HintSystem.EnqueueHint(ev.Player, FoundationFortune.Instance.Translation.Death.Replace("%moneyBeforeDeath%", moneyBeforeDeath.ToString()));
+			FoundationFortune.Instance.HintSystem.BroadcastHint(ev.Player, FoundationFortune.Instance.Translation.Death.Replace("%moneyBeforeDeath%", moneyBeforeDeath.ToString()));
 			PlayerDataRepository.EmptyMoney(ev.Player.UserId, true);
 			int coinValue = moneyBeforeDeath / FoundationFortune.SellableItemsList.DeathCoinsToDrop;
 			for (int i = 0; i < FoundationFortune.SellableItemsList.DeathCoinsToDrop; i++)
@@ -65,7 +65,7 @@ namespace FoundationFortune.API.Features.Items.CustomItems
 				int coinValue = coinData.coinValue;
 				int xpReward = coinValue / 2;
 				double prestigeMultiplier = PlayerDataRepository.GetPrestigeMultiplier(player.UserId);
-				FoundationFortune.Instance.HintSystem.EnqueueHint(player, FoundationFortune.Instance.Translation.DeathCoinPickup
+				FoundationFortune.Instance.HintSystem.BroadcastHint(player, FoundationFortune.Instance.Translation.DeathCoinPickup
 						.Replace("%coinValue%", coinValue.ToString())
 						.Replace("%xpReward%", xpReward.ToString())
 						.Replace("%multiplier%", prestigeMultiplier.ToString(CultureInfo.InvariantCulture)));

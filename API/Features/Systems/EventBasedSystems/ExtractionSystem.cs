@@ -20,7 +20,7 @@ namespace FoundationFortune.API.Features.Systems.EventBasedSystems
 		private static int _extractionCount;
 		private static int _nextExtractionTime;
 		private static float _extractionStartTime;
-		private static Dictionary<Player, ExtractionTimerData> _extractionTimers = new();
+		private static readonly Dictionary<Player, ExtractionTimerData> _extractionTimers = new();
 
 		private static bool IsPlayerInExtractionRoom(Player player, RoomType roomType)
 		{

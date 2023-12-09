@@ -1,16 +1,14 @@
 ﻿namespace FoundationFortune.API.Core.Models.Classes.Hints
 {
-    public class HintEntry
+    public class StaticHintEntry
     {
         public string Text { get; set; }
         public float Timestamp { get; set; }
-        public bool IsAnimated { get; set; }
 
-        public HintEntry(string text, float timestamp, bool isAnimated)
+        public StaticHintEntry(string text, float timestamp)
         {
             Text = text;
             Timestamp = timestamp;
-            IsAnimated = isAnimated;
         }
     }
 }

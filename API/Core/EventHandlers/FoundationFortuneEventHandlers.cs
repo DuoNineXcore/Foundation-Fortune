@@ -2,11 +2,14 @@
 using System.Globalization;
 using CameraShaking;
 using FoundationFortune.API.Core.Database;
-using FoundationFortune.API.Core.Events.EventArgs;
+using FoundationFortune.API.Core.Events.EventArgs.FoundationFortuneItems;
+using FoundationFortune.API.Core.Events.EventArgs.FoundationFortuneNPCs;
+using FoundationFortune.API.Core.Events.EventArgs.FoundationFortunePerks;
 using FoundationFortune.API.Core.Models.Enums.NPCs;
 using FoundationFortune.API.Core.Models.Enums.Systems.PerkSystem;
 using FoundationFortune.API.Core.Models.Enums.Systems.QuestSystem;
 using FoundationFortune.API.Core.Models.Interfaces.Perks;
+using FoundationFortune.API.Features;
 using FoundationFortune.API.Features.Items.PerkItems;
 using FoundationFortune.API.Features.Systems;
 using FoundationFortune.API.Features.Systems.EventBasedSystems;
@@ -41,21 +44,18 @@ namespace FoundationFortune.API.Core.EventHandlers
                 PerkSystem.ConsumedPerks[ev.Player] = playerPerks;
             }
 
-            if (ev.Perk.PerkType == PerkType.ViolentImpulses)
-            {
-                RecoilSettings = new(
-                    FoundationFortune.PerkSystemSettings.ViolentImpulsesRecoilAnimationTime,
-                    FoundationFortune.PerkSystemSettings.ViolentImpulsesRecoilZAxis,
-                    FoundationFortune.PerkSystemSettings.ViolentImpulsesRecoilFovKick,
-                    FoundationFortune.PerkSystemSettings.ViolentImpulsesRecoilUpKick,
-                    FoundationFortune.PerkSystemSettings.ViolentImpulsesRecoilSideKick);
-            }
+            if (ev.Perk.PerkType == PerkType.ViolentImpulses) RecoilSettings = new(
+                FoundationFortune.PerkSystemSettings.ViolentImpulsesRecoilAnimationTime, 
+                FoundationFortune.PerkSystemSettings.ViolentImpulsesRecoilZAxis, 
+                FoundationFortune.PerkSystemSettings.ViolentImpulsesRecoilFovKick, 
+                FoundationFortune.PerkSystemSettings.ViolentImpulsesRecoilUpKick, 
+                FoundationFortune.PerkSystemSettings.ViolentImpulsesRecoilSideKick);
 
             if (playerPerks.TryGetValue(ev.Perk, out var count)) playerPerks[ev.Perk] = count + 1;
             else playerPerks[ev.Perk] = 1;
 
             PerkSystem.GrantPerk(ev.Player, ev.Perk);
-            FoundationFortune.Instance.HintSystem.EnqueueHint(ev.Player, str);
+            FoundationFortune.Instance.HintSystem.BroadcastHint(ev.Player, str);
             PerkBottle.PerkBottles.Remove(ev.Item.Serial);
 
             if (ev.Perk is IActivePerk activePerk) activePerk.ApplyPassiveEffect(ev.Player);
@@ -70,7 +70,7 @@ namespace FoundationFortune.API.Core.EventHandlers
                 .Replace("%xpReward%", FoundationFortune.MoneyXPRewards.BuyingItemXpRewards.ToString())
                 .Replace("%multiplier%", PlayerDataRepository.GetPrestigeMultiplier(ev.Player.UserId).ToString(CultureInfo.InvariantCulture)); //oh my god i dont fucking care about culture
 
-            FoundationFortune.Instance.HintSystem.EnqueueHint(ev.Player, str);
+            FoundationFortune.Instance.HintSystem.BroadcastHint(ev.Player, str);
             QuestSystem.UpdateQuestProgress(ev.Player, QuestType.BuyItems, 1);
             ev.Player.AddItem(ev.BuyableItem.ItemType);
 
@@ -87,7 +87,7 @@ namespace FoundationFortune.API.Core.EventHandlers
                 .Replace("%xpReward%", FoundationFortune.MoneyXPRewards.BuyingPerkXpRewards.ToString())
                 .Replace("%multiplier%", PlayerDataRepository.GetPrestigeMultiplier(ev.Player.UserId).ToString(CultureInfo.InvariantCulture));
 
-            FoundationFortune.Instance.HintSystem.EnqueueHint(ev.Player, str);
+            FoundationFortune.Instance.HintSystem.BroadcastHint(ev.Player, str);
             QuestSystem.UpdateQuestProgress(ev.Player, QuestType.BuyItems, 1);
             PerkBottle.GivePerkBottle(ev.Player, ev.BuyablePerk.PerkType.ToPerk());
 
@@ -104,7 +104,7 @@ namespace FoundationFortune.API.Core.EventHandlers
                 .Replace("%xpReward%", FoundationFortune.MoneyXPRewards.SellingXpRewards.ToString())
                 .Replace("%multiplier%", PlayerDataRepository.GetPrestigeMultiplier(ev.Player.UserId).ToString(CultureInfo.InvariantCulture));
 
-            FoundationFortune.Instance.HintSystem.EnqueueHint(ev.Player, str);
+            FoundationFortune.Instance.HintSystem.BroadcastHint(ev.Player, str);
             ev.Player.RemoveItem(ev.Item);
 
             PlayerDataRepository.ModifyMoney(ev.Player.UserId, ev.SellableItem.Price, false, true, false);

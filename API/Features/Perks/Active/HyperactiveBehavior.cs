@@ -38,7 +38,7 @@ namespace FoundationFortune.API.Features.Perks.Active
                 player.Stamina = randomizedStamina;
                 player.ChangeEffectIntensity(EffectType.MovementBoost, (byte)randomizedMovementSpeed);
                 if (HyperactiveBehaviorOn != null) AudioPlayer.PlayTo(player, HyperactiveBehaviorOn.AudioFile, HyperactiveBehaviorOn.Volume, HyperactiveBehaviorOn.Loop, false);
-                FoundationFortune.Instance.HintSystem.EnqueueHint(player, $"<b>+{randomizedMovementSpeed} Movement Speed, +{randomizedStamina} Stamina</b>");
+                FoundationFortune.Instance.HintSystem.BroadcastHint(player, $"<b>+{randomizedMovementSpeed} Movement Speed, +{randomizedStamina} Stamina</b>");
                 yield return Timing.WaitForSeconds(UnityEngine.Random.Range(10f, 15f));
 
                 player.Stamina = 100;
@@ -49,5 +49,6 @@ namespace FoundationFortune.API.Features.Perks.Active
         }
 
         public PerkType PerkType { get; } = PerkType.HyperactiveBehavior;
+        public string Alias { get; } = "Hyperactive Behavior";
     }
 }

@@ -16,7 +16,7 @@ namespace FoundationFortune.API.Core.Models.Classes.Player
         public int ActiveAbilityActivationTime { get; set; }
         public int HintSize { get; set; }
         public int HintLimit { get; set; }
-        public int HintAgeSeconds { get; set; }
+        public float HintAgeSeconds { get; set; }
         public bool HintMinmode { get; set; }
         public bool HintSystem { get; set; }
         public bool HintAdmin { get; set; }

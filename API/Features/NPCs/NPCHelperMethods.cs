@@ -7,6 +7,7 @@ using Exiled.API.Enums;
 using Exiled.API.Extensions;
 using Exiled.API.Features;
 using Exiled.API.Features.Components;
+using FoundationFortune.API.Core.Models.Classes.NPCs;
 using FoundationFortune.API.Core.Models.Enums.NPCs;
 using MEC;
 using Mirror;
@@ -17,16 +18,18 @@ using UnityEngine;
 
 namespace FoundationFortune.API.Features.NPCs
 {
-    public static class NpcHelperMethods
+    public static class NPCHelperMethods
     {
+        public static readonly List<PlayerMusicBotPair> MusicBotPairs = new();
+
         public static bool IsFoundationFortuneNpc(ReferenceHub refHub)
         {
             Player targetPlayer = Player.Get(refHub);
-            return FoundationFortune.Instance.BuyingBots.Values.Any(botAndIndexation => botAndIndexation.bot == targetPlayer)
-                   || FoundationFortune.Instance.SellingBots.Values.Any(botAndIndexation => botAndIndexation.bot == targetPlayer)
-                   || FoundationFortune.Instance.MusicBotPairs.Any(pair => pair.Player == targetPlayer);
+            return NPCInitialization.BuyingBots.Values.Any(botAndIndexation => botAndIndexation.bot == targetPlayer)
+                   || NPCInitialization.SellingBots.Values.Any(botAndIndexation => botAndIndexation.bot == targetPlayer)
+                   || MusicBotPairs.Any(pair => pair.Player == targetPlayer);
         }
-        
+
         public static void UpdateNpcProximityMessages(Player ply, ref StringBuilder hintMessage)
         {
             if (IsPlayerNearBuyingBot(ply)) hintMessage.Append($"{FoundationFortune.Instance.Translation.BuyingBot}");
@@ -53,7 +56,7 @@ namespace FoundationFortune.API.Features.NPCs
         
         public static Npc GetNearestBuyingBot(Player player)
         {
-            var botPositions = FoundationFortune.Instance.BuyingBots
+            var botPositions = NPCInitialization.BuyingBots
                 .Where(kvp => kvp.Value.bot != null)
                 .ToDictionary(kvp => kvp.Value.bot, kvp => kvp.Value.bot.Position);
 
@@ -62,7 +65,7 @@ namespace FoundationFortune.API.Features.NPCs
 
         public static Npc GetNearestSellingBot(Player player)
         {
-            var botPositions = FoundationFortune.Instance.SellingBots
+            var botPositions = NPCInitialization.SellingBots
                 .Where(kvp => kvp.Value.bot != null)
                 .ToDictionary(kvp => kvp.Value.bot, kvp => kvp.Value.bot.Position);
 
@@ -71,7 +74,7 @@ namespace FoundationFortune.API.Features.NPCs
         
         public static bool IsPlayerNearBuyingBot(Player player)
         {
-            var botPositions = FoundationFortune.Instance.BuyingBots
+            var botPositions = NPCInitialization.BuyingBots
                 .Where(kvp => kvp.Value.bot != null)
                 .ToDictionary(kvp => kvp.Value.bot, kvp => kvp.Value.bot.Position);
 
@@ -80,7 +83,7 @@ namespace FoundationFortune.API.Features.NPCs
 
         public static bool IsPlayerNearSellingBot(Player player)
         {
-            var botPositions = FoundationFortune.Instance.SellingBots
+            var botPositions = NPCInitialization.SellingBots
                 .Where(kvp => kvp.Value.bot != null)
                 .ToDictionary(kvp => kvp.Value.bot, kvp => kvp.Value.bot.Position);
 
@@ -95,8 +98,8 @@ namespace FoundationFortune.API.Features.NPCs
             {
                 switch (botType)
                 {
-                    case NpcType.Buying when FoundationFortune.Instance.BuyingBots.Any(x => x.Value.bot == bot):
-                    case NpcType.Selling when FoundationFortune.Instance.SellingBots.Any(x => x.Value.bot == bot):
+                    case NpcType.Buying when NPCInitialization.BuyingBots.Any(x => x.Value.bot == bot):
+                    case NpcType.Selling when NPCInitialization.SellingBots.Any(x => x.Value.bot == bot):
                         return true;
                 }
             }
@@ -110,9 +113,9 @@ namespace FoundationFortune.API.Features.NPCs
             {
                 switch (botType)
                 {
-                    case NpcType.Buying when FoundationFortune.Instance.BuyingBots.Any(x => x.Value.bot == kvp.Key):
+                    case NpcType.Buying when NPCInitialization.BuyingBots.Any(x => x.Value.bot == kvp.Key):
                         return kvp.Key;
-                    case NpcType.Selling when FoundationFortune.Instance.SellingBots.Any(x => x.Value.bot == kvp.Key):
+                    case NpcType.Selling when NPCInitialization.SellingBots.Any(x => x.Value.bot == kvp.Key):
                         return kvp.Key;
                 }
             }
@@ -206,8 +209,6 @@ namespace FoundationFortune.API.Features.NPCs
 
                 yield return Timing.WaitForSeconds(FoundationFortune.Instance.Config.NpcLookatUpdateRate);
             }
-            // ReSharper disable once IteratorNeverReturns
-            // sorry five pebbles
         }
     }
 }

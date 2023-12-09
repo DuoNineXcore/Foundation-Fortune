@@ -2,6 +2,8 @@
 using System.Linq;
 using Exiled.API.Features;
 using Exiled.API.Features.Items;
+using FoundationFortune.API.Core.Models.Components;
+using FoundationFortune.API.Core.Models.Components.NPCs;
 using MEC;
 using Mirror;
 using PlayerRoles;
@@ -34,12 +36,26 @@ namespace FoundationFortune.API.Features.NPCs.NpcTypes
         public static Npc SpawnBuyingBot(string target, string badge, string color, RoleTypeId role, ItemType? heldItem, Vector3 scale)
         {
             int indexation = 0;
-            while (FoundationFortune.Instance.BuyingBots.Values.Any(data => data.indexation == indexation)) indexation++;
+            while (NPCInitialization.BuyingBots.Values.Any(data => data.indexation == indexation)) indexation++;
     
-            Npc spawnedBuyingBot = NpcHelperMethods.SpawnFix(target, role, indexation);
+            Npc spawnedBuyingBot = NPCHelperMethods.SpawnFix(target, role, indexation);
             string botKey = $"BuyingBot-{target}";
-            FoundationFortune.Instance.BuyingBots[botKey] = (spawnedBuyingBot, indexation);
+            NPCInitialization.BuyingBots[botKey] = (spawnedBuyingBot, indexation);
+            
+            //i did not steal this from you totally
+            NPCIndicatorComponent npcIndicatorComp = spawnedBuyingBot.GameObject.AddComponent<NPCIndicatorComponent>();
 
+            npcIndicatorComp.glowLight = Exiled.API.Features.Toys.Light.Create(spawnedBuyingBot.Position);
+            npcIndicatorComp.glowLight.Color = Color.blue;
+            npcIndicatorComp.glowLight.ShadowEmission = false;
+            npcIndicatorComp.glowLight.Range = 2f;
+            npcIndicatorComp.glowLight.Intensity = 3f;
+            
+            npcIndicatorComp.circ = Exiled.API.Features.Toys.Primitive.Create(spawnedBuyingBot.Position);
+            npcIndicatorComp.circ.Type = PrimitiveType.Sphere;
+            npcIndicatorComp.circ.Collidable = false;
+            npcIndicatorComp.circ.Scale = new Vector3(0.05f, 0.05f, 0.05f);
+            
             spawnedBuyingBot.RankName = badge;
             spawnedBuyingBot.RankColor = color;
             spawnedBuyingBot.Scale = scale;
@@ -57,7 +73,7 @@ namespace FoundationFortune.API.Features.NPCs.NpcTypes
         public static bool RemoveBuyingBot(string target)
         {
             string botKey = $"BuyingBot-{target}";
-            if (!FoundationFortune.Instance.BuyingBots.TryGetValue(botKey, out var botData)) return false;
+            if (!NPCInitialization.BuyingBots.TryGetValue(botKey, out var botData)) return false;
             var (bot, _) = botData;
             if (bot != null)
             {
@@ -68,7 +84,7 @@ namespace FoundationFortune.API.Features.NPCs.NpcTypes
                     CustomNetworkManager.TypedSingleton.OnServerDisconnect(bot.NetworkIdentity.connectionToClient);
                 });
             }
-            FoundationFortune.Instance.BuyingBots.Remove(botKey);
+            NPCInitialization.BuyingBots.Remove(botKey);
             return true;
         }
     }

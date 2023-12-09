@@ -1,8 +1,13 @@
 ﻿using Exiled.API.Features;
 using Exiled.API.Features.Items;
-using FoundationFortune.API.Core.Events.EventArgs;
+using FoundationFortune.API.Core.Events.EventArgs.FoundationFortuneAudio;
+using FoundationFortune.API.Core.Events.EventArgs.FoundationFortuneItems;
+using FoundationFortune.API.Core.Events.EventArgs.FoundationFortuneNPCs;
+using FoundationFortune.API.Core.Events.EventArgs.FoundationFortunePerks;
 using FoundationFortune.API.Core.Events.Handlers;
 using FoundationFortune.API.Core.Models.Classes.Items;
+using FoundationFortune.API.Core.Models.Classes.NPCs;
+using FoundationFortune.API.Core.Models.Classes.Player;
 using FoundationFortune.API.Core.Models.Enums.NPCs;
 using FoundationFortune.API.Core.Models.Interfaces.Perks;
 using FoundationFortune.API.Features.NPCs;
@@ -19,9 +24,11 @@ namespace FoundationFortune.API.Core.Events
         /// <param name="outcome">The outcome after the player used the NPC.</param>
         public static void RegisterOnUsedFoundationFortuneNPC(Player player, NpcType npcType, NpcUsageOutcome outcome)
         {
-            Npc npc = npcType == NpcType.Buying ? NpcHelperMethods.GetNearestBuyingBot(player) : NpcHelperMethods.GetNearestSellingBot(player);
+            Npc npc = npcType == NpcType.Buying
+                ? NPCHelperMethods.GetNearestBuyingBot(player)
+                : NPCHelperMethods.GetNearestSellingBot(player);
             UsedFoundationFortuneNpcEventArgs eventArgs = new(player, npc, npcType, outcome);
-            FoundationFortuneNPCs.OnUsedFoundationFortuneNPC(eventArgs);
+            FoundationFortuneNPCEvents.OnUsedFoundationFortuneNPC(eventArgs);
         }
 
         /// <summary>
@@ -33,7 +40,7 @@ namespace FoundationFortune.API.Core.Events
         public static void RegisterOnUsedFoundationFortunePerk(Player player, IPerk perk, Item item)
         {
             UsedFoundationFortunePerkEventArgs eventArgs = new(player, perk, item);
-            FoundationFortunePerks.OnUsedFoundationFortunePerk(eventArgs);
+            FoundationFortunePerkEvents.OnUsedFoundationFortunePerk(eventArgs);
         }
 
         /// <summary>
@@ -43,9 +50,9 @@ namespace FoundationFortune.API.Core.Events
         /// <param name="perk">The bought perk.</param>
         public static void RegisterOnBoughtPerk(Player player, BuyablePerk perk)
         {
-            Npc npc = NpcHelperMethods.GetNearestBuyingBot(player);
+            Npc npc = NPCHelperMethods.GetNearestBuyingBot(player);
             BoughtPerkEventArgs eventArgs = new(player, npc, perk);
-            FoundationFortuneNPCs.OnBoughtPerk(eventArgs);
+            FoundationFortuneItemEvents.OnBoughtPerk(eventArgs);
         }
 
         /// <summary>
@@ -55,9 +62,9 @@ namespace FoundationFortune.API.Core.Events
         /// <param name="item">The bought item.</param>
         public static void RegisterOnBoughtItem(Player player, BuyableItem item)
         {
-            Npc npc = NpcHelperMethods.GetNearestBuyingBot(player);
+            Npc npc = NPCHelperMethods.GetNearestBuyingBot(player);
             BoughtItemEventArgs eventArgs = new(player, npc, item);
-            FoundationFortuneNPCs.OnBoughtItem(eventArgs);
+            FoundationFortuneItemEvents.OnBoughtItem(eventArgs);
         }
 
         /// <summary>
@@ -68,9 +75,53 @@ namespace FoundationFortune.API.Core.Events
         /// <param name="item">The sold item.</param>
         public static void RegisterOnSoldItem(Player player, SellableItem sellableItem, Item item)
         {
-            Npc npc = NpcHelperMethods.GetNearestSellingBot(player);
+            Npc npc = NPCHelperMethods.GetNearestSellingBot(player);
             SoldItemEventArgs eventArgs = new(player, npc, sellableItem, item);
-            FoundationFortuneNPCs.OnSoldItem(eventArgs);
+            FoundationFortuneItemEvents.OnSoldItem(eventArgs);
+        }
+
+        /// <summary>
+        /// Registers the event when a player has played audio.
+        /// </summary>
+        /// <param name="player">The player who played audio.</param>
+        /// <param name="voiceChatSettings">The voice chat settings for the player.</param>
+        public static void RegisterOnPlayerPlayedAudio(Player player, PlayerVoiceChatSettings voiceChatSettings)
+        {
+            PlayerPlayedAudioEventArgs eventArgs = new PlayerPlayedAudioEventArgs(player, voiceChatSettings);
+            FoundationFortuneAudioEvents.OnPlayerPlayedAudio(eventArgs);
+        }
+
+        /// <summary>
+        /// Registers the event when a player is currently playing audio.
+        /// </summary>
+        /// <param name="player">The player who is playing audio.</param>
+        /// <param name="voiceChatSettings">The voice chat settings for the player.</param>
+        public static void RegisterOnPlayerPlayingAudio(Player player, PlayerVoiceChatSettings voiceChatSettings)
+        {
+            PlayerPlayingAudioEventArgs eventArgs = new PlayerPlayingAudioEventArgs(player, voiceChatSettings);
+            FoundationFortuneAudioEvents.OnPlayerPlayingAudio(eventArgs);
+        }
+
+        /// <summary>
+        /// Registers the event when an NPC has played audio.
+        /// </summary>
+        /// <param name="pair">The pair of player and music bot associated with the event.</param>
+        /// <param name="voiceChatSettings">The voice chat settings for the NPC.</param>
+        public static void RegisterOnNPCPlayedAudio(PlayerMusicBotPair pair, NPCVoiceChatSettings voiceChatSettings)
+        {
+            NPCPlayedAudioEventArgs eventArgs = new NPCPlayedAudioEventArgs(pair, voiceChatSettings);
+            FoundationFortuneAudioEvents.OnNPCPlayedAudio(eventArgs);
+        }
+
+        /// <summary>
+        /// Registers the event when an NPC is currently playing audio.
+        /// </summary>
+        /// <param name="pair">The pair of player and music bot associated with the event.</param>
+        /// <param name="voiceChatSettings">The voice chat settings for the NPC.</param>
+        public static void RegisterOnNPCPlayingAudio(PlayerMusicBotPair pair, NPCVoiceChatSettings voiceChatSettings)
+        {
+            NPCPlayingAudioEventArgs eventArgs = new NPCPlayingAudioEventArgs(pair, voiceChatSettings);
+            FoundationFortuneAudioEvents.OnNPCPlayingAudio(eventArgs);
         }
     }
 }

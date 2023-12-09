@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CMakeSettings">
+    <configurations>
+      <configuration PROFILE_NAME="Debug" ENABLED="true" CONFIG_NAME="Debug" />
+    </configurations>
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="a08df5d5-7409-4879-85be-d512e896d0b2" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/.name" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/Core/Events/EventArgs/FoundationFortuneAudio/NPCPlayedAudioEventArgs.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/Core/Events/EventArgs/FoundationFortuneAudio/NPCPlayingAudioEventArgs.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/Core/Events/EventArgs/FoundationFortuneAudio/PlayerPlayedAudioEventArgs.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/Core/Events/EventArgs/FoundationFortuneAudio/PlayerPlayingAudioEventArgs.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/Core/Events/Handlers/FoundationFortuneAudioEvents.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/Core/Events/Handlers/FoundationFortuneItemEvents.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/Core/Events/Handlers/FoundationFortuneNPCEvents.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/Core/Models/Classes/Hints/StaticHintEntry.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/Core/Models/Components/NPCs/NPCIndicatorComponent.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/Core/Models/Components/Rubicon.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/API/Core/Patches/Transpilers/NPCGlobalChatIndicator.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/API/Core/AudioPlayer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/API/Features/AudioPlayer.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/API/Core/Database/PlayerDataRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/API/Core/Database/PlayerDataRepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/API/Core/EventHandlers/EXILEDEventHandlers.cs" beforeDir="false" afterPath="$PROJECT_DIR$/API/Core/EventHandlers/EXILEDEventHandlers.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/API/Core/EventHandlers/FoundationFortuneEventHandlers.cs" beforeDir="false" afterPath="$PROJECT_DIR$/API/Core/EventHandlers/FoundationFortuneEventHandlers.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/API/Core/Events/EventArgs/BoughtItemEventArgs.cs" beforeDir="false" afterPath="$PROJECT_DIR$/API/Core/Events/EventArgs/FoundationFortuneItems/BoughtItemEventArgs.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/API/Core/Events/EventArgs/BoughtPerkEventArgs.cs" beforeDir="false" afterPath="$PROJECT_DIR$/API/Core/Events/EventArgs/FoundationFortuneItems/BoughtPerkEventArgs.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/API/Core/Events/EventArgs/SoldItemEventArgs.cs" beforeDir="false" afterPath="$PROJECT_DIR$/API/Core/Events/EventArgs/FoundationFortuneItems/SoldItemEventArgs.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/API/Core/Events/EventArgs/UsedFoundationFortuneNPCEventArgs.cs" beforeDir="false" afterPath="$PROJECT_DIR$/API/Core/Events/EventArgs/FoundationFortuneNPCs/UsedFoundationFortuneNPCEventArgs.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/API/Core/Events/EventArgs/UsedFoundationFortunePerkEventArgs.cs" beforeDir="false" afterPath="$PROJECT_DIR$/API/Core/Events/EventArgs/FoundationFortunePerks/UsedFoundationFortunePerkEventArgs.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/API/Core/Events/EventHelperMethods.cs" beforeDir="false" afterPath="$PROJECT_DIR$/API/Core/Events/EventHelperMethods.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/API/Core/Events/Handlers/FoundationFortuneNPCs.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/API/Core/Events/Handlers/FoundationFortunePerks.cs" beforeDir="false" afterPath="$PROJECT_DIR$/API/Core/Events/Handlers/FoundationFortunePerkEvents.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/API/Core/IndexationMethods.cs" beforeDir="false" afterPath="$PROJECT_DIR$/API/Core/IndexationMethods.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/API/Core/Models/Classes/Hints/HintEntry.cs" beforeDir="false" afterPath="$PROJECT_DIR$/API/Core/Models/Classes/Hints/HintEntry.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/API/Core/Models/Classes/NPCs/NPCVoiceChatSettings.cs" beforeDir="false" afterPath="$PROJECT_DIR$/API/Core/Models/Classes/NPCs/NPCVoiceChatSettings.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/API/Core/Models/Classes/NPCs/PlayerMusicBotPair.cs" beforeDir="false" afterPath="$PROJECT_DIR$/API/Core/Models/Classes/NPCs/PlayerMusicBotPair.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/API/Core/Models/Classes/Player/PlayerData.cs" beforeDir="false" afterPath="$PROJECT_DIR$/API/Core/Models/Classes/Player/PlayerData.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/API/Core/Models/Interfaces/IFoundationFortuneConfig.cs" beforeDir="false" afterPath="$PROJECT_DIR$/API/Core/Models/Interfaces/Configs/IFoundationFortuneConfig.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/API/Core/Models/Interfaces/Perks/IPerk.cs" beforeDir="false" afterPath="$PROJECT_DIR$/API/Core/Models/Interfaces/Perks/IPerk.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/API/Core/Patches/Prefixes/AddTarget.cs" beforeDir="false" afterPath="$PROJECT_DIR$/API/Core/Patches/Prefixes/AddTarget.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/API/Core/Patches/Prefixes/AnnounceScpTerminationPatch.cs" beforeDir="false" afterPath="$PROJECT_DIR$/API/Core/Patches/Prefixes/AnnounceScpTerminationPatch.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/API/Core/Patches/Prefixes/Scp079RecontainPatch.cs" beforeDir="false" afterPath="$PROJECT_DIR$/API/Core/Patches/Prefixes/Scp079RecontainPatch.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/API/Core/Patches/Transpilers/OnFootstepPlayed.cs" beforeDir="false" afterPath="$PROJECT_DIR$/API/Core/Patches/Transpilers/OnFootstepPlayed.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/API/Core/Patches/Transpilers/SCP173UpdateObservers.cs" beforeDir="false" afterPath="$PROJECT_DIR$/API/Core/Patches/Transpilers/SCP173UpdateObservers.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/API/Core/Patches/Transpilers/Update096Target.cs" beforeDir="false" afterPath="$PROJECT_DIR$/API/Core/Patches/Transpilers/Update096Target.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/API/Features/Items/CustomItems/DeathCoin.cs" beforeDir="false" afterPath="$PROJECT_DIR$/API/Features/Items/CustomItems/DeathCoin.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/API/Features/Items/CustomItems/ResurgenceBeacon.cs" beforeDir="false" afterPath="$PROJECT_DIR$/API/Features/Items/CustomItems/ResurgenceBeacon.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/API/Features/Items/PerkItems/PerkBottle.cs" beforeDir="false" afterPath="$PROJECT_DIR$/API/Features/Items/PerkItems/PerkBottle.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/API/Features/NPCs/NPCHelperMethods.cs" beforeDir="false" afterPath="$PROJECT_DIR$/API/Features/NPCs/NPCHelperMethods.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/API/Features/NPCs/NPCInitialization.cs" beforeDir="false" afterPath="$PROJECT_DIR$/API/Features/NPCs/NPCInitialization.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/API/Features/NPCs/NpcTypes/BuyingBot.cs" beforeDir="false" afterPath="$PROJECT_DIR$/API/Features/NPCs/NpcTypes/BuyingBot.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/API/Features/NPCs/NpcTypes/MusicBot.cs" beforeDir="false" afterPath="$PROJECT_DIR$/API/Features/NPCs/NpcTypes/MusicBot.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/API/Features/NPCs/NpcTypes/SellingBot.cs" beforeDir="false" afterPath="$PROJECT_DIR$/API/Features/NPCs/NpcTypes/SellingBot.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/API/Features/Perks/Active/BlissfulUnawareness.cs" beforeDir="false" afterPath="$PROJECT_DIR$/API/Features/Perks/Active/BlissfulUnawareness.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/API/Features/Perks/Active/EthericVitality.cs" beforeDir="false" afterPath="$PROJECT_DIR$/API/Features/Perks/Active/EthericVitality.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/API/Features/Perks/Active/HyperactiveBehavior.cs" beforeDir="false" afterPath="$PROJECT_DIR$/API/Features/Perks/Active/HyperactiveBehavior.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/API/Features/Perks/Passive/EtherealIntervention.cs" beforeDir="false" afterPath="$PROJECT_DIR$/API/Features/Perks/Passive/EtherealIntervention.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/API/Features/Perks/Passive/ViolentImpulses.cs" beforeDir="false" afterPath="$PROJECT_DIR$/API/Features/Perks/Passive/ViolentImpulses.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/API/Features/Systems/HintSystem.cs" beforeDir="false" afterPath="$PROJECT_DIR$/API/Features/Systems/HintSystem.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/API/Features/Systems/PerkSystem.cs" beforeDir="false" afterPath="$PROJECT_DIR$/API/Features/Systems/PerkSystem.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Commands/FortuneAdminCommands/AdminCommands/AddAdmin.cs" beforeDir="false" afterPath="$PROJECT_DIR$/API/Features/Commands/FortuneAdminCommands/AdminCommands/AddAdmin.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Commands/FortuneAdminCommands/AdminCommands/BountyCommands/AddBounty.cs" beforeDir="false" afterPath="$PROJECT_DIR$/API/Features/Commands/FortuneAdminCommands/AdminCommands/BountyCommands/AddBounty.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Commands/FortuneAdminCommands/AdminCommands/BountyCommands/FlushAllBounties.cs" beforeDir="false" afterPath="$PROJECT_DIR$/API/Features/Commands/FortuneAdminCommands/AdminCommands/BountyCommands/FlushAllBounties.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Commands/FortuneAdminCommands/AdminCommands/BountyCommands/RemoveBounty.cs" beforeDir="false" afterPath="$PROJECT_DIR$/API/Features/Commands/FortuneAdminCommands/AdminCommands/BountyCommands/RemoveBounty.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Commands/FortuneAdminCommands/AdminCommands/DatabaseCommands/AddMoney.cs" beforeDir="false" afterPath="$PROJECT_DIR$/API/Features/Commands/FortuneAdminCommands/AdminCommands/DatabaseCommands/AddMoney.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Commands/FortuneAdminCommands/AdminCommands/DatabaseCommands/FlushDatabase.cs" beforeDir="false" afterPath="$PROJECT_DIR$/API/Features/Commands/FortuneAdminCommands/AdminCommands/DatabaseCommands/FlushDatabase.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Commands/FortuneAdminCommands/AdminCommands/DatabaseCommands/RemoveMoney.cs" beforeDir="false" afterPath="$PROJECT_DIR$/API/Features/Commands/FortuneAdminCommands/AdminCommands/DatabaseCommands/RemoveMoney.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Commands/FortuneAdminCommands/AdminCommands/ExtractionCommands/AddExtraction.cs" beforeDir="false" afterPath="$PROJECT_DIR$/API/Features/Commands/FortuneAdminCommands/AdminCommands/ExtractionCommands/AddExtraction.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Commands/FortuneAdminCommands/AdminCommands/ExtractionCommands/RemoveExtraction.cs" beforeDir="false" afterPath="$PROJECT_DIR$/API/Features/Commands/FortuneAdminCommands/AdminCommands/ExtractionCommands/RemoveExtraction.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Commands/FortuneAdminCommands/AdminCommands/RemoveAdmin.cs" beforeDir="false" afterPath="$PROJECT_DIR$/API/Features/Commands/FortuneAdminCommands/AdminCommands/RemoveAdmin.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Commands/FortuneAdminCommands/HintCommands/HintEnqueue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/API/Features/Commands/FortuneAdminCommands/HintCommands/HintEnqueue.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Commands/FortuneAdminCommands/NpcCommands/NpcAdd.cs" beforeDir="false" afterPath="$PROJECT_DIR$/API/Features/Commands/FortuneAdminCommands/NpcCommands/NpcAdd.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Commands/FortuneAdminCommands/NpcCommands/NpcFlush.cs" beforeDir="false" afterPath="$PROJECT_DIR$/API/Features/Commands/FortuneAdminCommands/NpcCommands/NpcFlush.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Commands/FortuneAdminCommands/NpcCommands/NpcList.cs" beforeDir="false" afterPath="$PROJECT_DIR$/API/Features/Commands/FortuneAdminCommands/NpcCommands/NpcList.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Commands/FortuneAdminCommands/NpcCommands/NpcRemove.cs" beforeDir="false" afterPath="$PROJECT_DIR$/API/Features/Commands/FortuneAdminCommands/NpcCommands/NpcRemove.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Commands/FortuneCommands/Buy.cs" beforeDir="false" afterPath="$PROJECT_DIR$/API/Features/Commands/FortuneCommands/Buy.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Commands/FortuneCommands/Level.cs" beforeDir="false" afterPath="$PROJECT_DIR$/API/Features/Commands/FortuneCommands/Level.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Commands/FortuneCommands/Quest.cs" beforeDir="false" afterPath="$PROJECT_DIR$/API/Features/Commands/FortuneCommands/Quest.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Commands/FortuneCommands/Settings.cs" beforeDir="false" afterPath="$PROJECT_DIR$/API/Features/Commands/FortuneCommands/Settings.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Configs/BuyableItemsList.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Configs/BuyableItemsList.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Configs/EXILED/PluginConfigs.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Configs/EXILED/PluginConfigs.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Configs/EXILED/PluginTranslations.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Configs/EXILED/PluginTranslations.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Configs/FoundationFortuneNPCSettings.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Configs/FoundationFortuneNPCSettings.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Configs/MoneyExtractionSystemSettings.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Configs/MoneyExtractionSystemSettings.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Configs/MoneyXPRewards.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Configs/MoneyXPRewards.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Configs/PerkSystemSettings.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Configs/PerkSystemSettings.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Configs/SellableItemsList.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Configs/SellableItemsList.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Configs/VoiceChatSettings.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Configs/VoiceChatSettings.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DirectoryIterator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DirectoryIterator.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FoundationFortune.cs" beforeDir="false" afterPath="$PROJECT_DIR$/FoundationFortune.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FoundationFortune.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/FoundationFortune.csproj" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ClangdSettings">
+    <option name="formatViaClangd" value="false" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProjectId" id="2ZGGlGt24HstDcpadmbgVgeWEfO" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;cf.first.check.clang-format&quot;: &quot;false&quot;,
+    &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="a08df5d5-7409-4879-85be-d512e896d0b2" name="Changes" comment="" />
+      <created>1702041152461</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1702041152461</updated>
+      <workItem from="1702041155620" duration="10000" />
+      <workItem from="1702083752668" duration="31000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>

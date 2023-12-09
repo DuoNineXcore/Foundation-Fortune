@@ -3,6 +3,7 @@ using System.ComponentModel;
 using Exiled.API.Enums;
 using FoundationFortune.API.Core.Models.Classes.NPCs;
 using FoundationFortune.API.Core.Models.Interfaces;
+using FoundationFortune.API.Core.Models.Interfaces.Configs;
 using PlayerRoles;
 using UnityEngine;
 using YamlDotNet.Serialization;

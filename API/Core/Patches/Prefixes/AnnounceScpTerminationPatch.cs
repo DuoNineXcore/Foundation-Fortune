@@ -9,6 +9,6 @@ internal static class TerminationPatch
     private static bool Prefix(ReferenceHub scp)
     {
         if (scp == null) return false;
-        return !NpcHelperMethods.IsFoundationFortuneNpc(scp);
+        return !NPCHelperMethods.IsFoundationFortuneNpc(scp);
     }
 }

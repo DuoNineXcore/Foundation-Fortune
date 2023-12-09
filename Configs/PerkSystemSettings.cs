@@ -2,6 +2,7 @@
 using Exiled.API.Enums;
 using FoundationFortune.API.Core.Models.Enums.Systems.PerkSystem;
 using FoundationFortune.API.Core.Models.Interfaces;
+using FoundationFortune.API.Core.Models.Interfaces.Configs;
 using YamlDotNet.Serialization;
 
 namespace FoundationFortune.Configs

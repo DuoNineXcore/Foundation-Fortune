@@ -5,12 +5,9 @@ using HarmonyLib;
 using LiteDB;
 using SCPSLAudioApi;
 using System;
-using System.Collections.Generic;
 using FoundationFortune.API.Core;
 using FoundationFortune.API.Core.EventHandlers;
 using FoundationFortune.API.Core.Events.Handlers;
-using FoundationFortune.API.Core.Models.Classes.Items;
-using FoundationFortune.API.Core.Models.Classes.NPCs;
 using FoundationFortune.API.Features.Systems;
 using FoundationFortune.Configs.EXILED;
 
@@ -33,19 +30,15 @@ namespace FoundationFortune
 		public static VoiceChatSettings VoiceChatSettings;
 		public static MoneyXPRewards MoneyXPRewards;
 		public static FoundationFortuneNpcSettings FoundationFortuneNpcSettings; 
-	
-		private Harmony _harmony;
-		public FoundationFortuneEventHandlers FoundationFortuneEventHandlers = new();
-		public ExiledEventHandlers ExiledEventHandlers = new();
 		
 		public static FoundationFortune Instance;
-		public static List<ObjectInteractions> PlayerPurchaseLimits = new();
+		
+		public FoundationFortuneEventHandlers FoundationFortuneEventHandlers = new();
+		public ExiledEventHandlers ExiledEventHandlers = new();
 		public LiteDatabase DB;
 		public HintSystem HintSystem = new();
 
-		public Dictionary<string, (Npc bot, int indexation)> BuyingBots = new();
-		public Dictionary<string, (Npc bot, int indexation)> SellingBots = new();
-		public List<PlayerMusicBotPair> MusicBotPairs { get; private set; } = new();
+		private Harmony _harmony;
 
 		public override void OnEnabled()
 		{
@@ -110,11 +103,11 @@ namespace FoundationFortune
 			Exiled.Events.Handlers.Scp049.ActivatingSense += ExiledEventHandlers.FuckYourAbility;
 			Exiled.Events.Handlers.Scp0492.TriggeringBloodlust += ExiledEventHandlers.FuckYourOtherAbility;
 
-			FoundationFortuneNPCs.SoldItem += FoundationFortuneEventHandlers.SoldItem;
-			FoundationFortuneNPCs.BoughtItem += FoundationFortuneEventHandlers.BoughtItem;
-			FoundationFortuneNPCs.BoughtPerk += FoundationFortuneEventHandlers.BoughtPerk;
-			FoundationFortuneNPCs.UsedFoundationFortuneNpc += FoundationFortuneEventHandlers.UsedFoundationFortuneNpc;
-			FoundationFortunePerks.UsedFoundationFortunePerk += FoundationFortuneEventHandlers.UsedFoundationFortunePerk;
+			FoundationFortuneItemEvents.SoldItem += FoundationFortuneEventHandlers.SoldItem;
+			FoundationFortuneItemEvents.BoughtItem += FoundationFortuneEventHandlers.BoughtItem;
+			FoundationFortuneItemEvents.BoughtPerk += FoundationFortuneEventHandlers.BoughtPerk;
+			FoundationFortuneNPCEvents.UsedFoundationFortuneNpc += FoundationFortuneEventHandlers.UsedFoundationFortuneNpc;
+			FoundationFortunePerkEvents.UsedFoundationFortunePerk += FoundationFortuneEventHandlers.UsedFoundationFortunePerk;
 		}
 
 		private void UnregisterEvents()
@@ -138,11 +131,11 @@ namespace FoundationFortune
 			Exiled.Events.Handlers.Scp049.ActivatingSense -= ExiledEventHandlers.FuckYourAbility;
 			Exiled.Events.Handlers.Scp0492.TriggeringBloodlust -= ExiledEventHandlers.FuckYourOtherAbility;
 
-			FoundationFortuneNPCs.SoldItem -= FoundationFortuneEventHandlers.SoldItem;
-			FoundationFortuneNPCs.BoughtItem -= FoundationFortuneEventHandlers.BoughtItem;
-			FoundationFortuneNPCs.BoughtPerk -= FoundationFortuneEventHandlers.BoughtPerk;
-			FoundationFortuneNPCs.UsedFoundationFortuneNpc -= FoundationFortuneEventHandlers.UsedFoundationFortuneNpc;
-			FoundationFortunePerks.UsedFoundationFortunePerk -= FoundationFortuneEventHandlers.UsedFoundationFortunePerk;
+			FoundationFortuneItemEvents.SoldItem -= FoundationFortuneEventHandlers.SoldItem;
+			FoundationFortuneItemEvents.BoughtItem -= FoundationFortuneEventHandlers.BoughtItem;
+			FoundationFortuneItemEvents.BoughtPerk -= FoundationFortuneEventHandlers.BoughtPerk;
+			FoundationFortuneNPCEvents.UsedFoundationFortuneNpc -= FoundationFortuneEventHandlers.UsedFoundationFortuneNpc;
+			FoundationFortunePerkEvents.UsedFoundationFortunePerk -= FoundationFortuneEventHandlers.UsedFoundationFortunePerk;
 		}
 	}
 }

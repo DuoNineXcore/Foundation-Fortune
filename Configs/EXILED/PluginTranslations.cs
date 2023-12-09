@@ -29,7 +29,7 @@ namespace FoundationFortune.Configs.EXILED
 		public string WrongBot { get; set; } = "<b><color=red>Wrong Bot.</color></b>";
 		public string SaleCancelled { get; set; } = "<b><color=red>Item changed. Sale canceled.</color></b>";
 		public string ItemConfirmation { get; set; } = "<b>This item is worth <color=green>%price%</color>, Confirm sale? (%time% seconds left)</b></align>";
-		public string ConfirmPerkActivation { get; set; } = "<b>You are about to enable <color=#FFA500>%perkType%</color>'s ability. Proceed? (%time% seconds left)</b></align>";
+		public string ConfirmPerkActivation { get; set; } = "<b>You are about to enable <color=#FFA500>%perkAlias%</color>'s ability. Proceed? (%time% seconds left)</b></align>";
 		public string BuyItemSuccess { get; set; } = "<b><color=#FFA500>+%xpReward% (%multiplier%) EXP</color> <color=red>-$%itemPrice%</color> Bought Item: %itemAlias%.</b>";
 		public string BuyPerkSuccess { get; set; } = "<b><color=#FFA500>+%xpReward% (%multiplier%) EXP</color> <color=red>-$%perkPrice%</color> Bought Perk: %perkAlias%.</b>";
 		public string SellItemSuccess { get; set; } = "<b><color=#FFA500>+%xpReward% (%multiplier%) EXP</color> <color=green>+%price%$</color> Sold %itemName%.</b>";
@@ -67,7 +67,7 @@ namespace FoundationFortune.Configs.EXILED
 		public string SteamIDRemoveMoney { get; set; } = "<b><color=red>-$%amount%.</color> Admin Command.</b>";
 
 		[Description("Perk bottles")]
-		public string DrankPerkBottle { get; set; } = "<b><color=#FFA500>+%xpReward% (%multiplier%) EXP</color> You drank a Perk bottle. [<color=#FFC0CB>%type%</color>]</b>";
-		public string HoldingPerkBottle { get; set; } = "<b>You are holding a Perk bottle. [<color=#FFC0CB>%type%</color>]</b>";
+		public string DrankPerkBottle { get; set; } = "<b><color=#FFA500>+%xpReward% (%multiplier%) EXP</color> You drank a Perk bottle. [<color=#FFC0CB>%alias%</color>]</b>";
+		public string HoldingPerkBottle { get; set; } = "<b>You are holding a Perk bottle. [<color=#FFC0CB>%alias%</color>]</b>";
 	}
 }

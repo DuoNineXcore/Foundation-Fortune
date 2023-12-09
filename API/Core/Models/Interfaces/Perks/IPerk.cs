@@ -5,5 +5,6 @@ namespace FoundationFortune.API.Core.Models.Interfaces.Perks
     public interface IPerk
     {
         PerkType PerkType { get; }
+        string Alias { get; }
     }
 }

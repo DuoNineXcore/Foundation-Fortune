@@ -22,10 +22,10 @@ internal static class UpdateTarget
         newInstructions.InsertRange(0, new List<CodeInstruction>()
         {
             new CodeInstruction(OpCodes.Ldarg_1),
-            new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(NpcHelperMethods), nameof(NpcHelperMethods.IsFoundationFortuneNpc), new[] { typeof(ReferenceHub) })),
+            new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(NPCHelperMethods), nameof(NPCHelperMethods.IsFoundationFortuneNpc), new[] { typeof(ReferenceHub) })),
             new CodeInstruction(OpCodes.Brtrue_S, skip),
             new CodeInstruction(OpCodes.Ldarg_0),
-            new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(NpcHelperMethods), nameof(NpcHelperMethods.IsFoundationFortuneNpc), new[] { typeof(Scp096TargetsTracker) })),
+            new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(NPCHelperMethods), nameof(NPCHelperMethods.IsFoundationFortuneNpc), new[] { typeof(Scp096TargetsTracker) })),
             new CodeInstruction(OpCodes.Brtrue_S, skip),
         });
 

@@ -24,10 +24,10 @@ internal static class UpdateObservers
         newInstructions.InsertRange(index, new List<CodeInstruction>()
         {
             new CodeInstruction(OpCodes.Ldloc_3),
-            new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(NpcHelperMethods), nameof(NpcHelperMethods.IsFoundationFortuneNpc), new[] { typeof(ReferenceHub) })),
+            new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(NPCHelperMethods), nameof(NPCHelperMethods.IsFoundationFortuneNpc), new[] { typeof(ReferenceHub) })),
             new CodeInstruction(OpCodes.Brtrue_S, skip),
             new CodeInstruction(OpCodes.Ldarg_0),
-            new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(NpcHelperMethods), nameof(NpcHelperMethods.IsFoundationFortuneNpc), new[] { typeof(Scp173ObserversTracker) })),
+            new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(NPCHelperMethods), nameof(NPCHelperMethods.IsFoundationFortuneNpc), new[] { typeof(Scp173ObserversTracker) })),
             new CodeInstruction(OpCodes.Brtrue_S, skip),
         });
 

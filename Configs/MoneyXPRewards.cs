@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using FoundationFortune.API.Core.Models.Enums.Player;
 using FoundationFortune.API.Core.Models.Interfaces;
+using FoundationFortune.API.Core.Models.Interfaces.Configs;
 using YamlDotNet.Serialization;
 
 namespace FoundationFortune.Configs

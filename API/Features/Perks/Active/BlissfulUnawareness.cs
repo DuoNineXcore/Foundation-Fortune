@@ -76,5 +76,6 @@ namespace FoundationFortune.API.Features.Perks.Active
         }
 
         public PerkType PerkType { get; } = PerkType.BlissfulUnawareness;
+        public string Alias { get; } = "Blissful Unawareness";
     }
 }

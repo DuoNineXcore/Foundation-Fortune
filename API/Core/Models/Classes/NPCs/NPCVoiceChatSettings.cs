@@ -3,7 +3,7 @@ using VoiceChat;
 
 namespace FoundationFortune.API.Core.Models.Classes.NPCs
 {
-    public class NpcVoiceChatSettings
+    public class NPCVoiceChatSettings
     {
         public VoiceChatChannel VoiceChat { get; set; }
         public byte Volume { get; set; }

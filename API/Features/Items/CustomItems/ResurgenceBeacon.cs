@@ -58,7 +58,7 @@ namespace FoundationFortune.API.Features.Items.CustomItems
             var targetToRevive = Player.Get(targetName);
             if (targetToRevive is not { IsDead: true })
             {
-                FoundationFortune.Instance.HintSystem.EnqueueHint(reviver, FoundationFortune.Instance.Translation.RevivalNoDeadPlayer.Replace("%targetName%", targetName));
+                FoundationFortune.Instance.HintSystem.BroadcastHint(reviver, FoundationFortune.Instance.Translation.RevivalNoDeadPlayer.Replace("%targetName%", targetName));
                 return;
             }
 
@@ -72,7 +72,7 @@ namespace FoundationFortune.API.Features.Items.CustomItems
             
             foreach (var ply in Player.List.Where(p => !p.IsNPC))
             {
-                FoundationFortune.Instance.HintSystem.EnqueueHint(ply, FoundationFortune.Instance.Translation.RevivalSuccess
+                FoundationFortune.Instance.HintSystem.BroadcastHint(ply, FoundationFortune.Instance.Translation.RevivalSuccess
                     .Replace("%rolecolor%", reviver.Role.Color.ToHex())
                     .Replace("%nickname%", reviver.Nickname)
                     .Replace("%target%", targetToRevive.Nickname));

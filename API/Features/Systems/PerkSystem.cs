@@ -36,7 +36,7 @@ namespace FoundationFortune.API.Features.Systems
 
             hintMessage.Append($"{FoundationFortune.Instance.Translation.ConfirmPerkActivation
                 .Replace("%time%", FoundationFortune.Instance.HintSystem.GetPerkActivationTimeLeft(ply))}")
-                .Replace("%perkType%", activePerks.FirstOrDefault().Key.PerkType.ToString());
+                .Replace("%perkAlias%", activePerks.FirstOrDefault().Key.Alias);
         }
 
         public static void ClearConsumedPerks(Player player)

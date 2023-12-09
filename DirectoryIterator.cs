@@ -9,6 +9,7 @@ using Discord;
 using Exiled.API.Features;
 using FoundationFortune.API.Core.Models.Classes.Player;
 using FoundationFortune.API.Core.Models.Interfaces;
+using FoundationFortune.API.Core.Models.Interfaces.Configs;
 using FoundationFortune.API.Core.YamlConverters;
 using LiteDB;
 using MEC;
