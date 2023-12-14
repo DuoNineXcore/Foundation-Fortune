@@ -1,18 +1,18 @@
 ﻿using System;
 using Random = UnityEngine.Random;
 
-namespace FoundationFortune
+namespace FoundationFortune;
+
+/// <summary>
+/// the wall
+/// </summary>
+public static class WelcomeText
 {
-    /// <summary>
-    /// the wall
-    /// </summary>
-    public static class WelcomeText
+    public static void PrintMessage()
     {
-        public static void PrintMessage()
-        {
-            int randomNumber = Random.Range(1, 100001);
-            DirectoryIterator.Log(randomNumber == 1
-                    ? @" 
+        int randomNumber = Random.Range(1, 100001);
+        DirectoryIterator.Log(randomNumber == 1
+                ? @" 
             [Verse 1]
             What's with these homies dissin' my girl?
             Why do they gotta front?
@@ -74,7 +74,7 @@ namespace FoundationFortune
             I don't care 'bout that
 
 	   Welcome to Foundation Fortune lol"
-                    : @"
+                : @"
 Welcome To   
   
                                                                                                                            *%%%%%%%%*               
@@ -94,7 +94,6 @@ Welcome To
 Lead Dev: DuoNineXcore
 Devs: Nameless      
        "
-                , ConsoleColor.DarkYellow);
-        }  
-    }
+            , ConsoleColor.DarkYellow);
+    }  
 }

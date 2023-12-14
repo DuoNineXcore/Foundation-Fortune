@@ -1,20 +1,13 @@
-﻿using System.Collections.Generic;
-using Exiled.API.Features;
-using FoundationFortune.API.Core.Models.Enums.Systems.PerkSystem;
-using FoundationFortune.API.Core.Models.Interfaces.Perks;
+﻿using Exiled.API.Features;
+using FoundationFortune.API.Common.Enums.Systems.PerkSystem;
+using FoundationFortune.API.Common.Interfaces.Perks;
+using FoundationFortune.API.Core.Systems;
 
-namespace FoundationFortune.API.Features.Perks.Passive
+namespace FoundationFortune.API.Features.Perks.Passive;
+
+public class EtherealIntervention : IPassivePerk
 {
-    public class EtherealIntervention : IPassivePerk
-    {
-        public static readonly List<Player> EtherealInterventionPlayers = new();
-
-        public void ApplyPassiveEffect(Player player)
-        {
-            EtherealInterventionPlayers.Add(player);
-        }
-
-        public PerkType PerkType { get; } = PerkType.EtherealIntervention;
-        public string Alias { get; } = "Ethereal Intervention";
-    }
+    public void ApplyPassiveEffect(Player player) => PerkSystem.PerkPlayers[PerkType.EtherealIntervention].Add(player);
+    public PerkType PerkType { get; } = PerkType.EtherealIntervention;
+    public string Alias { get; } = "Ethereal Intervention";
 }

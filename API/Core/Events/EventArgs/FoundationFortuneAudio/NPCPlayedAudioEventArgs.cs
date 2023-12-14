@@ -1,5 +1,5 @@
 ﻿using Exiled.Events.EventArgs.Interfaces;
-using FoundationFortune.API.Core.Models.Classes.NPCs;
+using FoundationFortune.API.Common.Models.NPCs;
 
 namespace FoundationFortune.API.Core.Events.EventArgs.FoundationFortuneAudio;
 
