@@ -14,7 +14,7 @@ public static class SellingWorkstations
 
     public static void Start()
     {
-        DirectoryIterator.Log($"Initializing Selling Workstations.", LogLevel.Debug);
+        DirectoryIterator.Log("Initializing Selling Workstations.", LogLevel.Debug);
         if (!FoundationFortune.SellableItemsList.UseSellingWorkstation)
         {
             DirectoryIterator.Log("no workstations they're turned off nvm", LogLevel.Debug);

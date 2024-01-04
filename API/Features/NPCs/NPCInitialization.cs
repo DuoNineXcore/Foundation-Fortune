@@ -5,7 +5,7 @@ using Discord;
 using Exiled.API.Enums;
 using Exiled.API.Features;
 using Exiled.API.Features.Doors;
-using FoundationFortune.API.Common.Models.NPCs;
+using FoundationFortune.API.Core.Common.Models.NPCs;
 using FoundationFortune.API.Features.NPCs.NpcTypes;
 using MEC;
 using UnityEngine;
@@ -24,11 +24,11 @@ public static class NPCInitialization
     {
         try
         {
-            DirectoryIterator.Log($"Initializing Foundation Fortune NPCs.", LogLevel.Debug);
+            DirectoryIterator.Log("Initializing Foundation Fortune NPCs.", LogLevel.Debug);
             if (!FoundationFortune.FoundationFortuneNpcSettings.BuyingBots) DirectoryIterator.Log("Buying bots are turned off", LogLevel.Debug);
             else
             {
-                DirectoryIterator.Log($"Initializing Buying Bot NPCs.", LogLevel.Debug);
+                DirectoryIterator.Log("Initializing Buying Bot NPCs.", LogLevel.Debug);
                 foreach (BuyingBotSpawn spawn in FoundationFortune.FoundationFortuneNpcSettings.BuyingBotSpawnSettings)
                 {
                     DirectoryIterator.Log($"Spawning Bot: {spawn.Name}", LogLevel.Debug);
@@ -88,15 +88,15 @@ public static class NPCInitialization
                                 DirectoryIterator.Log($"Teleported Buying Bot to room {roomType}, Pos: {bot.Position}, Rot: {bot.Rotation}", LogLevel.Debug);
                             });
                         }
-                        else DirectoryIterator.Log($"No available rooms for Buying Bots.", LogLevel.Error);
+                        else DirectoryIterator.Log("No available rooms for Buying Bots.", LogLevel.Error);
                     }
                 }
             }
 
-            if (!FoundationFortune.FoundationFortuneNpcSettings.SellingBots) DirectoryIterator.Log($"Selling bots are turned off", LogLevel.Debug);
+            if (!FoundationFortune.FoundationFortuneNpcSettings.SellingBots) DirectoryIterator.Log("Selling bots are turned off", LogLevel.Debug);
             else
             {
-                DirectoryIterator.Log($"Initializing Selling Bot NPCs.", LogLevel.Debug);
+                DirectoryIterator.Log("Initializing Selling Bot NPCs.", LogLevel.Debug);
                 SellingBotPositions.Clear();
                 foreach (SellingBotSpawn spawn in FoundationFortune.FoundationFortuneNpcSettings.SellingBotSpawnSettings)
                 {
@@ -106,7 +106,7 @@ public static class NPCInitialization
 
                 if (FoundationFortune.FoundationFortuneNpcSettings.SellingBotFixedLocation)
                 {
-                    DirectoryIterator.Log($"Bots spawned.", LogLevel.Info);
+                    DirectoryIterator.Log("Bots spawned.", LogLevel.Info);
                     var rooms = FoundationFortune.FoundationFortuneNpcSettings.SellingBotSpawnSettings.Select(location => location.Room).ToList();
 
                     foreach (var kvp in SellingBots)
@@ -158,7 +158,7 @@ public static class NPCInitialization
                                 DirectoryIterator.Log($"Teleported Selling Bot to room {roomType}, Pos: {bot.Position}, Rot: {bot.Rotation}", LogLevel.Debug);
                             });
                         }
-                        else DirectoryIterator.Log($"No available rooms for Selling Bots.", LogLevel.Error);
+                        else DirectoryIterator.Log("No available rooms for Selling Bots.", LogLevel.Error);
                     }
                 }
             }

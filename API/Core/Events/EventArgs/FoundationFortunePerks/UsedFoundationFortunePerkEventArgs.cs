@@ -1,7 +1,7 @@
 ﻿using Exiled.API.Features;
 using Exiled.API.Features.Items;
 using Exiled.Events.EventArgs.Interfaces;
-using FoundationFortune.API.Common.Interfaces.Perks;
+using FoundationFortune.API.Core.Common.Interfaces.Perks;
 
 namespace FoundationFortune.API.Core.Events.EventArgs.FoundationFortunePerks;
 

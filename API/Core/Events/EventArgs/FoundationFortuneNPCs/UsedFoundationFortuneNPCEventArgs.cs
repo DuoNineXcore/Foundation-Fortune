@@ -1,6 +1,6 @@
 ﻿using Exiled.API.Features;
 using Exiled.Events.EventArgs.Interfaces;
-using FoundationFortune.API.Common.Enums.NPCs;
+using FoundationFortune.API.Core.Common.Enums.NPCs;
 
 namespace FoundationFortune.API.Core.Events.EventArgs.FoundationFortuneNPCs;
 

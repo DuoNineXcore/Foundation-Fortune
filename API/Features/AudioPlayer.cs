@@ -2,10 +2,10 @@
 using System.Linq;
 using Exiled.API.Enums;
 using Exiled.API.Features;
-using FoundationFortune.API.Common.Enums.NPCs;
-using FoundationFortune.API.Common.Enums.Player;
-using FoundationFortune.API.Common.Models.NPCs;
-using FoundationFortune.API.Common.Models.Player;
+using FoundationFortune.API.Core.Common.Enums.NPCs;
+using FoundationFortune.API.Core.Common.Enums.Player;
+using FoundationFortune.API.Core.Common.Models.NPCs;
+using FoundationFortune.API.Core.Common.Models.Player;
 using FoundationFortune.API.Features.NPCs.NpcTypes;
 using MEC;
 using PlayerRoles;
@@ -14,7 +14,6 @@ using VoiceChat;
 
 namespace FoundationFortune.API.Features;
 
-//this can be used by another plugin if it references ff (why though)
 public static class AudioPlayer
 {
     public static void PlayAudio(Npc ply, string audioFile, byte volume, bool loop, VoiceChatChannel channel)

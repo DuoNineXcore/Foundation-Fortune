@@ -1,6 +1,6 @@
 ﻿using Exiled.API.Features;
 using Exiled.Events.EventArgs.Interfaces;
-using FoundationFortune.API.Common.Models.Player;
+using FoundationFortune.API.Core.Common.Models.Player;
 
 namespace FoundationFortune.API.Core.Events.EventArgs.FoundationFortuneAudio;
 

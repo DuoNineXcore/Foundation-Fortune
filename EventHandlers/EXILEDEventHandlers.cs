@@ -4,7 +4,6 @@ using System.Globalization;
 using System.Linq;
 using Discord;
 using Exiled.API.Enums;
-using Exiled.API.Extensions;
 using Exiled.API.Features;
 using Exiled.API.Features.Items;
 using Exiled.Events.EventArgs.Player;
@@ -13,15 +12,15 @@ using Exiled.Events.EventArgs.Scp0492;
 using Exiled.Events.EventArgs.Scp096;
 using Exiled.Events.EventArgs.Scp173;
 using Exiled.Events.EventArgs.Server;
-using FoundationFortune.API.Common.Enums.NPCs;
-using FoundationFortune.API.Common.Enums.Player;
-using FoundationFortune.API.Common.Enums.Systems.HintSystem;
-using FoundationFortune.API.Common.Enums.Systems.PerkSystem;
-using FoundationFortune.API.Common.Enums.Systems.QuestSystem;
-using FoundationFortune.API.Common.Interfaces.Perks;
-using FoundationFortune.API.Common.Models.Items;
-using FoundationFortune.API.Common.Models.Player;
 using FoundationFortune.API.Core;
+using FoundationFortune.API.Core.Common.Enums.NPCs;
+using FoundationFortune.API.Core.Common.Enums.Player;
+using FoundationFortune.API.Core.Common.Enums.Systems.HintSystem;
+using FoundationFortune.API.Core.Common.Enums.Systems.PerkSystem;
+using FoundationFortune.API.Core.Common.Enums.Systems.QuestSystem;
+using FoundationFortune.API.Core.Common.Interfaces.Perks;
+using FoundationFortune.API.Core.Common.Models.Databases;
+using FoundationFortune.API.Core.Common.Models.Items;
 using FoundationFortune.API.Core.Database;
 using FoundationFortune.API.Core.Events;
 using FoundationFortune.API.Core.Systems;
@@ -29,11 +28,9 @@ using FoundationFortune.API.Features;
 using FoundationFortune.API.Features.Items.World;
 using FoundationFortune.API.Features.NPCs;
 using FoundationFortune.API.Features.NPCs.NpcTypes;
-using FoundationFortune.API.Features.Perks;
 using MEC;
 using PlayerRoles;
 using PlayerStatsSystem;
-using UnityEngine;
 using Random = UnityEngine.Random;
 
 namespace FoundationFortune.EventHandlers;
@@ -56,13 +53,14 @@ public class ExiledEventHandlers
 	#region EXILED Events
 	public void RoundStart()
 	{
-		if (FoundationFortune.FoundationFortuneNpcSettings.FoundationFortuneNpCs) NPCInitialization.Start();
+		if (FoundationFortune.FoundationFortuneNpcSettings.FoundationFortuneNPCs) NPCInitialization.Start();
 		if (FoundationFortune.SellableItemsList.UseSellingWorkstation) SellingWorkstations.Start();
 		
 		CoroutineManager.StopAllCoroutines();
 		CoroutineManager.Coroutines.Add(Timing.RunCoroutine(FoundationFortune.Instance.HintSystem.HintSystemCoroutine()));
 		CoroutineManager.Coroutines.Add(Timing.RunCoroutine(NPCHelperMethods.UpdateNpcDirection()));
-
+		QuestRotationRepository.IncrementQuestRotationNumber();
+		
 		if (!FoundationFortune.MoneyExtractionSystemSettings.MoneyExtractionSystem) return;
 		int extractionTime = Random.Range(FoundationFortune.MoneyExtractionSystemSettings.MinExtractionPointGenerationTime, FoundationFortune.MoneyExtractionSystemSettings.MaxExtractionPointGenerationTime + 1);
 		Timing.CallDelayed(extractionTime, ExtractionSystem.StartExtractionEvent);
@@ -72,18 +70,31 @@ public class ExiledEventHandlers
 	public void RegisterInDatabase(VerifiedEventArgs ev)
 	{
 		if (NPCHelperMethods.MusicBotPairs.All(pair => pair.Player.UserId != ev.Player.UserId) && !ev.Player.IsNPC) MusicBot.SpawnMusicBot(ev.Player);
-		if (!ev.Player.IsNPC) QuestRotation.GetShuffledQuestsForUser(ev.Player.UserId);
-		var existingPlayer = PlayerDataRepository.GetPlayerById(ev.Player.UserId);
-		if (existingPlayer == null && !ev.Player.IsNPC)
+		if (!ev.Player.IsNPC) QuestRotationRepository.GetShuffledQuestsForUser(ev.Player.UserId);
+
+		var existingPlayerStats = PlayerStatsRepository.GetPlayerById(ev.Player.UserId);
+		var existingPlayerSettings = PlayerSettingsRepository.GetPlayerById(ev.Player.UserId);
+
+		if (existingPlayerStats == null && !ev.Player.IsNPC)
 		{
-			var newPlayer = new PlayerData
+			var newPlayerStats = new API.Core.Common.Models.Databases.PlayerStats
 			{
 				UserId = ev.Player.UserId,
 				MoneyOnHold = 0,
 				MoneySaved = 0,
 				Exp = 0,
 				Level = 0,
-				PrestigeLevel = 0,
+				PrestigeLevel = 0
+			};
+
+			PlayerStatsRepository.InsertPlayer(newPlayerStats);
+		}
+
+		if (existingPlayerSettings == null && !ev.Player.IsNPC)
+		{
+			var newPlayerSettings = new PlayerSettings
+			{
+				UserId = ev.Player.UserId,
 				HintAgeSeconds = 5,
 				SellingConfirmationTime = 5,
 				ActiveAbilityActivationTime = 5,
@@ -94,7 +105,8 @@ public class ExiledEventHandlers
 				HintSize = 20,
 				HintAlign = HintAlign.Center
 			};
-			PlayerDataRepository.InsertPlayer(newPlayer);
+
+			PlayerSettingsRepository.InsertPlayer(newPlayerSettings);
 		}
 	}
 
@@ -102,7 +114,6 @@ public class ExiledEventHandlers
 	{
 		AudioPlayer.StopAudio(ev.Player);
 		var bountiedPlayer = BountySystem.BountiedPlayers.FirstOrDefault(bounty => bounty.Player == ev.Player && bounty.IsBountied);
-
 		if (bountiedPlayer != null && ev.Attacker != null)
 		{
 			foreach (Player ply in Player.List.Where(p => p != ev.Attacker && !p.IsDead))
@@ -123,7 +134,7 @@ public class ExiledEventHandlers
 					.Replace("%bountyPrice%", bountiedPlayer.Value.ToString());
 
 				FoundationFortune.Instance.HintSystem.BroadcastHint(ev.Attacker, killHint);
-				PlayerDataRepository.ModifyMoney(ev.Attacker.UserId, bountiedPlayer.Value, false, true, false);
+				PlayerStatsRepository.ModifyMoney(ev.Attacker.UserId, bountiedPlayer.Value, false, true, false);
 			}
 
 			BountySystem.StopBounty(ev.Player);
@@ -138,42 +149,34 @@ public class ExiledEventHandlers
 			BountySystem.StopBounty(ev.Player);
 		}
 		
-		if (PerkSystem.HasPerk(ev.Player, PerkType.EtherealIntervention))
+		if (!PerkSystem.ConsumedPerks.TryGetValue(ev.Player, out var playerPerks)) return;
+		var perksToRemove = new List<IPerk>();
+		foreach (var perk in playerPerks.Keys)
 		{
-			ev.IsAllowed = false;
-			RoleTypeId role = ev.Player.Role.Type;
-			Room room = Room.List.Where(r => r.Zone == ev.Player.Zone & !FoundationFortune.PerkSystemSettings.ForbiddenEtherealInterventionRoomTypes.Contains(r.Type)).GetRandomValue();
-			QuestSystem.UpdateQuestProgress(ev.Player, QuestType.UseEtherealIntervention, 1);
-
-			Timing.CallDelayed(0.1f, delegate
+			switch (perk.PerkType)
 			{
-				ev.Player.Role.Set(role, SpawnReason.None, RoleSpawnFlags.None);
-				ev.Player.Teleport(room);
-			});
+				case PerkType.GracefulSaint:
+					if (playerPerks.ContainsKey(PerkType.BlissfulAgony.ToPerk()))
+					{
+						perksToRemove.Add(PerkType.BlissfulAgony.ToPerk());
+						DirectoryIterator.Log($"Removed Blissful Agony due to Ethereal Intervention for player {ev.Player.Nickname}.", LogLevel.Info);
+					}
+					break;
+				default:
+					perksToRemove.Add(perk);
+					break;
+			}
 		}
-	}
 
-	public void EtherealInterventionSpawn(SpawnedEventArgs ev)
-	{
-		if (PerkSystem.HasPerk(ev.Player, PerkType.EtherealIntervention) && ev.Reason == SpawnReason.None)
+		foreach (var perkToRemove in perksToRemove)
 		{
-			IPerk etherealInterventionPerk = PerkType.EtherealIntervention.ToPerk();
-			IPerk blissfulAgonyPerk = PerkType.BlissfulAgony.ToPerk();
-		
-			if (PerkSystem.HasPerk(ev.Player, PerkType.BlissfulAgony)) PerkSystem.RemovePerk(ev.Player, blissfulAgonyPerk);
-
-			Timing.CallDelayed(0.2f, () =>
-			{
-				var etherealInterventionAudio = AudioPlayer.GetVoiceChatSettings(PlayerVoiceChatUsageType.EtherealIntervention);
-				PerkSystem.RemovePerk(ev.Player, etherealInterventionPerk);
-				if (etherealInterventionAudio != null) AudioPlayer.PlayTo(ev.Player, etherealInterventionAudio.AudioFile, etherealInterventionAudio.Volume, etherealInterventionAudio.Loop, true);
-			});
+			PerkSystem.RemovePerk(ev.Player, perkToRemove);
+			DirectoryIterator.Log($"Removed perk {perkToRemove.Alias} for player {ev.Player.Nickname}. they died lol.", LogLevel.Info);
 		}
 	}
 
 	public void KillingReward(DiedEventArgs ev)
 	{
-		PerkSystem.ClearConsumedPerks(ev.Player);
 		if (PerkSystem.HasPerk(ev.Attacker, PerkType.ViolentImpulses)) ev.Attacker.ReferenceHub.playerStats.GetModule<AhpStat>().ServerAddProcess(15f).DecayRate = 2.0f;
 
 		QuestSystem.UpdateQuestProgress(ev.Attacker, QuestType.GetAKillstreak, 1);
@@ -186,10 +189,10 @@ public class ExiledEventHandlers
 				.Replace("%attacker%", ev.Attacker.Nickname)
 				.Replace("%killMoneyReward%", FoundationFortune.MoneyXPRewards.KillEventMoneyRewards.ToString())
 				.Replace("%killXPReward%", FoundationFortune.MoneyXPRewards.KillEventXpRewards.ToString())
-				.Replace("%multiplier%", PlayerDataRepository.GetPrestigeMultiplier(ev.Player.UserId).ToString(CultureInfo.InvariantCulture));
+				.Replace("%multiplier%", PlayerStatsRepository.GetPrestigeMultiplier(ev.Player.UserId).ToString(CultureInfo.InvariantCulture));
 			
-			PlayerDataRepository.ModifyMoney(ev.Attacker.UserId, FoundationFortune.MoneyXPRewards.KillEventMoneyRewards, false, true, false);
-			PlayerDataRepository.SetExperience(ev.Attacker.UserId, FoundationFortune.MoneyXPRewards.KillEventXpRewards);
+			PlayerStatsRepository.ModifyMoney(ev.Attacker.UserId, FoundationFortune.MoneyXPRewards.KillEventMoneyRewards, false, true, false);
+			PlayerStatsRepository.SetExperience(ev.Attacker.UserId, FoundationFortune.MoneyXPRewards.KillEventXpRewards);
 			FoundationFortune.Instance.HintSystem.BroadcastHint(ev.Attacker, killHint);
 		}
 	}
@@ -202,42 +205,30 @@ public class ExiledEventHandlers
 			var escapeHint = FoundationFortune.Instance.Translation.Escape
 				.Replace("%escapeMoneyReward%", FoundationFortune.MoneyXPRewards.KillEventMoneyRewards.ToString())
 				.Replace("%escapeXPReward%", FoundationFortune.MoneyXPRewards.KillEventXpRewards.ToString())
-				.Replace("%multiplier%", PlayerDataRepository.GetPrestigeMultiplier(ev.Player.UserId).ToString(CultureInfo.InvariantCulture));
+				.Replace("%multiplier%", PlayerStatsRepository.GetPrestigeMultiplier(ev.Player.UserId).ToString(CultureInfo.InvariantCulture));
 			
-			PlayerDataRepository.TransferMoney(ev.Player.UserId, true);
-			PlayerDataRepository.ModifyMoney(ev.Player.UserId, FoundationFortune.MoneyXPRewards.EscapeEventMoneyRewards);
-			PlayerDataRepository.SetExperience(ev.Player.UserId, FoundationFortune.MoneyXPRewards.EscapeEventXpRewards);
+			PlayerStatsRepository.TransferMoney(ev.Player.UserId, true);
+			PlayerStatsRepository.ModifyMoney(ev.Player.UserId, FoundationFortune.MoneyXPRewards.EscapeEventMoneyRewards);
+			PlayerStatsRepository.SetExperience(ev.Player.UserId, FoundationFortune.MoneyXPRewards.EscapeEventXpRewards);
 			FoundationFortune.Instance.HintSystem.BroadcastHint(ev.Player, escapeHint);
 		}
 	}
 
 	public void ActivatingPerk(TogglingNoClipEventArgs ev)
 	{
-		if (!PerkSystem.ConsumedActivePerks.TryGetValue(ev.Player, out var activePerks)) return;
 		if (ev.Player.IsBypassModeEnabled) return;
-			
-		foreach (var activePerk in activePerks.Keys)
+
+		if (PerkSystem.ConsumedCooldownActivePerks.TryGetValue(ev.Player, out var cooldownPerks) && cooldownPerks.Any())
 		{
-			if (!FoundationFortune.Instance.HintSystem.ConfirmActivatePerk.ContainsKey(ev.Player.UserId))
-			{
-				FoundationFortune.Instance.HintSystem.ConfirmActivatePerk[ev.Player.UserId] = true;
-				FoundationFortune.Instance.HintSystem.ActivatePerkTimestamp[ev.Player.UserId] = Time.time;
-				ev.IsAllowed = false;
-				break;
-			}
-
-			if (FoundationFortune.Instance.HintSystem.ConfirmActivatePerk.TryGetValue(ev.Player.UserId, out bool isConfirming))
-			{
-				if (!FoundationFortune.Instance.HintSystem.ActivatePerkTimestamp.TryGetValue(ev.Player.UserId, out float toggleTime)) continue;
-				if (!isConfirming || !(Time.time - toggleTime <= activePerk.TimeUntilNextActivation)) continue;
-				activePerk.StartActivePerkAbility(ev.Player);
-				FoundationFortune.Instance.HintSystem.ConfirmActivatePerk.Remove(ev.Player.UserId);
-				break;
-			}
-
-			ev.IsAllowed = true;
+			PerkSystem.HandlePerkActivation(ev, cooldownPerks.Keys.First(),
+				cooldownPerks.Keys.First().Cooldown.Seconds);
+			return;
 		}
+
+		if (PerkSystem.ConsumedMeteredActivePerks.TryGetValue(ev.Player, out var meteredPerks) && meteredPerks.Any())
+			PerkSystem.HandlePerkActivation(ev, meteredPerks.Keys.First(), meteredPerks.Keys.First().Cooldown.Seconds);
 	}
+
 
 	public void SellingItem(DroppingItemEventArgs ev)
 	{
@@ -246,7 +237,7 @@ public class ExiledEventHandlers
 			ev.IsAllowed = true;
 			return;
 		}
-		
+
 		if (NPCHelperMethods.IsPlayerNearSellingBot(ev.Player))
 		{
 			if (!FoundationFortune.Instance.HintSystem.ConfirmSell.ContainsKey(ev.Player.UserId))
@@ -255,15 +246,15 @@ public class ExiledEventHandlers
 				{
 					FoundationFortune.Instance.HintSystem.ItemsBeingSold[ev.Player.UserId] = (ev.Item, sellableItem.Price);
 					FoundationFortune.Instance.HintSystem.ConfirmSell[ev.Player.UserId] = true;
-					FoundationFortune.Instance.HintSystem.DropTimestamp[ev.Player.UserId] = Time.time;
+					FoundationFortune.Instance.HintSystem.DropTimestamp[ev.Player.UserId] = DateTime.UtcNow;
 					ev.IsAllowed = false;
 					return;
 				}
 			}
 
-			if (FoundationFortune.Instance.HintSystem.ConfirmSell.TryGetValue(ev.Player.UserId, out bool isConfirming) && FoundationFortune.Instance.HintSystem.DropTimestamp.TryGetValue(ev.Player.UserId, out float dropTime))
+			if (FoundationFortune.Instance.HintSystem.ConfirmSell.TryGetValue(ev.Player.UserId, out bool isConfirming) && FoundationFortune.Instance.HintSystem.DropTimestamp.TryGetValue(ev.Player.UserId, out DateTime dropTime))
 			{
-				if (isConfirming && Time.time - dropTime <= PlayerDataRepository.GetSellingConfirmationTime(ev.Player.UserId))
+				if (isConfirming && (DateTime.UtcNow - dropTime).TotalSeconds <= PlayerSettingsRepository.GetSellingConfirmationTime(ev.Player.UserId))
 				{
 					if (FoundationFortune.Instance.HintSystem.ItemsBeingSold.TryGetValue(ev.Player.UserId, out var soldItemData))
 					{
@@ -276,7 +267,6 @@ public class ExiledEventHandlers
 							EventHelperMethods.RegisterOnUsedFoundationFortuneNPC(ev.Player, NpcType.Selling, NpcUsageOutcome.SellSuccess);
 						}
 						else FoundationFortune.Instance.HintSystem.BroadcastHint(ev.Player, FoundationFortune.Instance.Translation.SaleCancelled);
-
 						FoundationFortune.Instance.HintSystem.ItemsBeingSold.Remove(ev.Player.UserId);
 						ev.IsAllowed = true;
 						return;
@@ -290,7 +280,6 @@ public class ExiledEventHandlers
 			EventHelperMethods.RegisterOnUsedFoundationFortuneNPC(ev.Player, NpcType.Selling, NpcUsageOutcome.WrongBot);
 			FoundationFortune.Instance.HintSystem.BroadcastHint(ev.Player, FoundationFortune.Instance.Translation.WrongBot);
 		}
-
 		ev.IsAllowed = true;
 	}
 
@@ -318,31 +307,31 @@ public class ExiledEventHandlers
 			switch (teamCondition)
 			{
 				case PlayerTeamConditions.Winning:
-					PlayerDataRepository.ModifyMoney(ply.UserId, winningAmount);
-					PlayerDataRepository.SetExperience(ply.UserId, winningAmount);
+					PlayerStatsRepository.ModifyMoney(ply.UserId, winningAmount);
+					PlayerStatsRepository.SetExperience(ply.UserId, winningAmount);
 					FoundationFortune.Instance.HintSystem.BroadcastHint(ply, FoundationFortune.Instance.Translation.RoundEndWin
 						.Replace("%winningFactionColor%", teamColor)
 						.Replace("%winningAmount%", winningAmount.ToString())
 						.Replace("%expReward%", winningAmount.ToString())
-						.Replace("%multiplier%", PlayerDataRepository.GetPrestigeMultiplier(ply.UserId).ToString(CultureInfo.InvariantCulture)));
+						.Replace("%multiplier%", PlayerStatsRepository.GetPrestigeMultiplier(ply.UserId).ToString(CultureInfo.InvariantCulture)));
 					break;
 				case PlayerTeamConditions.Losing:
-					PlayerDataRepository.ModifyMoney(ply.UserId, losingAmount);
-					PlayerDataRepository.SetExperience(ply.UserId, losingAmount);
+					PlayerStatsRepository.ModifyMoney(ply.UserId, losingAmount);
+					PlayerStatsRepository.SetExperience(ply.UserId, losingAmount);
 					FoundationFortune.Instance.HintSystem.BroadcastHint(ply, FoundationFortune.Instance.Translation.RoundEndLoss
 						.Replace("%losingFactionColor%", teamColor)
 						.Replace("%losingAmount%", losingAmount.ToString())
 						.Replace("%expReward%", losingAmount.ToString())
-						.Replace("%multiplier%", PlayerDataRepository.GetPrestigeMultiplier(ply.UserId).ToString(CultureInfo.InvariantCulture)));
+						.Replace("%multiplier%", PlayerStatsRepository.GetPrestigeMultiplier(ply.UserId).ToString(CultureInfo.InvariantCulture)));
 					break;
 				case PlayerTeamConditions.Draw:
-					PlayerDataRepository.ModifyMoney(ply.UserId, drawAmount);
-					PlayerDataRepository.SetExperience(ply.UserId, drawAmount);
+					PlayerStatsRepository.ModifyMoney(ply.UserId, drawAmount);
+					PlayerStatsRepository.SetExperience(ply.UserId, drawAmount);
 					FoundationFortune.Instance.HintSystem.BroadcastHint(ply, FoundationFortune.Instance.Translation.RoundEndDraw
 						.Replace("%drawFactionColor%", teamColor)
 						.Replace("%drawAmount%", drawAmount.ToString())
 						.Replace("%expReward%", drawAmount.ToString())
-						.Replace("%multiplier%", PlayerDataRepository.GetPrestigeMultiplier(ply.UserId).ToString(CultureInfo.InvariantCulture)));
+						.Replace("%multiplier%", PlayerStatsRepository.GetPrestigeMultiplier(ply.UserId).ToString(CultureInfo.InvariantCulture)));
 					break;
 				default: throw new ArgumentOutOfRangeException();
 			}
@@ -358,21 +347,11 @@ public class ExiledEventHandlers
 		if (NPCHelperMethods.IsFoundationFortuneNpc(ev.Target.ReferenceHub)) ev.IsAllowed = false;
 	}
 
-	public void ShootingWeapon(ShootingEventArgs ev)
-	{
-		if (PerkSystem.HasPerk(ev.Player, PerkType.ViolentImpulses)) ev.Firearm.Recoil = FoundationFortune.Instance.FoundationFortuneEventHandlers.RecoilSettings;
-	}
-
 	public void DestroyMusicBots(LeftEventArgs ev)
 	{
 		if (NPCHelperMethods.MusicBotPairs.Find(pair => pair.Player.Nickname == ev.Player.Nickname) != null) MusicBot.RemoveMusicBot(ev.Player.Nickname);
 	}
-
-	public void HurtingPlayer(HurtingEventArgs ev)
-	{
-		if (PerkSystem.HasPerk(ev.Attacker, PerkType.ViolentImpulses)) ev.Amount *= FoundationFortune.PerkSystemSettings.ViolentImpulsesDamageMultiplier;
-	}
-
+	
 	public void FuckYourAbility(ActivatingSenseEventArgs ev)
 	{
 		if (ev.Target.IsNPC) ev.IsAllowed = false;
@@ -390,7 +369,7 @@ public class ExiledEventHandlers
 
 	public void RoundRestart()
 	{ 
-		QuestRotation.IncrementQuestRotationNumber();
+		QuestRotationRepository.IncrementQuestRotationNumber();
 		IndexationMethods.ClearIndexations();
 	}
 	public void ThrownGhostlight(ThrownProjectileEventArgs ev) => QuestSystem.UpdateQuestProgress(ev.Player, QuestType.ThrowGhostlights, 1);

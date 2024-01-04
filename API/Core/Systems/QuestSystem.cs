@@ -2,8 +2,8 @@
 using System.Text;
 using Discord;
 using Exiled.API.Features;
-using FoundationFortune.API.Common.Enums.Systems.QuestSystem;
-using FoundationFortune.API.Common.Models.Events;
+using FoundationFortune.API.Core.Common.Enums.Systems.QuestSystem;
+using FoundationFortune.API.Core.Common.Models;
 
 namespace FoundationFortune.API.Core.Systems;
 
@@ -14,10 +14,8 @@ public static class QuestSystem
     public static void EnableQuest(string userId, QuestType questType)
     {
         if (ActiveQuests.ContainsKey(userId)) return;
-        
         var questProgress = new QuestProgress(questType);
         ActiveQuests.Add(userId, questProgress);
-
         DirectoryIterator.Log($"Quest {questType} enabled for user {userId}.", LogLevel.Debug);
     }
     
@@ -32,10 +30,8 @@ public static class QuestSystem
     private static void TrackQuestProgress(string userId, int amount)
     {
         if (!ActiveQuests.ContainsKey(userId)) return;
-
         var questProgress = ActiveQuests[userId];
         questProgress.UpdateProgress(amount);
-
         if (!questProgress.IsCompleted) return;
         DirectoryIterator.Log($"User {userId} completed quest: {questProgress.QuestType}", LogLevel.Debug);
         DisableQuest(userId);

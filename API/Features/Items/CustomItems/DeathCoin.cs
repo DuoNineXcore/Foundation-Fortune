@@ -8,11 +8,10 @@ using Exiled.API.Features.Pickups;
 using Exiled.API.Features.Spawn;
 using Exiled.CustomItems.API.Features;
 using Exiled.Events.EventArgs.Player;
-using FoundationFortune.API.Common.Enums.Systems.PerkSystem;
-using FoundationFortune.API.Common.Enums.Systems.QuestSystem;
+using FoundationFortune.API.Core.Common.Enums.Systems.PerkSystem;
+using FoundationFortune.API.Core.Common.Enums.Systems.QuestSystem;
 using FoundationFortune.API.Core.Database;
 using FoundationFortune.API.Core.Systems;
-using FoundationFortune.API.Features.Perks;
 
 namespace FoundationFortune.API.Features.Items.CustomItems;
 
@@ -24,7 +23,7 @@ public class DeathCoin : CustomItem
 	public override string Description { get; set; } = "A dead man's wealth.";
 	public override float Weight { get; set; } = 0f;
 	public override SpawnProperties SpawnProperties { get; set; }
-	private Dictionary<int, (int coinValue, Player player)> _droppedCoins = new();
+	private readonly Dictionary<int, (int coinValue, Player player)> _droppedCoins = new();
 
 	protected override void SubscribeEvents()
 	{
@@ -40,12 +39,12 @@ public class DeathCoin : CustomItem
 
 	private void OnDeath(DyingEventArgs ev)
 	{
-		if (PerkSystem.HasPerk(ev.Player, PerkType.EtherealIntervention)) return;
+		if (PerkSystem.HasPerk(ev.Player, PerkType.GracefulSaint)) return;
 
-		int moneyBeforeDeath = PlayerDataRepository.GetMoneyOnHold(ev.Player.UserId);
-		if (moneyBeforeDeath <= 0 || PlayerDataRepository.GetPluginAdmin(ev.Player.UserId)) return;
+		int moneyBeforeDeath = PlayerStatsRepository.GetMoneyOnHold(ev.Player.UserId);
+		if (moneyBeforeDeath <= 0 || PlayerSettingsRepository.GetPluginAdmin(ev.Player.UserId)) return;
 		FoundationFortune.Instance.HintSystem.BroadcastHint(ev.Player, FoundationFortune.Instance.Translation.Death.Replace("%moneyBeforeDeath%", moneyBeforeDeath.ToString()));
-		PlayerDataRepository.EmptyMoney(ev.Player.UserId, true);
+		PlayerStatsRepository.EmptyMoney(ev.Player.UserId, true);
 		int coinValue = moneyBeforeDeath / FoundationFortune.SellableItemsList.DeathCoinsToDrop;
 		for (int i = 0; i < FoundationFortune.SellableItemsList.DeathCoinsToDrop; i++)
 		{
@@ -64,14 +63,14 @@ public class DeathCoin : CustomItem
 		{
 			int coinValue = coinData.coinValue;
 			int xpReward = coinValue / 2;
-			double prestigeMultiplier = PlayerDataRepository.GetPrestigeMultiplier(player.UserId);
+			double prestigeMultiplier = PlayerStatsRepository.GetPrestigeMultiplier(player.UserId);
 			FoundationFortune.Instance.HintSystem.BroadcastHint(player, FoundationFortune.Instance.Translation.DeathCoinPickup
 				.Replace("%coinValue%", coinValue.ToString())
 				.Replace("%xpReward%", xpReward.ToString())
 				.Replace("%multiplier%", prestigeMultiplier.ToString(CultureInfo.InvariantCulture)));
-			PlayerDataRepository.ModifyMoney(player.UserId, coinValue, false, true, false, prestigeMultiplier);
+			PlayerStatsRepository.ModifyMoney(player.UserId, coinValue, false, true, false, prestigeMultiplier);
 			QuestSystem.UpdateQuestProgress(player, QuestType.CollectMoneyFromDeathCoins, coinData.coinValue);
-			PlayerDataRepository.SetExperience(player.UserId, xpReward);
+			PlayerStatsRepository.SetExperience(player.UserId, xpReward);
 			_droppedCoins.Remove(item.Serial);
 		}
 		item.Destroy();

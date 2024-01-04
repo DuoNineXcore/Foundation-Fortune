@@ -4,7 +4,7 @@ using System.Text;
 using Discord;
 using Exiled.API.Enums;
 using Exiled.API.Features;
-using FoundationFortune.API.Common.Models.Events;
+using FoundationFortune.API.Core.Common.Models;
 using FoundationFortune.API.Core.Database;
 using MEC;
 using UnityEngine;
@@ -20,11 +20,19 @@ public static class ExtractionSystem
 	private static int _nextExtractionTime;
 	private static float _extractionStartTime;
 	private static readonly Dictionary<Player, ExtractionTimerData> _extractionTimers = new();
+	private static readonly Vector3 _worldPos = new(42f, 12f, 51f);
+	private const float _radiusSqr = 16f * 16f;
 
 	private static bool IsPlayerInExtractionRoom(Player player, RoomType roomType)
 	{
 		if (player.CurrentRoom != null) return player.CurrentRoom.Type == roomType;
 		return false;
+	}
+	
+	private static bool IsPlayerInExtractionZone(Player player)
+	{
+		float distanceSqr = (player.Position - _worldPos).sqrMagnitude;
+		return distanceSqr <= _radiusSqr;
 	}
 
 	public static void StartExtractionEvent()
@@ -76,9 +84,9 @@ public static class ExtractionSystem
 	{
 		if (!_isExtractionPointActive) return;
 			
-		if (IsPlayerInExtractionRoom(ply, _activeExtractionRoom))
+		if (IsPlayerInExtractionRoom(ply, _activeExtractionRoom) || IsPlayerInExtractionZone(ply))
 		{
-			int totalMoneyOnHold = PlayerDataRepository.GetMoneyOnHold(ply.UserId);
+			int totalMoneyOnHold = PlayerStatsRepository.GetMoneyOnHold(ply.UserId);
 
 			if (totalMoneyOnHold <= 0) hintMessage.Append($"{FoundationFortune.Instance.Translation.ExtractionNoMoney}");
 			else
@@ -96,7 +104,7 @@ public static class ExtractionSystem
 		}
 		else
 		{
-			CancelExtractionTimer(ply);
+			if (_extractionTimers.ContainsKey(ply)) CancelExtractionTimer(ply);
 
 			string extractionHint = FoundationFortune.Instance.Translation.ExtractionEvent
 				.Replace("%room%", _activeExtractionRoom.ToString())
@@ -130,16 +138,12 @@ public static class ExtractionSystem
 			}
 			yield return Timing.WaitForSeconds(1f);
 		}
-		ExtractMoney(player);
-	}
-		
-	private static void ExtractMoney(Player player)
-	{
-		int totalMoneyOnHold = PlayerDataRepository.GetMoneyOnHold(player.UserId);
-		if (totalMoneyOnHold <= 0) return;
+		int totalMoneyOnHold = PlayerStatsRepository.GetMoneyOnHold(player.UserId);
+		if (totalMoneyOnHold <= 0) yield break;
 			
-		PlayerDataRepository.TransferMoney(player.UserId, true);
+		PlayerStatsRepository.TransferMoney(player.UserId, true);
 		DirectoryIterator.Log($"Transferred {totalMoneyOnHold} money to player {player.UserId}", LogLevel.Debug);
+		
 	}
 
 	private static void CancelExtractionTimer(Player player)

@@ -1,6 +1,6 @@
 ﻿using Exiled.API.Features;
 using Exiled.Events.EventArgs.Interfaces;
-using FoundationFortune.API.Common.Models.Items;
+using FoundationFortune.API.Core.Common.Models.Items;
 
 namespace FoundationFortune.API.Core.Events.EventArgs.FoundationFortuneItems;
 

@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using Exiled.API.Enums;
 using Exiled.API.Features;
-using FoundationFortune.API.Common.Enums.Player;
-using FoundationFortune.API.Common.Models.Events;
-using FoundationFortune.API.Common.Models.Player;
+using FoundationFortune.API.Core.Common.Enums.Player;
+using FoundationFortune.API.Core.Common.Models;
+using FoundationFortune.API.Core.Common.Models.Player;
 using FoundationFortune.API.Features;
 using MEC;
 
@@ -14,7 +14,7 @@ namespace FoundationFortune.API.Core.Systems;
 
 public static class BountySystem
 {
-	public static List<Bounty> BountiedPlayers { get; } = new List<Bounty>();
+	public static List<Bounty> BountiedPlayers { get; } = new();
 
 	public static void AddBounty(Player player, int bountyPrice, TimeSpan duration)
 	{
@@ -22,7 +22,7 @@ public static class BountySystem
 		PlayerVoiceChatSettings hunter = FoundationFortune.VoiceChatSettings.PlayerVoiceChatSettings.FirstOrDefault(settings => settings.VoiceChatUsageType == PlayerVoiceChatUsageType.Hunter);
 			
 		DateTime expirationTime = DateTime.Now.Add(duration);
-		BountiedPlayers.Add(new Bounty(player, true, bountyPrice, expirationTime));
+		BountiedPlayers.Add(new(player, true, bountyPrice, expirationTime));
 			
 		if (hunted != null) AudioPlayer.PlayTo(player, hunted.AudioFile, hunted.Volume, hunted.Loop, true);
 		foreach (Player ply in Player.List.Where(p => !p.IsNPC && p != player)) if (hunter != null) AudioPlayer.PlayTo(ply, hunter.AudioFile, hunter.Volume, hunter.Loop, true);

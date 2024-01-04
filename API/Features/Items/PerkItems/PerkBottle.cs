@@ -7,7 +7,8 @@ using Exiled.API.Features.Items;
 using Exiled.API.Features.Spawn;
 using Exiled.CustomItems.API.Features;
 using Exiled.Events.EventArgs.Player;
-using FoundationFortune.API.Common.Interfaces.Perks;
+using FoundationFortune.API.Core.Common.Abstract.Perks;
+using FoundationFortune.API.Core.Common.Interfaces.Perks;
 using FoundationFortune.API.Core.Events;
 
 namespace FoundationFortune.API.Features.Items.PerkItems;
@@ -40,6 +41,11 @@ public class PerkBottle : CustomItem
 	private void UsedPerkBottle(UsedItemEventArgs ev)
 	{
 		if (!PerkBottles.TryGetValue(ev.Item.Serial, out var perkBottleData)) return;
+		switch (perkBottleData.perk)
+		{
+			case PassivePerkBase passivePerk: passivePerk.SubscribeEvents(); break;
+			case CooldownActivePerkBase activePerk: activePerk.SubscribeEvents(); break;
+		}
 		EventHelperMethods.RegisterOnUsedFoundationFortunePerk(ev.Player, perkBottleData.perk, ev.Item);
 	}
 

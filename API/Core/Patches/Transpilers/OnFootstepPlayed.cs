@@ -19,11 +19,11 @@ internal static class OnFootstepPlayed
 
         newInstructions.InsertRange(0, new List<CodeInstruction>()
         {
-            new CodeInstruction(OpCodes.Ldarg_1),
-            new CodeInstruction(OpCodes.Callvirt, AccessTools.PropertyGetter(typeof(CharacterModel), nameof(CharacterModel.OwnerHub))),
-            new CodeInstruction(OpCodes.Callvirt, AccessTools.Method(typeof(NPCHelperMethods), nameof(NPCHelperMethods.IsFoundationFortuneNpc), new[] { typeof(ReferenceHub) })),
-            new CodeInstruction(OpCodes.Brfalse_S, skip),
-            new CodeInstruction(OpCodes.Ret)
+            new(OpCodes.Ldarg_1),
+            new(OpCodes.Callvirt, AccessTools.PropertyGetter(typeof(CharacterModel), nameof(CharacterModel.OwnerHub))),
+            new(OpCodes.Callvirt, AccessTools.Method(typeof(NPCHelperMethods), nameof(NPCHelperMethods.IsFoundationFortuneNpc), new[] { typeof(ReferenceHub) })),
+            new(OpCodes.Brfalse_S, skip),
+            new(OpCodes.Ret)
         });
 
         foreach (CodeInstruction instruction in newInstructions) yield return instruction;

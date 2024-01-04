@@ -1,13 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Exiled.API.Features;
-using FoundationFortune.API.Common.Models.Items;
+using FoundationFortune.API.Core.Common.Models.Items;
 using FoundationFortune.API.Core.Database;
 using FoundationFortune.API.Core.Systems;
 using FoundationFortune.API.Features.Items.World;
 using FoundationFortune.API.Features.NPCs;
 using FoundationFortune.API.Features.NPCs.NpcTypes;
-using FoundationFortune.API.Features.Perks;
 
 namespace FoundationFortune.API.Core;
 
@@ -35,7 +34,7 @@ public static class IndexationMethods
 		var playerLimit = PlayerPurchaseLimits.FirstOrDefault(p => p.Player.UserId == player.UserId);
 		if (playerLimit == null)
 		{
-			playerLimit = new ObjectInteractions(player);
+			playerLimit = new(player);
 			PlayerPurchaseLimits.Add(playerLimit);
 		}
 
@@ -48,7 +47,7 @@ public static class IndexationMethods
 		var playerLimit = PlayerPurchaseLimits.FirstOrDefault(p => p.Player.UserId == player.UserId);
 		if (playerLimit == null)
 		{
-			playerLimit = new ObjectInteractions(player);
+			playerLimit = new(player);
 			PlayerPurchaseLimits.Add(playerLimit);
 		}
 
@@ -61,7 +60,7 @@ public static class IndexationMethods
 		var playerLimit = PlayerPurchaseLimits.FirstOrDefault(p => p.Player.UserId == player.UserId);
 		if (playerLimit == null)
 		{
-			playerLimit = new ObjectInteractions(player);
+			playerLimit = new(player);
 			PlayerPurchaseLimits.Add(playerLimit);
 		}
 
@@ -71,7 +70,7 @@ public static class IndexationMethods
         
 	public static bool ExceedsPerkLimit(Player player, BuyablePerk buyablePerk)
 	{
-		if (PlayerDataRepository.GetPluginAdmin(player.UserId)) return false;
+		if (PlayerSettingsRepository.GetPluginAdmin(player.UserId)) return false;
 		var playerLimit = PlayerPurchaseLimits.FirstOrDefault(p => p.Player.UserId == player.UserId);
 		if (playerLimit == null) return false;
 		var perkCount = playerLimit.BoughtPerks.Count(pair => pair.Key.PerkType == buyablePerk.PerkType);
@@ -80,7 +79,7 @@ public static class IndexationMethods
 
 	public static bool ExceedsItemLimit(Player player, BuyableItem buyItem)
 	{
-		if (PlayerDataRepository.GetPluginAdmin(player.UserId)) return false;
+		if (PlayerSettingsRepository.GetPluginAdmin(player.UserId)) return false;
 		var playerLimit = PlayerPurchaseLimits.FirstOrDefault(p => p.Player.UserId == player.UserId);
 		if (playerLimit == null) return false;
 		var itemCount = playerLimit.BoughtItems.Count(pair => pair.Key.ItemType == buyItem.ItemType);

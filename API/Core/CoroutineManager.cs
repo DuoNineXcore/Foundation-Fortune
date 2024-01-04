@@ -5,7 +5,7 @@ namespace FoundationFortune.API.Core;
 
 public static class CoroutineManager
 {
-    public static readonly List<CoroutineHandle> Coroutines = new List<CoroutineHandle>();
+    public static readonly List<CoroutineHandle> Coroutines = new();
 
     /// <summary>
     /// Starts a coroutine and returns a handle to control its execution.

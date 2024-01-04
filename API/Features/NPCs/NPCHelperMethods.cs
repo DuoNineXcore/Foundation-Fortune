@@ -7,8 +7,8 @@ using Exiled.API.Enums;
 using Exiled.API.Extensions;
 using Exiled.API.Features;
 using Exiled.API.Features.Components;
-using FoundationFortune.API.Common.Enums.NPCs;
-using FoundationFortune.API.Common.Models.NPCs;
+using FoundationFortune.API.Core.Common.Enums.NPCs;
+using FoundationFortune.API.Core.Common.Models.NPCs;
 using MEC;
 using Mirror;
 using PlayerRoles;
@@ -25,9 +25,7 @@ public static class NPCHelperMethods
     public static bool IsFoundationFortuneNpc(ReferenceHub refHub)
     {
         Player targetPlayer = Player.Get(refHub);
-        return NPCInitialization.BuyingBots.Values.Any(botAndIndexation => botAndIndexation.bot == targetPlayer)
-               || NPCInitialization.SellingBots.Values.Any(botAndIndexation => botAndIndexation.bot == targetPlayer)
-               || MusicBotPairs.Any(pair => pair.Player == targetPlayer);
+        return NPCInitialization.BuyingBots.Values.Any(botAndIndexation => botAndIndexation.bot == targetPlayer) || NPCInitialization.SellingBots.Values.Any(botAndIndexation => botAndIndexation.bot == targetPlayer) || MusicBotPairs.Any(pair => pair.Player == targetPlayer);
     }
 
     public static void UpdateNpcProximityMessages(Player ply, ref StringBuilder hintMessage)

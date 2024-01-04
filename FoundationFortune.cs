@@ -1,15 +1,15 @@
-﻿using Exiled.API.Features;
+﻿using System;
+using Exiled.API.Features;
 using Exiled.CustomItems.API.Features;
-using FoundationFortune.Configs;
-using HarmonyLib;
-using LiteDB;
-using SCPSLAudioApi;
-using System;
 using FoundationFortune.API.Core;
 using FoundationFortune.API.Core.Events.Handlers;
 using FoundationFortune.API.Core.Systems;
 using FoundationFortune.Configs.EXILED;
+using FoundationFortune.Configs.FoundationFortune;
 using FoundationFortune.EventHandlers;
+using HarmonyLib;
+using LiteDB;
+using SCPSLAudioApi;
 
 namespace FoundationFortune;
 
@@ -32,10 +32,13 @@ public class FoundationFortune : Plugin<PluginConfigs, PluginTranslations>
 	public static FoundationFortuneNpcSettings FoundationFortuneNpcSettings; 
 		
 	public static FoundationFortune Instance;
-		
+
+	public LiteDatabase PlayerSettingsDatabase;
+	public LiteDatabase PlayerStatsDatabase;
+	public LiteDatabase QuestRotationDatabase;
+
 	public FoundationFortuneEventHandlers FoundationFortuneEventHandlers = new();
 	public ExiledEventHandlers ExiledEventHandlers = new();
-	public LiteDatabase DB;
 	public HintSystem HintSystem = new();
 
 	private Harmony _harmony;
@@ -46,6 +49,7 @@ public class FoundationFortune : Plugin<PluginConfigs, PluginTranslations>
 		_harmony = new("Foundation Fortune");
 		_harmony.PatchAll();
 		DirectoryIterator.InitializeLogFile();
+		DirectoryIterator.InitializeDatabases();
 		DirectoryIterator.SetupDirectories();
 		RegisterEvents();
 		SetupConfigs();
@@ -56,15 +60,22 @@ public class FoundationFortune : Plugin<PluginConfigs, PluginTranslations>
 
 	public override void OnDisabled()
 	{
+		PlayerSettingsDatabase?.Checkpoint();
+		PlayerSettingsDatabase?.Dispose();
+		PlayerStatsDatabase?.Checkpoint();
+		PlayerStatsDatabase?.Dispose();
+		QuestRotationDatabase?.Checkpoint();
+		QuestRotationDatabase?.Dispose();
 		_harmony = null!;
 		ExiledEventHandlers = null;
 		FoundationFortuneEventHandlers = null;
-		DB = null;
 		Instance = null;
-		DB?.Checkpoint();
-		DB?.Dispose();
+		PlayerSettingsDatabase = null;
+		PlayerStatsDatabase = null;
+		QuestRotationDatabase = null;
 		_harmony?.UnpatchAll(_harmony.Id);
 		UnregisterEvents();
+		IndexationMethods.ClearIndexations();
 		CoroutineManager.StopAllCoroutines();
 		CustomItem.UnregisterItems();
 	}
@@ -84,13 +95,10 @@ public class FoundationFortune : Plugin<PluginConfigs, PluginTranslations>
 	{
 		Exiled.Events.Handlers.Player.Verified += ExiledEventHandlers.RegisterInDatabase;
 		Exiled.Events.Handlers.Player.Dying += ExiledEventHandlers.DyingEvent;
-		Exiled.Events.Handlers.Player.Spawned += ExiledEventHandlers.EtherealInterventionSpawn;
 		Exiled.Events.Handlers.Player.Died += ExiledEventHandlers.KillingReward;
 		Exiled.Events.Handlers.Player.Escaping += ExiledEventHandlers.EscapingReward;
 		Exiled.Events.Handlers.Player.DroppingItem += ExiledEventHandlers.SellingItem;
 		Exiled.Events.Handlers.Player.Left += ExiledEventHandlers.DestroyMusicBots;
-		Exiled.Events.Handlers.Player.Hurting += ExiledEventHandlers.HurtingPlayer;
-		Exiled.Events.Handlers.Player.Shooting += ExiledEventHandlers.ShootingWeapon;
 		Exiled.Events.Handlers.Player.ThrownProjectile += ExiledEventHandlers.ThrownGhostlight;
 		Exiled.Events.Handlers.Player.UnlockingGenerator += ExiledEventHandlers.UnlockingGenerator;
 		Exiled.Events.Handlers.Player.TogglingNoClip += ExiledEventHandlers.ActivatingPerk;
@@ -107,20 +115,16 @@ public class FoundationFortune : Plugin<PluginConfigs, PluginTranslations>
 		FoundationFortuneItemEvents.BoughtItem += FoundationFortuneEventHandlers.BoughtItem;
 		FoundationFortuneItemEvents.BoughtPerk += FoundationFortuneEventHandlers.BoughtPerk;
 		FoundationFortuneNPCEvents.UsedFoundationFortuneNpc += FoundationFortuneEventHandlers.UsedFoundationFortuneNpc;
-		FoundationFortunePerkEvents.UsedFoundationFortunePerk += FoundationFortuneEventHandlers.UsedFoundationFortunePerk;
 	}
 
 	private void UnregisterEvents()
 	{
 		Exiled.Events.Handlers.Player.Verified -= ExiledEventHandlers.RegisterInDatabase;
 		Exiled.Events.Handlers.Player.Dying -= ExiledEventHandlers.DyingEvent;
-		Exiled.Events.Handlers.Player.Spawned -= ExiledEventHandlers.EtherealInterventionSpawn;
 		Exiled.Events.Handlers.Player.Died -= ExiledEventHandlers.KillingReward;
 		Exiled.Events.Handlers.Player.Escaping -= ExiledEventHandlers.EscapingReward;
 		Exiled.Events.Handlers.Player.DroppingItem -= ExiledEventHandlers.SellingItem;
 		Exiled.Events.Handlers.Player.Left -= ExiledEventHandlers.DestroyMusicBots;
-		Exiled.Events.Handlers.Player.Hurting -= ExiledEventHandlers.HurtingPlayer;
-		Exiled.Events.Handlers.Player.Shooting -= ExiledEventHandlers.ShootingWeapon;
 		Exiled.Events.Handlers.Player.ThrownProjectile -= ExiledEventHandlers.ThrownGhostlight;
 		Exiled.Events.Handlers.Player.UnlockingGenerator -= ExiledEventHandlers.UnlockingGenerator;
 		Exiled.Events.Handlers.Player.TogglingNoClip -= ExiledEventHandlers.ActivatingPerk;
@@ -135,6 +139,5 @@ public class FoundationFortune : Plugin<PluginConfigs, PluginTranslations>
 		FoundationFortuneItemEvents.BoughtItem -= FoundationFortuneEventHandlers.BoughtItem;
 		FoundationFortuneItemEvents.BoughtPerk -= FoundationFortuneEventHandlers.BoughtPerk;
 		FoundationFortuneNPCEvents.UsedFoundationFortuneNpc -= FoundationFortuneEventHandlers.UsedFoundationFortuneNpc;
-		FoundationFortunePerkEvents.UsedFoundationFortunePerk -= FoundationFortuneEventHandlers.UsedFoundationFortunePerk;
 	}
 }

@@ -6,7 +6,7 @@ using Discord;
 using Exiled.API.Extensions;
 using Exiled.API.Features;
 using Exiled.API.Features.Components;
-using FoundationFortune.API.Common.Models.NPCs;
+using FoundationFortune.API.Core.Common.Models.NPCs;
 using MEC;
 using Mirror;
 using PlayerRoles;
@@ -35,31 +35,13 @@ public static class MusicBot
     {
         Npc spawnedMusicBot = SpawnFix(target.Nickname, RoleTypeId.Spectator);
     
-        PlayerMusicBotPair pair = new PlayerMusicBotPair(target, spawnedMusicBot, false);
+        PlayerMusicBotPair pair = new(target, spawnedMusicBot, false);
         NPCHelperMethods.MusicBotPairs.Add(pair);
         DirectoryIterator.Log($"Generated Music Bot for player {target.Nickname} / Bot: {spawnedMusicBot.Nickname ?? "Null"}", LogLevel.Debug);
 
         Round.IgnoredPlayers.Add(spawnedMusicBot.ReferenceHub);
     }
 
-    public static Npc GetMusicBotByPlayer(Player player)
-    {
-        var pair = NPCHelperMethods.MusicBotPairs.Find(p => p.Player == player);
-        return pair?.MusicBot;
-    }
-
-    public static bool RemoveMusicBot(string target)
-    {
-        var pairToRemove = NPCHelperMethods.MusicBotPairs.Find(pair => pair.Player.Nickname == target);
-        if (pairToRemove == null) return false;
-        Timing.CallDelayed(0.3f, () =>
-        {
-            CustomNetworkManager.TypedSingleton.OnServerDisconnect(pairToRemove.MusicBot.NetworkIdentity.connectionToClient);
-        });
-        NPCHelperMethods.MusicBotPairs.Remove(pairToRemove);
-        return true;
-    }
-        
     private static Npc SpawnFix(string name, RoleTypeId role, int id = 0)
     {
         GameObject gameObject = UnityEngine.Object.Instantiate(NetworkManager.singleton.playerPrefab);
@@ -94,4 +76,23 @@ public static class MusicBot
         });
         return npc;
     }
+
+    public static Npc GetMusicBotByPlayer(Player player)
+    {
+        var pair = NPCHelperMethods.MusicBotPairs.Find(p => p.Player == player);
+        return pair?.MusicBot;
+    }
+
+    public static bool RemoveMusicBot(string target)
+    {
+        var pairToRemove = NPCHelperMethods.MusicBotPairs.Find(pair => pair.Player.Nickname == target);
+        if (pairToRemove == null) return false;
+        Timing.CallDelayed(0.3f, () =>
+        {
+            CustomNetworkManager.TypedSingleton.OnServerDisconnect(pairToRemove.MusicBot.NetworkIdentity.connectionToClient);
+        });
+        NPCHelperMethods.MusicBotPairs.Remove(pairToRemove);
+        return true;
+    }
+
 }

@@ -32,7 +32,7 @@ public class PluginTranslations : ITranslation
 	public string ConfirmPerkActivation { get; set; } = "\\n<b>You are about to enable <color=#FFA500>%perkAlias%</color>'s ability. Proceed? (%time% seconds left)</b></align>";
 	public string BuyItemSuccess { get; set; } = "\\n<b><color=#FFA500>+%xpReward% (%multiplier%) EXP</color> <color=red>-$%itemPrice%</color> Bought Item: %itemAlias%.</b>";
 	public string BuyPerkSuccess { get; set; } = "\\n<b><color=#FFA500>+%xpReward% (%multiplier%) EXP</color> <color=red>-$%perkPrice%</color> Bought Perk: %perkAlias%.</b>";
-	public string SellItemSuccess { get; set; } = "\\n<b><color=#FFA500>+%xpReward% (%multiplier%) EXP</color> <color=green>+%price%$</color> Sold %itemName%.</b>";
+	public string  SellItemSuccess { get; set; } = "\\n<b><color=#FFA500>+%xpReward% (%multiplier%) EXP</color> <color=green>+%price%$</color> Sold %itemName%.</b>";
 
 	[Description("Extraction Events")]
 	public string ExtractionEvent = "\\n<b>A <color=green>Money</color> Extraction Zone has opened up. Room: %room% Time Left: %time%</b>";
@@ -42,9 +42,10 @@ public class PluginTranslations : ITranslation
 	[Description("Death Coins")]
 	public string DeathCoinPickup { get; set; } = "\\n<b><color=green>+%coinValue%</color> <color=#FFA500>+%xpReward% (%multiplier%) EXP</color> Picked up Death Coin.</b>";
 
-	[Description("Item and Perk list return messages.")]
+	[Description("Item Perk and Custom Item list return messages.")]
 	public string ItemsList { get; set; } = "%buyableItemDisplayName% (%buyableItemAlias%): $%buyableItemPrice%";
 	public string PerksList { get; set; } = "%perkItemDisplayName% (%perkItemAlias%) - %perkItemDescription%: $%perkItemPrice%";
+	public string CustomItemsList { get; set; } = "%customItemDisplayName% (%customItemAlias%) - %customItemDescription%: $%customItemPrice%";
 
 	[Description("Revival System Hints")]
 	public string RevivalNoDeadPlayer { get; set; } = "\\n<b>No dead player with Name: '%targetName%' found nearby to revive.</b>";

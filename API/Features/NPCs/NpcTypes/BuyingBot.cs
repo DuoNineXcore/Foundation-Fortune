@@ -2,7 +2,7 @@
 using System.Linq;
 using Exiled.API.Features;
 using Exiled.API.Features.Items;
-using FoundationFortune.API.Common.Components.NPCs;
+using FoundationFortune.API.Core.Common.Components.NPCs;
 using MEC;
 using Mirror;
 using PlayerRoles;
@@ -53,7 +53,7 @@ public static class BuyingBot
         npcIndicatorComp.circ = Exiled.API.Features.Toys.Primitive.Create(spawnedBuyingBot.Position);
         npcIndicatorComp.circ.Type = PrimitiveType.Sphere;
         npcIndicatorComp.circ.Collidable = false;
-        npcIndicatorComp.circ.Scale = new Vector3(0.05f, 0.05f, 0.05f);
+        npcIndicatorComp.circ.Scale = new(0.05f, 0.05f, 0.05f);
             
         spawnedBuyingBot.RankName = badge;
         spawnedBuyingBot.RankColor = color;

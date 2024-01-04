@@ -1,10 +1,10 @@
 ﻿using Exiled.API.Features;
 using Exiled.API.Features.Items;
-using FoundationFortune.API.Common.Enums.NPCs;
-using FoundationFortune.API.Common.Interfaces.Perks;
-using FoundationFortune.API.Common.Models.Items;
-using FoundationFortune.API.Common.Models.NPCs;
-using FoundationFortune.API.Common.Models.Player;
+using FoundationFortune.API.Core.Common.Enums.NPCs;
+using FoundationFortune.API.Core.Common.Interfaces.Perks;
+using FoundationFortune.API.Core.Common.Models.Items;
+using FoundationFortune.API.Core.Common.Models.NPCs;
+using FoundationFortune.API.Core.Common.Models.Player;
 using FoundationFortune.API.Core.Events.EventArgs.FoundationFortuneAudio;
 using FoundationFortune.API.Core.Events.EventArgs.FoundationFortuneItems;
 using FoundationFortune.API.Core.Events.EventArgs.FoundationFortuneNPCs;
@@ -85,7 +85,7 @@ public static class EventHelperMethods
     /// <param name="voiceChatSettings">The voice chat settings for the player.</param>
     public static void RegisterOnPlayerPlayedAudio(Player player, PlayerVoiceChatSettings voiceChatSettings)
     {
-        PlayerPlayedAudioEventArgs eventArgs = new PlayerPlayedAudioEventArgs(player, voiceChatSettings);
+        PlayerPlayedAudioEventArgs eventArgs = new(player, voiceChatSettings);
         FoundationFortuneAudioEvents.OnPlayerPlayedAudio(eventArgs);
     }
 
@@ -96,7 +96,7 @@ public static class EventHelperMethods
     /// <param name="voiceChatSettings">The voice chat settings for the player.</param>
     public static void RegisterOnPlayerPlayingAudio(Player player, PlayerVoiceChatSettings voiceChatSettings)
     {
-        PlayerPlayingAudioEventArgs eventArgs = new PlayerPlayingAudioEventArgs(player, voiceChatSettings);
+        PlayerPlayingAudioEventArgs eventArgs = new(player, voiceChatSettings);
         FoundationFortuneAudioEvents.OnPlayerPlayingAudio(eventArgs);
     }
 
@@ -107,7 +107,7 @@ public static class EventHelperMethods
     /// <param name="voiceChatSettings">The voice chat settings for the NPC.</param>
     public static void RegisterOnNPCPlayedAudio(PlayerMusicBotPair pair, NPCVoiceChatSettings voiceChatSettings)
     {
-        NPCPlayedAudioEventArgs eventArgs = new NPCPlayedAudioEventArgs(pair, voiceChatSettings);
+        NPCPlayedAudioEventArgs eventArgs = new(pair, voiceChatSettings);
         FoundationFortuneAudioEvents.OnNPCPlayedAudio(eventArgs);
     }
 
@@ -118,7 +118,7 @@ public static class EventHelperMethods
     /// <param name="voiceChatSettings">The voice chat settings for the NPC.</param>
     public static void RegisterOnNPCPlayingAudio(PlayerMusicBotPair pair, NPCVoiceChatSettings voiceChatSettings)
     {
-        NPCPlayingAudioEventArgs eventArgs = new NPCPlayingAudioEventArgs(pair, voiceChatSettings);
+        NPCPlayingAudioEventArgs eventArgs = new(pair, voiceChatSettings);
         FoundationFortuneAudioEvents.OnNPCPlayingAudio(eventArgs);
     }
 }
